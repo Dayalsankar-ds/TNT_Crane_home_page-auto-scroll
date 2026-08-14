@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git rev-list *)",
+      "Bash(git cat-file *)",
+      "Bash(awk '$1==\"blob\"')",
+      "Bash(sort -k3 -nr)",
+      "Bash(awk '{printf \"%.1f MB  %s\\\\n\", $3/1048576, $4}')",
+      "Bash(awk '$1==\"blob\" {split\\($3,p,\"/\"\\); dir=\\(p[2]!=\"\"? p[1]\"/\"p[2] : p[1]\\); s[dir]+=$2; tot+=$2} END {for \\(d in s\\) printf \"%8.1f MB  %s\\\\n\", s[d]/1048576, d; printf \"%8.1f MB  == TOTAL ALL BLOBS IN HISTORY ==\\\\n\", tot/1048576}')",
+      "Bash(git ls-tree *)",
+      "Bash(awk '{s+=$4} END {printf \"%.1f MB\\\\n\", s/1048576}')",
+      "Bash(awk '{print $1}')",
+      "Bash(awk '$1==\"blob\"{s+=$2; n++} END {printf \"%d blobs, %.2f GB\\\\n\", n, s/1073741824}')",
+      "Bash(awk '{print $5, $9}')",
+      "Bash(git tag *)",
+      "Bash(git checkout *)",
+      "Bash(git reset *)",
+      "Bash(awk -F/ '{print $1}')",
+      "Bash(git commit -q -m ' *)"
+    ]
+  }
+}
