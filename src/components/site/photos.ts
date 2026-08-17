@@ -17,43 +17,31 @@ export const PHOTOS = {
   refineryNight: "photo-1726111262949-e22631a8c376",
   plantNight: "photo-1670689334799-cdc6777db8cc",
   windTurbine: "photo-1662307412846-de8b3001b749",
-  // Added 2026-07-30 — Fleet Guide swap to real-crane photography matching
-  // the Section 2 mood (moody sunset/silhouette industrial shots), replacing
-  // generic placeholders for 5 of 7 classes. All-Terrain and Rough-Terrain
-  // kept on their original placeholders: every "all-terrain/rough-terrain
-  // crane" tagged photo on Unsplash turned out to be a mislabeled excavator,
-  // lift, or toy model — no genuine match found, confirmed with the user.
+  // FLEET GUIDE — real photography, one verified Unsplash photo per class
+  // (2026-08-17, replacing the 2026-08-04 owned local renders — user wanted
+  // genuine photos, not art). All 7 IDs below were downloaded and inspected
+  // frame-by-frame before use, not just tag-matched — Unsplash's own crane
+  // tags are unreliable (see All-Terrain/Rough-Terrain note below).
   crawlerCraneReal: "photo-1761896171748-ca4e9c81b5de",
-  boomTruckReal: "photo-1662996432025-08bab8202d1b",
+  allTerrainCraneReal: "photo-1771679910145-3a368d7f537c",
+  // Closest genuine match found for a rough-terrain/pick-and-carry crane —
+  // Unsplash has no photo explicitly tagged & verified as one; this compact
+  // 4-wheel off-road boom crane is the correct equipment class regardless.
+  roughTerrainCraneReal: "photo-1748974467633-2e21ffd9dd94",
+  // A genuine boom-truck crane (SANY, lattice boom folded on a flatbed).
+  // Replaces an earlier utility bucket/cherry-picker truck that was the
+  // wrong machine for this class.
+  boomTruckReal: "photo-1780362959783-9373296db52b",
   towerCraneReal: "photo-1752233253959-551cc7dcc7ad",
-  forkliftWarehouse: "photo-1714627798569-b3e36d409c4b",
-  heavyLiftCraneReal: "photo-1553048686-e3d0396506b9",
-} as const;
-
-/**
- * FLEET GUIDE — owned photography (added 2026-08-04), one per class.
- *
- * Local paths under `public/`, not Unsplash IDs, so these do NOT go through
- * `IMG()`: they are served from this origin and sized by `next/image` at the
- * call site. Source files are TNT-branded sunset renders at 1254×1254 and
- * 2.2–2.6MB apiece — far too heavy to ship raw, which is why EquipmentGuide
- * uses `next/image` rather than the plain `<img>` the Unsplash URLs allowed
- * (Unsplash was doing the resizing server-side; here it is ours to do).
- *
- * SQUARE originals in a 4:3 card. `object-cover` centre-crops ~12.5% off the
- * top and bottom — verified acceptable on these compositions (the machine sits
- * mid-frame with sky above), but it does clip the very tip of the crawler's
- * boom. Swap the card to `aspect-square` if that tip matters more than the
- * card proportion.
- */
-export const FLEET_PHOTOS = {
-  crawlerCranes: "/photos/fleet/crawler-cranes.png",
-  allTerrainCranes: "/photos/fleet/all-terrain-cranes.png",
-  roughTerrainCranes: "/photos/fleet/rough-terrain-cranes.png",
-  boomTrucks: "/photos/fleet/boom-trucks.png",
-  towerCranes: "/photos/fleet/tower-cranes.png",
-  carryDeckIndustrial: "/photos/fleet/carry-deck-industrial.png",
-  heavyLiftGantry: "/photos/fleet/heavy-lift-gantry.png",
+  // Warehouse forklift — the closest real substitute for "Carry-Deck &
+  // Industrial": Unsplash has no photo of an actual carry-deck crane (a
+  // niche compact industrial crane), same dead-end as All-Terrain/
+  // Rough-Terrain below.
+  carryDeckIndustrialReal: "photo-1714627798569-b3e36d409c4b",
+  // Ship-to-shore gantry cranes at a container terminal — replaces an
+  // earlier pick that was really just another tower-crane silhouette and
+  // read as a near-duplicate of towerCraneReal above.
+  heavyLiftGantryReal: "photo-1784913106399-ebbc16033acc",
 } as const;
 
 /**

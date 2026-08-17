@@ -30,11 +30,10 @@
  * number given in the reference image itself, kept as-is.
  */
 
-import Image from "next/image";
 import Link from "next/link";
 import { Eyebrow, Icon, type IconName } from "./primitives";
 import RevealText from "./RevealText";
-import { FLEET_PHOTOS, GRADIENTS } from "./photos";
+import { IMG, PHOTOS, GRADIENTS } from "./photos";
 import { slugify } from "./navigation";
 
 type FleetClass = {
@@ -52,7 +51,7 @@ const FLEET: FleetClass[] = [
     title: "Crawler Cranes",
     machines: "180+",
     icon: "crawler",
-    photo: FLEET_PHOTOS.crawlerCranes,
+    photo: PHOTOS.crawlerCraneReal,
     gradient: GRADIENTS.slate,
   },
   {
@@ -60,7 +59,7 @@ const FLEET: FleetClass[] = [
     title: "All-Terrain Cranes",
     machines: "210+",
     icon: "allterrain",
-    photo: FLEET_PHOTOS.allTerrainCranes,
+    photo: PHOTOS.allTerrainCraneReal,
     gradient: GRADIENTS.navy,
   },
   {
@@ -68,7 +67,7 @@ const FLEET: FleetClass[] = [
     title: "Rough-Terrain Cranes",
     machines: "130+",
     icon: "carrydeck",
-    photo: FLEET_PHOTOS.roughTerrainCranes,
+    photo: PHOTOS.roughTerrainCraneReal,
     gradient: GRADIENTS.slate,
   },
   {
@@ -76,7 +75,7 @@ const FLEET: FleetClass[] = [
     title: "Boom Trucks",
     machines: "120+",
     icon: "boom",
-    photo: FLEET_PHOTOS.boomTrucks,
+    photo: PHOTOS.boomTruckReal,
     gradient: GRADIENTS.navy,
   },
   {
@@ -84,7 +83,7 @@ const FLEET: FleetClass[] = [
     title: "Tower Cranes",
     machines: "35+",
     icon: "tower",
-    photo: FLEET_PHOTOS.towerCranes,
+    photo: PHOTOS.towerCraneReal,
     gradient: GRADIENTS.slate,
   },
   {
@@ -92,7 +91,7 @@ const FLEET: FleetClass[] = [
     title: "Carry-Deck & Industrial",
     machines: "60+",
     icon: "carrydeck",
-    photo: FLEET_PHOTOS.carryDeckIndustrial,
+    photo: PHOTOS.carryDeckIndustrialReal,
     gradient: GRADIENTS.maroon,
   },
   {
@@ -100,7 +99,7 @@ const FLEET: FleetClass[] = [
     title: "Heavy-Lift & Gantry",
     machines: "15+",
     icon: "heavylift",
-    photo: FLEET_PHOTOS.heavyLiftGantry,
+    photo: PHOTOS.heavyLiftGantryReal,
     gradient: GRADIENTS.navy,
   },
 ];
@@ -150,19 +149,16 @@ export default function EquipmentGuide() {
                 className="relative aspect-4/3 shrink-0 overflow-hidden"
                 style={{ backgroundImage: f.gradient }}
               >
-                {/* `next/image`, not a plain `<img>`: these are locally served
-                   2.2–2.6MB PNGs, and shipping them raw would be ~16MB for the
-                   section. Next resizes and re-encodes to AVIF/WebP per
-                   breakpoint. The Unsplash version could use a bare `<img>`
-                   because Unsplash resized on its side via IMG(). `sizes`
-                   mirrors the card's basis: full width, half at `sm`, quarter
-                   at `lg`. */}
-                <Image
-                  src={f.photo}
+                {/* Plain `<img>`, not `next/image`: these are Unsplash IDs run
+                   through `IMG()`, which already resizes/re-encodes on
+                   Unsplash's side — same pattern as ParallaxFrame and
+                   StickyStack's remote-photo branch. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={IMG(f.photo, 800)}
                   alt=""
-                  fill
-                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
                 {/* Fraction-index tag — the same numbered-catalog motif used
                    across the site (Fleet Guide's own heading, Case Studies'
