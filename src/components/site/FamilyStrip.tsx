@@ -28,10 +28,16 @@
  * Fixed-height / auto-width per logo, not a shared box: the marks range from
  * roughly 2:1 (TNT) to 4:1 (Southway/RMS/Eagle West), so a fixed WIDTH would
  * letterbox some and crop others. Height is what stays constant.
+ *
+ * TNT runs taller than the rest (2026-08-18, on request): it's the Primary
+ * mark now (near-square, 1200×987 — see SiteNav.tsx's docblock on the swap),
+ * so matching the row's shared height would render it noticeably smaller in
+ * WIDTH than the 2:1–4:1 marks beside it. `items-center` on the row keeps it
+ * vertically centered against them at the taller size.
  */
 
-const LOGOS: { name: string; src: string }[] = [
-  { name: "TNT Crane & Rigging", src: "/brand/tnt.png" },
+const LOGOS: { name: string; src: string; big?: boolean }[] = [
+  { name: "TNT Crane & Rigging", src: "/brand/tnt-primary.png", big: true },
   { name: "Southway Crane & Rigging", src: "/brand/southway.png" },
   { name: "RMS Cranes", src: "/brand/rms-cranes.png" },
   { name: "Eagle West Crane & Rigging", src: "/brand/eagle-west.png" },
@@ -55,7 +61,10 @@ export default function FamilyStrip() {
         </p>
         <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 lg:justify-end">
           {LOGOS.map((l) => (
-            <li key={l.name} className="flex h-8 items-center sm:h-9">
+            <li
+              key={l.name}
+              className={`flex items-center ${l.big ? "h-12 sm:h-14" : "h-8 sm:h-9"}`}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={l.src}

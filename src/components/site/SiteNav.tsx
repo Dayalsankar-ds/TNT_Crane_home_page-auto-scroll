@@ -253,21 +253,13 @@ export default function SiteNav() {
       <div onMouseLeave={scheduleClose}>
         {/* h-20 = 80px; pairs with TopInfoBar's h-10 to make CHROME_H = 120. */}
         <nav className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          {/* Wordmark — swapped Secondary → Primary mark (both from the brand
-              kit) on request, 2026-08-04. Primary is a DIFFERENT shape, not
-              just a bigger version of Secondary: it's near-square (1200×987
-              vs Secondary's 1200×579) and stacks a crane-boom illustration
-              above the "TNT" lockup, with "CRANE & RIGGING" as a thin strip at
-              the very bottom — designed for a large single placement (a
-              letterhead, a truck door), not a compact horizontal nav bar.
-              Sized to the tallest this 80px bar reasonably allows (64px, 8px
-              clearance top/bottom) to give that bottom strip its best chance,
-              but at nav scale it's still small — verify it reads before
-              treating this as final; Secondary (still at /brand/tnt.png,
-              still used in FamilyStrip + the Services panel) may simply suit
-              a nav bar's proportions better. Primary staged separately at
-              /brand/tnt-primary.png so Secondary's other call sites are
-              untouched.
+          {/* Wordmark — swapped back to Secondary mark, 2026-08-18 (traded
+              places with FamilyStrip's first logo, which now carries Primary).
+              Secondary is a DIFFERENT shape, not just a smaller version of
+              Primary: it's wide (1200×579 vs Primary's near-square 1200×987),
+              a flat "TNT" lockup with "CRANE & RIGGING" beneath — built for a
+              compact horizontal placement, which suits this 80px bar better
+              than Primary's stacked crane-boom illustration did.
 
               No white chip here, unlike the marks in the Services panel: this
               logo is drawn ON a black block, so it sits correctly against the
@@ -275,12 +267,12 @@ export default function SiteNav() {
               because it's above the fold on every route. */}
           <Link href="/" className="flex shrink-0 items-center">
             <Image
-              src="/brand/tnt-primary.png"
+              src="/brand/tnt.png"
               alt="TNT Crane &amp; Rigging — home"
               width={1200}
-              height={987}
+              height={579}
               priority
-              sizes="(min-width: 640px) 78px, 66px"
+              sizes="(min-width: 640px) 133px, 112px"
               className="h-[54px] w-auto sm:h-[64px]"
             />
           </Link>
