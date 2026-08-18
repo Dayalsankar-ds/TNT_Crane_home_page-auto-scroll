@@ -15,7 +15,7 @@
  * Renders an <a> when `href` is set, otherwise a <button>.
  */
 
-import { type ReactNode } from "react";
+import { type ReactNode, type Ref } from "react";
 import { Icon } from "./primitives";
 
 type Variant = "primary" | "secondary" | "link";
@@ -41,6 +41,7 @@ export default function Button({
   className = "",
   onClick,
   type = "button",
+  ref,
 }: {
   children: ReactNode;
   href?: string;
@@ -50,6 +51,10 @@ export default function Button({
   className?: string;
   onClick?: () => void;
   type?: "button" | "submit";
+  // React 19: function components receive `ref` as a plain prop, no
+  // forwardRef needed. Typed for both tags since the element rendered
+  // depends on `href` and the caller may want either.
+  ref?: Ref<HTMLAnchorElement | HTMLButtonElement>;
 }) {
   const skin = SKINS[`${variant}-${onDark ? "dark" : "light"}`];
   // The link variant used to get NO focus ring at all, which left every
@@ -77,11 +82,21 @@ export default function Button({
   );
 
   return href ? (
-    <a href={href} className={cls} onClick={onClick}>
+    <a
+      ref={ref as Ref<HTMLAnchorElement>}
+      href={href}
+      className={cls}
+      onClick={onClick}
+    >
       {inner}
     </a>
   ) : (
-    <button type={type} className={cls} onClick={onClick}>
+    <button
+      ref={ref as Ref<HTMLButtonElement>}
+      type={type}
+      className={cls}
+      onClick={onClick}
+    >
       {inner}
     </button>
   );
