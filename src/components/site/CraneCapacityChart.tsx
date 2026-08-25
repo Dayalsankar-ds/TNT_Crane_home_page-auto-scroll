@@ -128,8 +128,11 @@ export default function CraneCapacityChart() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="max-h-[32rem] overflow-y-auto">
+      {/* Table — `data-lenis-prevent` so a wheel over this nested scroll
+         region moves the table, not the (also-scrollable) modal behind it or
+         the locked page. Same reasoning as the dialog wrapper in
+         EquipmentFinder.tsx. */}
+      <div data-lenis-prevent className="max-h-[32rem] overflow-y-auto overscroll-contain">
         <table className="w-full border-collapse font-body text-sm">
           <thead className="sticky top-0 z-10 bg-tnt-navy">
             <tr className="border-b border-white/10 text-left text-[11px] tracking-[0.14em] text-white/50 uppercase">

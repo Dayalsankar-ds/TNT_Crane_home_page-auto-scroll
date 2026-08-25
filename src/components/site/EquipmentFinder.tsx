@@ -159,11 +159,18 @@ export default function EquipmentFinder() {
       </div>
 
       {chartOpen && (
+        // `data-lenis-prevent`: Lenis owns the wheel globally, so without it
+        // a wheel over this overlay smooth-scrolls the (locked, overflow:
+        // hidden) page behind it instead of this dialog's own content — the
+        // modal reads as stuck. Same fix as BranchLocator's branch list and
+        // LocationSelect's dropdown; the matching `overscroll-behavior` rule
+        // is in globals.css.
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="capacity-chart-heading"
-          className="fixed inset-0 z-[60] overflow-y-auto bg-black/70 p-4 py-10 sm:p-8"
+          data-lenis-prevent
+          className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-black/70 p-4 py-10 sm:p-8"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) setChartOpen(false);
           }}
