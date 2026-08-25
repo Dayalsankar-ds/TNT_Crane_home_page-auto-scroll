@@ -16,15 +16,26 @@ import RequestQuote from "@/components/site/RequestQuote";
 
 /**
  * HOMEPAGE — the shortlisted Toyota-style arc (2026-07-27 trim, 21 → 9):
- * open cinematic → declare → show the machines → catalog them (dark band) →
- * what we do → where we are → prove it → convert. Everything cut from here
- * still ships on its own route (/about, /charts, /coverage, /industries,
- * /services, /careers, /for-sale, /contact) — the footer links carry the
- * secondary audiences.
+ * open cinematic → declare → what we do → catalog the machines (dark band) →
+ * find yours → where we are → trust (iCARE) → prove it → convert. Everything
+ * cut from here still ships on its own route (/about, /charts, /coverage,
+ * /industries, /services, /careers, /for-sale, /contact) — the footer links
+ * carry the secondary audiences.
  *
  * 2026-07-30: SafetyCulture (iCARE) added as a 10th section, between "prove
  * it" and "convert" — safety credentials land best immediately before the
  * ask, not earlier in the arc.
+ *
+ * 2026-08-21: SafetyCulture moved ahead of CaseStudies, on request — safety
+ * credentials now land before the case-studies proof rather than after it.
+ *
+ * 2026-08-19: EquipmentGuide (Fleet Guide) moved to sit directly after
+ * StatementSection, on request — the catalog now follows "who we are"
+ * immediately, ahead of EquipmentFinder's single-machine search.
+ *
+ * 2026-08-19 (later same day): CoreServices moved to sit directly after
+ * StatementSection too, on request — it now lands ahead of Fleet Guide,
+ * so "what we do" follows "who we are" before the equipment catalog.
  *
  * 2026-07-30 (later same day): a slim strip added right after the hero. First
  * built as CertificationsStrip (credential chips), but couldn't get real,
@@ -50,21 +61,25 @@ export default function Home() {
         {/* Manifesto + scale — Technical Paper opening statement */}
         <StatementSection />
 
-        {/* Qualify: find the machine, then the full catalog */}
-        <EquipmentFinder /> {/* find your machine */}
+        {/* What we do — sits directly behind the About/manifesto statement
+            (2026-08-19, on request). */}
+        <CoreServices /> {/* services (compaction pending) */}
+
+        {/* Fleet catalog — dark band #1, follows Services. */}
         <EquipmentGuide /> {/* fleet catalog — dark band #1 */}
 
-        {/* What we do */}
-        <CoreServices /> {/* services (compaction pending) */}
+        {/* Qualify: full catalog seen, now find the machine */}
+        <EquipmentFinder /> {/* find your machine */}
 
         {/* Where we are */}
         <CoverageMap /> {/* nearest branch — dark band #2 (glass) */}
 
+        {/* Trust — iCARE safety program, moved ahead of Case Studies
+            (2026-08-21, on request; was right before ContactSection). */}
+        <SafetyCulture />
+
         {/* Proof — sticky-stack case studies */}
         <CaseStudies />
-
-        {/* Trust — iCARE safety program, right before the ask */}
-        <SafetyCulture />
 
         {/* Convert — the dark finale */}
         <ContactSection /> {/* reach a human */}
