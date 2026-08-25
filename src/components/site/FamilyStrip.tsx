@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * FAMILY STRIP — slim trust band, right after the hero.
  *
@@ -34,7 +36,27 @@
  * so matching the row's shared height would render it noticeably smaller in
  * WIDTH than the 2:1–4:1 marks beside it. `items-center` on the row keeps it
  * vertically centered against them at the taller size.
+ *
+ * AUTO-SCROLL ON TO ABOUT US (2026-08-20, on request; wait shortened 4s→3s
+ * same day): 3s after this strip first scrolls into view, the page carries
+ * itself on to the Statement/"About Us" section (#statement) — this is a
+ * slim logo band nobody is meant to linger on, not a stop. Lands on the
+ * section's very top so the full card grid + description fit one viewport
+ * without further scrolling (see StorySlideshow.tsx's container sizing,
+ * tuned for exactly this). One-shot, not a repeating tour: the observer
+ * disconnects itself the moment it fires once, whether the timer completes
+ * or gets cancelled, so scrolling back up to re-look at the logos later never
+ * re-triggers it. Cancels instantly on the user's own wheel or touch — same
+ * "never fight a scroll already happening" rule useHeroAutoScroll follows —
+ * and never arms at all under prefers-reduced-motion, where getLenis() is
+ * null for the whole session (no window.scrollTo fallback, same reasoning as
+ * that hook: someone who asked for less motion should not get a programmatic
+ * scroll anyway).
  */
+
+import { useEffect, useRef } from "react";
+import { getLenis } from "@/components/SmoothScroll";
+import { heroRunEase } from "@/components/useHeroAutoScroll";
 
 const LOGOS: { name: string; src: string; big?: boolean }[] = [
   { name: "TNT Crane & Rigging", src: "/brand/tnt-primary.png", big: true },
@@ -45,25 +67,94 @@ const LOGOS: { name: string; src: string; big?: boolean }[] = [
 ];
 
 export default function FamilyStrip() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    // A wheel delta under this magnitude is trackpad-inertia decay, not a
+    // deliberate new scroll — same reasoning, same value, as
+    // useHeroAutoScroll's CANCEL_DELTA. Without this floor every arrival
+    // silently cancelled itself: the very wheel gesture that carried the
+    // user down to the strip was still emitting trailing events at the
+    // instant the section crossed the intersection threshold.
+    const CANCEL_DELTA = 12;
+    // How long after arriving to wait before a wheel/touch counts as a fresh
+    // interruption rather than the tail of the arrival gesture. Inertial
+    // trackpads keep emitting small deltas for a few hundred ms after the
+    // finger lifts — this is comfortably past that.
+    const ARM_DELAY_MS = 500;
+
+    let timer = 0;
+    let armTimer = 0;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) >= CANCEL_DELTA) cancel();
+    };
+    function cancel() {
+      window.clearTimeout(timer);
+      window.clearTimeout(armTimer);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", cancel);
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect(); // one shot — never re-arms on a later visit
+
+        const lenis = getLenis();
+        if (!lenis) return; // reduced-motion: no programmatic scroll, ever
+
+        timer = window.setTimeout(() => {
+          cancel();
+          const target = document.getElementById("statement");
+          if (target) lenis.scrollTo(target, { duration: 1.5, easing: heroRunEase });
+        }, 3000);
+
+        // Arm cancellation only once the arrival gesture has had time to
+        // settle, so a genuine later scroll/touch can still interrupt it.
+        armTimer = window.setTimeout(() => {
+          window.addEventListener("wheel", onWheel, { passive: true });
+          window.addEventListener("touchstart", cancel, { passive: true });
+        }, ARM_DELAY_MS);
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(section);
+
+    return () => {
+      io.disconnect();
+      cancel();
+    };
+  }, []);
+
   return (
     // `#family` — the nav's Family of Companies link used to point at
     // /coverage; that route is gone (2026-08-04, single-page site) and this
     // strip is the only surviving place the family is shown.
-    <section id="family" className="scroll-mt-32 border-y border-black/10 bg-white">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-4 py-10 sm:px-6 sm:py-12 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+    <section
+      ref={sectionRef}
+      id="family"
+      className="scroll-mt-32 border-y border-black/10 bg-white"
+    >
+      <div className="mx-auto flex max-w-[100rem] flex-col items-center gap-8 px-20 py-10 text-center sm:py-12">
         {/* Sized up from the 13px Eyebrow spec (2026-08-04) so it reads as the
            strip's title rather than a kicker — it is the only text here and has
            a full logo row to hold its own against. Tracking eases off as the
            size climbs: 0.18em is set for 13px caps and gets gappy well before
-           20px. */}
-        <p className="font-body text-lg font-bold tracking-[0.12em] text-black uppercase sm:text-xl">
+           20px.
+           Bumped again 2026-08-19 (on request, was reading as too faint next
+           to five full-colour logos) — text-lg/xl → text-2xl/3xl, tracking
+           eased further per the note above. */}
+        <p className="font-body text-2xl font-bold tracking-[0.08em] text-black uppercase sm:text-3xl">
           TNT Family of Companies
         </p>
-        <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 lg:justify-end">
+        <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
           {LOGOS.map((l) => (
             <li
               key={l.name}
-              className={`flex items-center ${l.big ? "h-12 sm:h-14" : "h-8 sm:h-9"}`}
+              className={`flex items-center ${l.big ? "h-20 sm:h-24" : "h-14 sm:h-16"}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
