@@ -33,15 +33,33 @@ import { Icon, type IconName } from "./primitives";
 
 type Slide = {
   icon: IconName;
+  /** Overrides the glyph icon with a self-contained badge image (iCARE) —
+   *  see SafetyCulture.tsx's docblock on why the Badge variant, not a
+   *  stroke icon, is what reads on any background. */
+  badgeImg?: string;
   value: string;
   label: string;
   description: string;
 };
 
-const HERO_IMAGE = "/photos/tnt-crawler-crane-wide.jpg";
-const HERO_ALT = "TNT crawler crane on site at sunset";
+// Real TNT Crane & Rigging photography (2026-08-20, on request) — sourced
+// from tntcrane.com/wp-content/uploads/2023/09/TNT_Boom.jpg, replacing a
+// generic stock crawler-crane photo. Boom tip and hook block against sky.
+// Flipped horizontally (2026-08-20, on request) so the boom lands on the
+// open left side of the panel instead of behind it — the tradeoff, accepted
+// on request, is that the "TNT" wordmark on the boom now reads mirrored.
+const HERO_IMAGE = "/photos/tnt-crane-boom-hook.jpg";
+const HERO_ALT = "TNT crane boom and hook block against the sky";
 
 const SLIDES: Slide[] = [
+  {
+    icon: "engineering",
+    badgeImg: "/brand/icare-badge.png",
+    value: "iCARE",
+    label: "Safety Program",
+    description:
+      "iCARE is TNT's safety program — every operator, rigger, and crew member is personally accountable for the job running safely, on every lift, at every branch.",
+  },
   {
     icon: "clock",
     value: "40+",
@@ -181,7 +199,14 @@ export default function StorySlideshow() {
       {/* Photo — fixed background, identical across every slide — with the
          stat grid overlaid top-right, inset equally on top/right/bottom. */}
       <div
-        className="relative min-h-[32rem] overflow-hidden lg:min-h-[44rem]"
+        // Grown from 32/44rem (2026-08-19, iCARE card added as a 7th slide):
+        // 6 cards filled the grid in exactly 3 rows at the old heights; the
+        // 4th row now needs the extra room at every breakpoint or its bottom
+        // edge clips against the panel's `overflow-hidden`. Trimmed back down
+        // from 38/47/50rem the same day — with the card + description
+        // padding both tightened, the full section (cards + description) now
+        // fits inside common viewport heights without extra scrolling.
+        className="relative min-h-[31rem] overflow-hidden sm:min-h-[37rem] lg:min-h-[40rem]"
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -204,6 +229,15 @@ export default function StorySlideshow() {
             <dl className="grid h-full grid-cols-2">
               {SLIDES.map((s, i) => {
                 const isActive = i === index;
+                // The badge card (iCARE) leads the grid (2026-08-20, moved
+                // from the last slide to the first, on request) and spans the
+                // full width alone in its own row rather than leaving an
+                // empty cell beside it. That shifts the 2-col pairing for
+                // every card after it by one: they now pair up starting
+                // AFTER the spanning row, so the left column is the ODD
+                // indices (1, 3, 5), not the even ones. Bottom dividers still
+                // go on every row except the true last one.
+                const isFirst = i === 0;
                 return (
                   <button
                     key={s.label}
@@ -211,21 +245,32 @@ export default function StorySlideshow() {
                     onClick={() => go(i)}
                     aria-current={isActive ? "true" : undefined}
                     aria-label={`${s.label}: ${s.value}`}
-                    className={`flex flex-col items-center justify-center gap-2 px-4 py-6 text-center transition-colors duration-300 sm:gap-3 sm:py-8 ${
+                    className={`flex flex-col items-center justify-center gap-1.5 px-4 py-3 text-center transition-colors duration-300 sm:gap-2 sm:py-4 ${
                       isActive ? "bg-tnt-maroon" : ""
-                    } ${i % 2 === 0 ? "border-r border-black/10" : ""} ${
-                      i < SLIDES.length - 2 ? "border-b border-black/10" : ""
-                    }`}
+                    } ${isFirst ? "col-span-2" : ""} ${
+                      !isFirst && i % 2 === 1 ? "border-r border-black/10" : ""
+                    } ${i < SLIDES.length - 2 ? "border-b border-black/10" : ""}`}
                   >
-                    <span
-                      className={`flex h-9 w-9 items-center justify-center rounded-full border sm:h-11 sm:w-11 ${
-                        isActive
-                          ? "border-white text-white"
-                          : "border-tnt-amber text-tnt-amber"
-                      }`}
-                    >
-                      <Icon name={s.icon} className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.4} />
-                    </span>
+                    {s.badgeImg ? (
+                      // Self-contained shield mark — no circular border
+                      // wrapper, same reasoning as SafetyCulture's own badge.
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={s.badgeImg}
+                        alt=""
+                        className="h-8 w-8 object-contain sm:h-9 sm:w-9"
+                      />
+                    ) : (
+                      <span
+                        className={`flex h-8 w-8 items-center justify-center rounded-full border sm:h-9 sm:w-9 ${
+                          isActive
+                            ? "border-white text-white"
+                            : "border-tnt-amber text-tnt-amber"
+                        }`}
+                      >
+                        <Icon name={s.icon} className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.4} />
+                      </span>
+                    )}
                     <dt className="sr-only">{s.label}</dt>
                     <dd>
                       <span
@@ -251,12 +296,24 @@ export default function StorySlideshow() {
         </div>
       </div>
 
-      {/* Content panel — the slide's description on a black background,
-         directly beneath the photo/stat-grid row now that the arrows and
-         progress bar are gone; the stat cards themselves are the only
-         navigation control. Keyed on `index` so each slide change is a fresh
-         mount, which is what makes the CSS entrance animation replay. */}
-      <div className="flex items-center justify-center bg-black px-8 py-14 text-center sm:px-12 sm:py-16">
+      {/* Content panel — the slide's description, directly beneath the
+         photo/stat-grid row now that the arrows and progress bar are gone;
+         the stat cards themselves are the only navigation control. Keyed on
+         `index` so each slide change is a fresh mount, which is what makes
+         the CSS entrance animation replay.
+         bg-black restored (2026-08-19, on request) — briefly bg-tnt-maroon
+         to match SafetyCulture/iCARE, reverted back.
+         min-h fixed (2026-08-20, on request) — was purely content-driven, so
+         the panel visibly grew/shrank as the carousel auto-advanced between a
+         2-line description and iCARE's 3-line one. Heights below are the
+         EXACT measured worst case (iCARE, the longest copy) at each of the
+         text size's three breakpoints — text + padding, zero slack, same
+         methodology as the card grid's own min-h above — not rounded up,
+         because the extra headroom pushed the total section past 800px
+         viewport heights and broke the "fits without scrolling" requirement
+         that sizing was tuned for. `items-center` still centers whichever
+         text is shorter within the fixed box. */}
+      <div className="flex min-h-[170px] items-center justify-center bg-black px-8 py-3 text-center sm:min-h-[97px] sm:px-12 sm:py-4 lg:min-h-[149px]">
         <p
           key={index}
           className="story-fade-up max-w-3xl font-display text-lg leading-relaxed tracking-wide text-tnt-amber sm:text-xl lg:text-2xl"
