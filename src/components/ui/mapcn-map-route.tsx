@@ -60,17 +60,19 @@ function ensureWorker() {
   workerConfigured = true;
 }
 
-/** Premium industrial palette — black, charcoal, TNT gold. */
+/** Light "technical paper" palette (2026-08-20, on request — was a dark
+ *  black/charcoal/gold theme). Only the map's own tile colors change here;
+ *  markers keep their existing gold styling from globals.css untouched. */
 const THEME = {
   gold: "#F5A623",
   // Land must differ from the backdrop or the coastline disappears and the map
   // reads as a flat rectangle.
-  backdrop: "#0C0C0C",
-  land: "#1B1B1B", // charcoal
-  water: "#050505", // near black
-  road: "#2E2E2E", // dark gray
-  label: "#9A9A9A", // light gray
-  labelHalo: "#000000",
+  backdrop: "#E9ECED", // tnt-paper — cool technical-paper base
+  land: "#F7F6F2", // warm near-white
+  water: "#D7DEE1", // light cool blue-gray, distinct from land
+  road: "#B7B7B7", // medium gray, visible on light land without overpowering
+  label: "#242424", // near-black, for legibility on a light basemap
+  labelHalo: "#FFFFFF",
 };
 
 /** US + Canada. Excludes the far Arctic so the fit isn't mostly empty ice. */
@@ -299,7 +301,13 @@ export function BranchMap({
       if (!map) return;
       map.flyTo({
         center: [b.lng, b.lat],
-        zoom: Math.max(map.getZoom(), 5.2),
+        // 5.2 (was) is a whole-state-plus view — fine inland, but every
+        // coastal branch (Houston, Corpus Christi, Baton Rouge, Long Beach,
+        // Seattle, Vancouver) reads as floating in open water at that zoom,
+        // because the basemap's coastline is heavily generalized that far
+        // out. 9 is close enough to show streets/city context, which is what
+        // actually confirms the pin sits on land in the right place.
+        zoom: Math.max(map.getZoom(), 9),
         duration: reduced ? 0 : 1100,
         essential: true,
       });
@@ -330,7 +338,7 @@ export function BranchMap({
       ref={hostRef}
       role="application"
       aria-label="Map of TNT Crane & Rigging branches across the United States and Canada"
-      className={`tnt-map relative overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B0B] ${className}`}
+      className={`tnt-map relative overflow-hidden rounded-2xl border border-black/10 bg-[#E9ECED] ${className}`}
     />
   );
 }
