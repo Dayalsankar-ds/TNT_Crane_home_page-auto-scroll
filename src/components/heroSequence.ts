@@ -1,20 +1,23 @@
 /**
  * HERO FRAME SEQUENCE — which image sequence the scroll-scrub hero plays.
  *
- * Only the active sequence ships. Two earlier cuts (V1, a dark crawler-crane
- * sequence; V2, a tower crane over a city skyline) were removed on 2026-08-06
- * to shrink the repo — their frames and masters are no longer in the project.
- * V3 (JPEG) was replaced by V4 (WebP, same scene) on 2026-08-17; its frames
- * remain in public/video/frames-v3 but are unreferenced. V4 was replaced by
- * V5 on 2026-08-25; its frames remain in public/video/frames-v4, also
- * unreferenced now.
+ * Only the active sequence ships — everything else is fully removed, not
+ * just unreferenced, to keep the project folder to just what's live. V1
+ * (dark crawler-crane) and V2 (tower crane over a city skyline) went this
+ * way on 2026-08-06. V3 (JPEG, replaced by V4 on 2026-08-17) and V4 (WebP,
+ * replaced by V5 on 2026-08-25) followed the same day V5 shipped: their
+ * `public/video/frames-v3` / `frames-v4` directories and their masters
+ * (previously the repo-root `Video/` folder — itself outside public/,
+ * same reasoning as below, but still inside the project folder) were moved
+ * out to `../hero-video-archive` (a sibling of the project directory) on
+ * request, to shrink the project folder rather than the repo specifically —
+ * `Video/` was already gitignored, so this didn't change what git tracked.
+ * Their `HeroSequence` consts were deleted here too, once nothing in
+ * public/ backed them.
  *
- * Masters live outside public/ (anything under public/ is served to browsers),
- * and are not kept in this repo. V5's masters ("Clip 01.mp4" / "Clip 02.mp4",
- * supplied 2026-08-25) were extracted straight from
- * `Video/Updated video/` at the repo root, which is itself outside public/
- * for the same reason — worth moving out of the repo entirely if that
- * directory sticks around.
+ * Masters live outside public/ (anything under public/ is served to
+ * browsers) — now genuinely outside the project folder entirely, per the
+ * above, rather than merely gitignored-but-present.
  *
  * Re-encode with scripts/encode-hero-frames.sh, passing the master directory
  * as its first argument — NOTE this script is stale, JPEG-only, and expects
@@ -42,35 +45,6 @@ export type HeroSequence = {
 };
 
 /**
- * "Hero Section 3": drone flythrough over a TNT job site at dusk (crawler
- * crane setting a load, aerial site pass), resolving to the TNT Crane &
- * Rigging logo above the clouds. 386 4K frames, Adobe Media Encoder export,
- * at ~1vh of scroll per frame.
- */
-export const SEQUENCE_V3: HeroSequence = {
-  dir: "/video/frames-v3",
-  start: 0,
-  count: 386,
-  ext: "jpg",
-  sectionVh: 480,
-};
-
-/**
- * "Hero Section 4": same dusk drone-flythrough/logo-reveal scene as V3, re-cut
- * from its two source clips and re-encoded as WebP (2026-08-17) — 314 frames
- * at 1280px wide, ~22MB total versus V3's 386 JPEG frames at ~51MB. `sectionVh`
- * is kept identical to V3 so the scroll-trigger mechanics (pin distance,
- * auto-scroll arm/disarm points) are unchanged; only the image asset differs.
- */
-export const SEQUENCE_V4: HeroSequence = {
-  dir: "/video/frames-v4",
-  start: 0,
-  count: 314,
-  ext: "webp",
-  sectionVh: 480,
-};
-
-/**
  * "Hero Section 5" (2026-08-25, on request): new footage entirely — two
  * fresh source clips ("Clip 01.mp4", 8.08s; "Clip 02.mp4", 4.09s, both
  * 1920×1080 @ 24fps with audio) concatenated in numeric order into one
@@ -87,6 +61,10 @@ export const SEQUENCE_V4: HeroSequence = {
  * ~20MB total. `sectionVh` is scaled from V4's 480vh by the frame-count
  * ratio (480 × 290⁄314 ≈ 443) to preserve the same ~1.53vh-per-frame scrub
  * pace rather than carrying V4's absolute value over unchanged.
+ *
+ * V5's own masters ("Clip 01.mp4" / "Clip 02.mp4") have since moved too —
+ * see this file's top docblock — from the repo-root `Video/Updated video/`
+ * to `../hero-video-archive/masters/Updated video/`.
  */
 export const SEQUENCE_V5: HeroSequence = {
   dir: "/video/frames-v5",

@@ -17,49 +17,89 @@ export const PHOTOS = {
   refineryNight: "photo-1726111262949-e22631a8c376",
   plantNight: "photo-1670689334799-cdc6777db8cc",
   windTurbine: "photo-1662307412846-de8b3001b749",
-  // FLEET GUIDE — real photography, one verified Unsplash photo per class
-  // (2026-08-17, replacing the 2026-08-04 owned local renders — user wanted
-  // genuine photos, not art). All 7 IDs below were downloaded and inspected
-  // frame-by-frame before use, not just tag-matched — Unsplash's own crane
-  // tags are unreliable (see All-Terrain/Rough-Terrain note below).
-  crawlerCraneReal: "photo-1761896171748-ca4e9c81b5de",
-  allTerrainCraneReal: "photo-1771679910145-3a368d7f537c",
-  // Closest genuine match found for a rough-terrain/pick-and-carry crane —
-  // Unsplash has no photo explicitly tagged & verified as one; this compact
-  // 4-wheel off-road boom crane is the correct equipment class regardless.
-  roughTerrainCraneReal: "photo-1748974467633-2e21ffd9dd94",
-  // A genuine boom-truck crane (SANY, lattice boom folded on a flatbed).
-  // Replaces an earlier utility bucket/cherry-picker truck that was the
-  // wrong machine for this class.
-  boomTruckReal: "photo-1780362959783-9373296db52b",
-  towerCraneReal: "photo-1752233253959-551cc7dcc7ad",
-  // Warehouse forklift — the closest real substitute for "Carry-Deck &
-  // Industrial": Unsplash has no photo of an actual carry-deck crane (a
-  // niche compact industrial crane), same dead-end as All-Terrain/
-  // Rough-Terrain below.
-  carryDeckIndustrialReal: "photo-1714627798569-b3e36d409c4b",
-  // Ship-to-shore gantry cranes at a container terminal — replaces an
-  // earlier pick that was really just another tower-crane silhouette and
-  // read as a near-duplicate of towerCraneReal above.
-  heavyLiftGantryReal: "photo-1784913106399-ebbc16033acc",
+  // RIGGING & ATTACHMENTS — see RIGGING_PHOTOS below for the real,
+  // locally-hosted set added 2026-08-26 (later same day). This Unsplash-only
+  // set was the FIRST pass and undersold what's actually available: Unsplash
+  // genuinely has poor rigging-hardware coverage, but that conclusion never
+  // should have generalized to "only 3 categories possible" — tntcrane.com
+  // and rmscranes.com's own service pages, not checked at the time, turned
+  // out to have plenty. overheadBridgeCraneReal is the one category still
+  // without a found real substitute, so it's the only survivor still in use.
+  hookBlockReal: "photo-1718738002405-b149aac720bf",
+  gantryCraneReal: "photo-1781156215091-4133052708d0",
+  overheadBridgeCraneReal: "photo-1784916313628-d6525ab2199f",
 } as const;
 
 /**
- * CASE STUDIES — owned photography (added 2026-08-04), one per job.
+ * RIGGING & ATTACHMENTS — real TNT/RMS photography (2026-08-26, correcting
+ * the Unsplash-only pass above). Sourced from tntcrane.com and rmscranes.com
+ * (RMS Cranes is "A TNT Company") service pages, downloaded and inspected
+ * before use:
+ *   - hydraulicGantry: TNT-branded hydraulic gantry setting a heavy
+ *     concrete/vessel-sized load (tntcrane.com, Gantry_Banner — a wider crop
+ *     of the same job CASE_PHOTOS.petrochemicalVesselPlacement uses)
+ *   - cantileverSpreaderBar: a TNT-branded cantilever bar rigged off a
+ *     crawler crane's hook, lifting flush against a high-rise facade
+ *     (tntcrane.com, Rigging_Cantilever_Old_1) — stands in for
+ *     below-the-hook lifting devices generally, since a cantilever bar is
+ *     one, rather than keeping a separate, less specific Unsplash card for
+ *     the same equipment family
+ *   - spmtModularTransport: a Goldhofer SPMT hauling a large transformer
+ *     (tntcrane.com, Rigging_Goldhofer_SPMT_Transformer_2025_1)
+ *   - jackAndSlide: a jack-and-slide operation leveling equipment on skid
+ *     rails, RMS-stenciled timber cribbing visible (tntcrane.com,
+ *     Rigging_Jacking_Sliding_2025_1)
+ *   - versaLiftMachineryMoving: a TNT-branded Versa-Lift moving a
+ *     Siemens transformer (tntcrane.com, TNT-Machinery-Moving_Versa-Lift-
+ *     25-35_Siemens_2560x1440)
+ *
+ * NOT included: a photo filed under "…Personnel…" (Rigging_Buda_Manitou_
+ * Personnel) turned out to show a Manitou forklift loading HVAC units, not
+ * a man-basket/personnel platform — the filename was misleading. Using it
+ * under a "Personnel Lift" label would have mislabeled real footage, which
+ * is worse than the label not existing, so it was left out rather than
+ * force-fit.
+ */
+export const RIGGING_PHOTOS = {
+  hydraulicGantry: "/photos/rigging/hydraulic-gantry.jpg",
+  cantileverSpreaderBar: "/photos/rigging/cantilever-spreader-bar.jpg",
+  spmtModularTransport: "/photos/rigging/spmt-modular-transport.jpg",
+  jackAndSlide: "/photos/rigging/jack-and-slide.jpg",
+  versaLiftMachineryMoving: "/photos/rigging/versa-lift-machinery-moving.jpg",
+} as const;
+
+/**
+ * CASE STUDIES — real TNT photography, one per job (2026-08-26, replacing
+ * the earlier three generic stock renders + one Unsplash placeholder — none
+ * of the four previously showed actual TNT equipment on a real job site).
+ * All four sourced from tntcrane.com's own uploads (one, the wind farm
+ * erection, from rmscranes.com — RMS Cranes is "A TNT Company"), downloaded
+ * and inspected before use, same rigor as the Fleet Guide photos:
+ *   - refineryReactorExchange: a Liebherr LR1500 crawler crane rigged at a
+ *     refinery/gas-plant site (tntcrane.com, Heavy-Lift_Demethanizer-Lift-1)
+ *   - windFarmTurbineErection: two crawler cranes stepping a wind-tower
+ *     section into place, blades and nacelle staged nearby (rmscranes.com,
+ *     RMS-Cranes-Wind-Tower-Construction)
+ *   - bridgeGirderSet: a TNT-branded all-terrain crane setting a girder
+ *     over water (tntcrane.com, 900-Ton_Bridge-Girders_2024) — this job
+ *     previously had no real photo at all and ran on an Unsplash placeholder
+ *   - petrochemicalVesselPlacement: a TNT-branded hydraulic gantry lifting a
+ *     vessel-sized load (tntcrane.com, Gantry_Old_1)
+ *
+ * None is an exact tonnage/technique match for its story's copy (the copy
+ * itself is still placeholder narrative per this file's other case-photo
+ * notes) — each is a genuine TNT job in the right category (refinery/plant,
+ * wind, bridge, gantry), not a fabricated or mismatched stand-in.
  *
  * Local paths, same arrangement as FLEET_PHOTOS: not Unsplash IDs, so these
- * bypass `IMG()` and are sized by `next/image` at the call site (originals are
- * ~1370×1147 and 1.8–2.3MB each).
- *
- * TNT-211 "Bridge Girder Set" is ABSENT — only three of the four jobs were
- * supplied. It stays on its Unsplash placeholder until a real one arrives,
- * which is why StickyStack still carries the remote-image path.
+ * bypass `IMG()` and are sized by `next/image` at the call site.
  */
 export const CASE_PHOTOS = {
-  refineryReactorExchange: "/photos/cases/tnt-142-refinery-reactor-exchange.png",
-  windFarmTurbineErection: "/photos/cases/tnt-098-wind-farm-turbine-erection.png",
+  refineryReactorExchange: "/photos/cases/tnt-142-refinery-reactor-exchange.jpg",
+  windFarmTurbineErection: "/photos/cases/tnt-098-wind-farm-turbine-erection.jpg",
+  bridgeGirderSet: "/photos/cases/tnt-211-bridge-girder-set.jpg",
   petrochemicalVesselPlacement:
-    "/photos/cases/tnt-176-petrochemical-vessel-placement.png",
+    "/photos/cases/tnt-176-petrochemical-vessel-placement.jpg",
 } as const;
 
 // Tonal fallbacks shown behind each photo — a dead URL degrades to a gradient,

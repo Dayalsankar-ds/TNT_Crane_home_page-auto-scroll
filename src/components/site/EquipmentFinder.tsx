@@ -7,8 +7,11 @@
  * the left, headline + Operated/Bare rental-model cards on the right.
  *
  * The 01–04 sticky equipment stack that used to follow was removed 2026-07-27:
- * its classes duplicated EquipmentGuide (now the single fleet catalog), and
+ * its classes duplicated EquipmentGuide (the fleet catalog, at the time), and
  * the sticky-stack mechanism moved to CaseStudies.tsx with proof content.
+ * EquipmentGuide itself was later replaced with a rigging/attachments
+ * catalog (2026-08-26) — this section's own capacity chart is now the only
+ * place the fleet's classes and capacities are browsable.
  *
  * The full capacity chart (CraneCapacityChart) opens from a button here as a
  * modal (2026-08-18) rather than rendering inline in the section — on
@@ -79,10 +82,14 @@ export default function EquipmentFinder() {
       <div className="bg-white">
         <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
           <div className="grid items-stretch gap-10 lg:grid-cols-2 lg:gap-16">
-            {/* LEFT — tall photo, full column height, sharp corners. Demo stock
-               (a fleet of cranes, matching the "which machine" question) with a
-               gradient behind it, so a dead image degrades to tone rather than a
-               broken icon. Swap the PHOTOS id for owned fleet photography. */}
+            {/* LEFT — tall photo, full column height, sharp corners. Real TNT
+               photography (2026-08-26, replacing "demo stock" — sourced from
+               tntcrane.com/wp-content/uploads/2023/10/TNT_Crawler_Union-
+               Pacific.jpg, downloaded and inspected before use, same rigor
+               as the other real photos on this site): a TNT crawler crane
+               setting a bridge girder, real crew in the frame. Gradient
+               behind it so a dead image degrades to tone rather than a
+               broken icon. */}
             <div className="order-1">
               <CursorReadout variant="coords" className="h-full">
                 <div
@@ -91,8 +98,8 @@ export default function EquipmentFinder() {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/photos/find-your-machine.jpg"
-                    alt="TNT crawler crane at a job site at sunset"
+                    src="/photos/tnt-crawler-bridge-lift.jpg"
+                    alt="TNT crawler crane setting a bridge girder at a job site"
                     className="aspect-4/5 h-full w-full object-cover sm:aspect-3/4 lg:aspect-auto"
                   />
                 </div>

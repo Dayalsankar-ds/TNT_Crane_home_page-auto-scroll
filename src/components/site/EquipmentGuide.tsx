@@ -1,132 +1,137 @@
 "use client";
 
 /**
- * EQUIPMENT GUIDE — the mid-page DARK BAND of the Technical Paper rhythm.
+ * RIGGING & ATTACHMENTS — the mid-page DARK BAND of the Technical Paper
+ * rhythm. Formerly "Fleet Guide": a 7-card catalog of crane CLASSES
+ * (Crawler, All-Terrain, Tower, …). Replaced entirely (2026-08-26, on
+ * request) with a catalog of rigging equipment/attachments instead — same
+ * card UI, same checkbox-compare mechanic, different subject.
  *
- * Laid out 4-then-3-centred since 2026-08-04 — see the note on the wrapper.
+ * 6 CARDS, UP FROM AN INITIAL 3 (2026-08-26, later same day) — the first
+ * pass concluded "only 3 categories have a real photo" from Unsplash search
+ * results alone, which was too hasty: tntcrane.com and rmscranes.com's own
+ * service pages (RMS Cranes is "A TNT Company") turned out to have real,
+ * verified photography for several more categories, found on a asked-for
+ * cross-check. Each card ties to a real service CoreServices.tsx already
+ * claims, still nothing invented — see photos.ts's RIGGING_PHOTOS docblock
+ * for exactly which real job backs each card:
+ *   - Hydraulic Gantry Systems → "Hydraulic gantries… where a crane can't
+ *     reach" (Specialized Rigging blurb)
+ *   - Cantilever & Spreader Bar Rigging → the same Specialized Rigging
+ *     service's below-the-hook/custom-fixture side (this replaces the
+ *     original "Below-the-Hook Lifting Devices" card: a cantilever bar IS a
+ *     below-the-hook device, and now has a real photo of one instead of a
+ *     generic Unsplash hook-block standing in for the category)
+ *   - In-Plant Overhead Rigging → machinery moves inside facilities that
+ *     already run their own bridge cranes (Machinery Moving blurb) — still
+ *     the one category without a found real photo; kept on its Unsplash
+ *     fallback rather than dropped
+ *   - SPMT & Modular Transport → self-propelled modular transporters, the
+ *     heavy-haul side of Machinery Moving
+ *   - Jack-and-Slide Systems → named explicitly in the Specialized Rigging
+ *     blurb ("jack-and-slide, and precision skidding")
+ *   - Versa-Lift Machinery Moving → the Machinery Moving service's toe-jack/
+ *     rigging-dolly equipment, TNT-branded in the photo itself
+ * A sixth candidate (a photo filed under "…Personnel…") was left out on
+ * inspection — it showed a forklift loading HVAC units, not a man-basket/
+ * personnel platform the filename implied. Mislabeling real footage is worse
+ * than not having the category, so it's absent rather than force-fit.
  *
- * 2026-07-30: rebuilt as a 7-card photo grid, replacing the previous single
- * crossfading stage + giant dim/bright hover list (user's own words: "I don't
- * want that listing"). Reference was a single card screenshot — photo, a
- * solid dark footer bar with an icon + title + machine count on the left, and
- * a large amber arrow tile flush right.
+ * No machine counts or capacity ranges here — unlike the old crane-class
+ * cards (which had navigation.ts's real "80–750 T" figures to draw on),
+ * there is no equivalent honest numeric figure for these categories, so the
+ * footer carries a description instead and the compare view shows
+ * descriptions side by side rather than fabricating numbers to fill the
+ * old dl layout.
  *
- * This drops a fair amount of machinery the old version needed and this one
- * doesn't: there is no more "active" class, so the crossfade stage, the
- * hover-intent debounce, and the whole hash→active-index selection dance
- * (useHashTarget, pointer-liveness tracking) are gone. What MUST survive
- * unchanged is the deep-link anchor contract — the nav's Equipment mega panel
- * links straight to `/equipment#crawler-cranes` etc. for all 7 classes, plus
- * `/equipment#fleet-guide` for the group header (see navigation.ts). A plain
- * per-card `id={slugify(title)}` plus the section's own `id="fleet-guide"`
- * satisfies that with the browser's native anchor scroll — no JS required.
+ * NAV IMPACT: navigation.ts's Equipment mega panel "Fleet Classes" column
+ * pointed at 7 old class anchors, then 3 rigging ones; it was updated again
+ * alongside this file to list all 6 current categories, so the panel
+ * doesn't link to stale ids. The section itself keeps `id="fleet-guide"` —
+ * the nav group's own `href` target — since renaming that anchor would need
+ * touching every place that links to the group, not just its sub-items.
  *
- * Icons reuse the exact glyphs navigation.ts already assigns each class in
- * the nav dropdown, so the same machine reads with the same icon in both
- * places.
- *
- * Machine counts are PLACEHOLDERS (no real per-class fleet data exists yet —
- * today's other data is capacity ranges like "80–750 T", not counts). Chosen
- * to roughly sum to the "750 cranes" figure quoted elsewhere on the site;
- * swap for real numbers when available. Crawler Cranes' 180+ is the one
- * number given in the reference image itself, kept as-is.
- *
- * COMPARE (2026-08-21, on request): the cards used to be `<Link href=
- * "#fleet-guide">` — the whole card as a hit area for an anchor that just
- * scrolled back to this section's own heading, a placeholder with no real
- * destination (there's no per-class detail page). That's gone. Each card is
- * now a plain container with a real checkbox in the corner the arrow tile
- * used to occupy; checking 2+ opens a compare view. `capacityRange` is NOT
- * invented for this — it's the same "80–750 T"-style figures navigation.ts's
- * Equipment panel already carries per class, copied here rather than
- * imported, matching how the icons are already duplicated rather than
- * cross-imported from that file.
+ * Card UI/compare mechanic docs below are otherwise unchanged from Fleet
+ * Guide's own history — see git log for the checkbox-vs-decorative-arrow
+ * background if that ever needs re-litigating.
  */
 
 import { useEffect, useRef, useState } from "react";
 import { Eyebrow, Icon, type IconName } from "./primitives";
 import RevealText from "./RevealText";
-import { IMG, PHOTOS, GRADIENTS } from "./photos";
+import { IMG, PHOTOS, RIGGING_PHOTOS, GRADIENTS } from "./photos";
 import { slugify } from "./navigation";
 
-type FleetClass = {
+type RiggingCategory = {
   index: string;
   title: string;
-  machines: string;
-  /** Real figure — see navigation.ts's Equipment panel, same source. */
-  capacityRange: string;
+  description: string;
   icon: IconName;
-  photo: string;
+  /** Unsplash fallback id — only set where no real photo has been found. */
+  photo?: string;
+  /** Real, locally-hosted photo (RIGGING_PHOTOS) — used over `photo` when present. */
+  localPhoto?: string;
   gradient: string;
 };
 
-const FLEET: FleetClass[] = [
+const RIGGING: RiggingCategory[] = [
   {
     index: "01",
-    title: "Crawler Cranes",
-    machines: "180+",
-    capacityRange: "80–750 T",
-    icon: "crawler",
-    photo: PHOTOS.crawlerCraneReal,
-    gradient: GRADIENTS.slate,
-  },
-  {
-    index: "02",
-    title: "All-Terrain Cranes",
-    machines: "210+",
-    capacityRange: "75–900 T",
-    icon: "allterrain",
-    photo: PHOTOS.allTerrainCraneReal,
+    title: "Hydraulic Gantry Systems",
+    description:
+      "Rail-mounted and hydraulic gantries for repeat heavy lifts in one fixed working area — ports, yards, and fabrication shops.",
+    icon: "heavylift",
+    localPhoto: RIGGING_PHOTOS.hydraulicGantry,
     gradient: GRADIENTS.navy,
   },
   {
-    index: "03",
-    title: "Rough-Terrain Cranes",
-    machines: "130+",
-    capacityRange: "15–150 T",
-    icon: "carrydeck",
-    photo: PHOTOS.roughTerrainCraneReal,
+    index: "02",
+    title: "Cantilever & Spreader Bar Rigging",
+    description:
+      "Custom cantilever bars and spreader beams for loads a standard hook can't rig safely — set flush against structure where clearance is tight.",
+    icon: "rigging",
+    localPhoto: RIGGING_PHOTOS.cantileverSpreaderBar,
     gradient: GRADIENTS.slate,
   },
   {
+    index: "03",
+    title: "In-Plant Overhead Rigging",
+    description:
+      "Machinery moves and precision positioning inside facilities already running their own overhead bridge cranes.",
+    icon: "engineering",
+    photo: PHOTOS.overheadBridgeCraneReal,
+    gradient: GRADIENTS.maroon,
+  },
+  {
     index: "04",
-    title: "Boom Trucks",
-    machines: "120+",
-    capacityRange: "10–50 T",
-    icon: "boom",
-    photo: PHOTOS.boomTruckReal,
+    title: "SPMT & Modular Transport",
+    description:
+      "Self-propelled modular transporters for the heaviest, most awkward loads — hydraulic axles that steer independently for millimetre placement.",
+    icon: "transport",
+    localPhoto: RIGGING_PHOTOS.spmtModularTransport,
     gradient: GRADIENTS.navy,
   },
   {
     index: "05",
-    title: "Tower Cranes",
-    machines: "35+",
-    capacityRange: "5–40 T",
-    icon: "tower",
-    photo: PHOTOS.towerCraneReal,
+    title: "Jack-and-Slide Systems",
+    description:
+      "Hydraulic jacking and skid rails for loads too heavy or awkward to crane — set down, levelled, and walked into final position.",
+    icon: "heavylift",
+    localPhoto: RIGGING_PHOTOS.jackAndSlide,
     gradient: GRADIENTS.slate,
   },
   {
     index: "06",
-    title: "Carry-Deck & Industrial",
-    machines: "60+",
-    capacityRange: "8–25 T",
-    icon: "carrydeck",
-    photo: PHOTOS.carryDeckIndustrialReal,
+    title: "Versa-Lift Machinery Moving",
+    description:
+      "Toe-jack rigging dollies for plant relocation — transformers, switchgear, and process equipment moved without a crane pick.",
+    icon: "rental",
+    localPhoto: RIGGING_PHOTOS.versaLiftMachineryMoving,
     gradient: GRADIENTS.maroon,
-  },
-  {
-    index: "07",
-    title: "Heavy-Lift & Gantry",
-    machines: "15+",
-    capacityRange: "Up to 1,300 T",
-    icon: "heavylift",
-    photo: PHOTOS.heavyLiftGantryReal,
-    gradient: GRADIENTS.navy,
   },
 ];
 
-const TOTAL = String(FLEET.length).padStart(2, "0");
+const TOTAL = String(RIGGING.length).padStart(2, "0");
 
 /** Inline, not the shared Icon set — same call EquipmentFinder's modal close
  *  button already made for a one-off glyph nothing else in the site needs. */
@@ -157,7 +162,7 @@ export default function EquipmentGuide() {
     });
   };
 
-  const selectedClasses = FLEET.filter((f) => selected.has(f.index));
+  const selectedCategories = RIGGING.filter((r) => selected.has(r.index));
 
   // Same lock/focus/Escape pattern as EquipmentFinder's capacity-chart modal.
   useEffect(() => {
@@ -180,43 +185,32 @@ export default function EquipmentGuide() {
     <section id="fleet-guide" className="bg-tnt-navy text-white">
       <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
         <div className="max-w-3xl">
-          <Eyebrow>Fleet Guide</Eyebrow>
+          <Eyebrow>Rigging &amp; Attachments</Eyebrow>
           <RevealText
             as="h2"
             barClassName="bg-tnt-amber"
-            text="Seven Hundred Fifty Cranes. Seven Classes."
+            text="The Gear Behind Every Lift."
             className="mt-4 font-display text-5xl leading-[0.95] tracking-tight text-white uppercase sm:text-7xl"
           />
           <p className="mt-4 font-body text-sm text-white/60 sm:text-base">
-            Check any classes you need and compare their rated capacity side
-            by side.
+            Check any categories you need and compare them side by side.
           </p>
         </div>
 
-        {/* FLEX, not grid (2026-08-04). Seven cards over a 3-col grid ran
-            3/3/1; this runs 4 then 3, LEFT-aligned — the leftover row starts
-            at the same edge as the row above it rather than centring under it
-            (was `justify-center` briefly the same day). Row one fills the
-            width, so `justify-start` only has any effect on the short row.
-            Card widths are basis calcs that subtract the gutters: at `lg`,
-            four cards leave three 24px gaps, hence 25% − 18px. Keep the basis
-            values in step with `gap-6`. */}
+        {/* FLEX, not grid (2026-08-04, carried over from Fleet Guide). At 3
+            cards this never wraps to a short leftover row the way 7 did, but
+            the basis math is kept identical so a 4th category can drop in
+            later without redoing the layout. */}
         <div className="mt-16 flex flex-wrap justify-start gap-6">
-          {FLEET.map((f) => {
-            const isChecked = selected.has(f.index);
+          {RIGGING.map((r) => {
+            const isChecked = selected.has(r.index);
             return (
               <div
-                key={f.index}
+                key={r.index}
                 // Deep-link target for the nav's Equipment panel — see
-                // docblock. Was on the card's <Link>; a plain element with an
-                // id and scroll-mt is exactly as valid an anchor target.
-                id={slugify(f.title)}
-                // `flex flex-col` so the footer can claim the leftover
-                // height: flex-wrap stretches the CARDS in a row to equal
-                // height, but not their contents, so a one-line title (Boom
-                // Trucks, Tower Cranes) used to leave its amber tile
-                // floating short of the card's bottom edge while its
-                // two-line neighbours reached it.
+                // docblock. A plain element with an id and scroll-mt is
+                // exactly as valid an anchor target as the old <Link> was.
+                id={slugify(r.title)}
                 className={`group flex basis-full flex-col scroll-mt-32 overflow-hidden rounded-2xl border bg-black transition-[transform,border-color] duration-300 ease-out hover:-translate-y-1 sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(25%-1.125rem)] ${
                   isChecked
                     ? "border-tnt-amber"
@@ -225,83 +219,50 @@ export default function EquipmentGuide() {
               >
                 {/* Photo */}
                 <div
-                  // `shrink-0`: the photo holds its 4:3 ratio and the footer
-                  // absorbs the height difference, never the other way round.
                   className="relative aspect-4/3 shrink-0 overflow-hidden"
-                  style={{ backgroundImage: f.gradient }}
+                  style={{ backgroundImage: r.gradient }}
                 >
-                  {/* Plain `<img>`, not `next/image`: these are Unsplash IDs
-                     run through `IMG()`, which already resizes/re-encodes on
-                     Unsplash's side — same pattern as ParallaxFrame and
-                     StickyStack's remote-photo branch. */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={IMG(f.photo, 800)}
+                    src={r.localPhoto ?? IMG(r.photo ?? "", 800)}
                     alt=""
                     loading="lazy"
                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  {/* Fraction-index tag — the same numbered-catalog motif
-                     used across the site (Fleet Guide's own heading, Case
-                     Studies' job codes, the Statement slideshow's progress
-                     track). */}
                   <span className="absolute top-4 left-4 rounded-full bg-black/60 px-3 py-1 font-mono text-[11px] tracking-[0.14em] text-white/80 tabular-nums backdrop-blur-sm">
-                    <span className="text-tnt-amber">{f.index}</span> / {TOTAL}
+                    <span className="text-tnt-amber">{r.index}</span> / {TOTAL}
                   </span>
                 </div>
 
-                {/* Footer bar — icon + title/count/capacity on the left,
-                   compare checkbox tile right (was a decorative arrow — the
-                   whole card used to be the link this tile pointed nowhere
-                   real for; now it's the card's one real control).
-                   `flex-1` makes it eat the card's leftover height so the
-                   tile always lands flush on the bottom edge, whatever the
-                   title wrapped to. */}
+                {/* Footer bar — icon + title/description on the left, compare
+                   checkbox tile right. `flex-1` makes it eat the card's
+                   leftover height so the tile always lands flush on the
+                   bottom edge, whatever the title/description wrapped to. */}
                 <div className="flex flex-1 items-stretch justify-between gap-3 bg-black">
-                  {/* `min-w-0` so this column can be narrower than its
-                     nowrap title if a future label outgrows the slot —
-                     without it the flex item refuses to shrink and pushes
-                     the tile off the card instead of just clipping. */}
                   <div className="flex min-w-0 items-center gap-3 px-4 py-5">
                     <Icon
-                      name={f.icon}
+                      name={r.icon}
                       className="h-8 w-8 shrink-0 text-tnt-amber"
                       strokeWidth={1.5}
                     />
                     <div>
-                      {/* SINGLE LINE at every breakpoint. Measured at the
-                         4-across width the slot is ~142px once the tile,
-                         icon and padding above are trimmed, while the
-                         longest title ("Carry-Deck & Industrial") needs
-                         170px at the old 18px — hence the step down to 14px,
-                         which brings it to 132px and leaves ~10px of margin.
-                         `text-lg` returns only if the cards get wider again.
-                         The reserved two-line min-height this replaced is no
-                         longer needed: every title is one line, so the
-                         machine counts align by construction. */}
-                      <h3 className="truncate font-display text-sm leading-tight tracking-wide text-white uppercase">
-                        {f.title}
+                      <h3 className="font-display text-sm leading-tight tracking-wide text-white uppercase">
+                        {r.title}
                       </h3>
-                      <p className="mt-1 font-body text-sm">
-                        <span className="font-bold text-tnt-amber">
-                          {f.machines}
-                        </span>{" "}
-                        <span className="text-white/50">Machines</span>
-                      </p>
-                      <p className="font-body text-[11px] text-white/40">
-                        {f.capacityRange}
+                      <p className="mt-1.5 font-body text-[12px] leading-snug text-white/50">
+                        {r.description}
                       </p>
                     </div>
                   </div>
 
                   <button
                     type="button"
-                    onClick={() => toggle(f.index)}
+                    onClick={() => toggle(r.index)}
                     aria-pressed={isChecked}
                     aria-label={
                       isChecked
-                        ? `Remove ${f.title} from comparison`
-                        : `Add ${f.title} to comparison`
+                        ? `Remove ${r.title} from comparison`
+                        : `Add ${r.title} to comparison`
                     }
                     className={`flex w-14 shrink-0 items-center justify-center transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none ${
                       isChecked
@@ -317,14 +278,12 @@ export default function EquipmentGuide() {
           })}
         </div>
 
-        {/* Compare bar — appears once there's something to compare. Two
-           selections is the minimum a "compare" reads as meaningful; one
-           checked class just sits highlighted with nothing to do yet. */}
+        {/* Compare bar — appears once there's something to compare. */}
         {selected.size >= 2 && (
           <div className="mt-8 flex flex-wrap items-center gap-4 rounded-xl border border-tnt-amber/40 bg-white/5 px-6 py-4">
             <p className="font-body text-sm text-white/80">
               <span className="font-bold text-tnt-amber">{selected.size}</span>{" "}
-              classes selected
+              categories selected
             </p>
             <button
               ref={triggerRef}
@@ -373,40 +332,33 @@ export default function EquipmentGuide() {
             </button>
 
             <h2 id="compare-heading" className="font-display text-3xl tracking-wide uppercase sm:text-4xl">
-              Compare Fleet Classes
+              Compare Rigging &amp; Attachments
             </h2>
             <p className="mt-2 font-body text-sm text-white/60">
-              Rated capacity range per class — for a specific machine's real
-              load chart, use the capacity finder above.
+              What each category covers, side by side — talk to an engineer
+              for a specific rigging plan.
             </p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {selectedClasses.map((f) => (
-                <div key={f.index} className="relative rounded-xl border border-white/10 bg-white/5 p-5">
+              {selectedCategories.map((r) => (
+                <div key={r.index} className="relative rounded-xl border border-white/10 bg-white/5 p-5">
                   <button
                     type="button"
-                    onClick={() => toggle(f.index)}
-                    aria-label={`Remove ${f.title} from comparison`}
+                    onClick={() => toggle(r.index)}
+                    aria-label={`Remove ${r.title} from comparison`}
                     className="absolute top-3 right-3 text-white/40 hover:text-white"
                   >
                     <svg viewBox="0 0 20 20" aria-hidden="true" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
                       <path d="m5 5 10 10M15 5 5 15" />
                     </svg>
                   </button>
-                  <Icon name={f.icon} className="h-8 w-8 text-tnt-amber" strokeWidth={1.5} />
+                  <Icon name={r.icon} className="h-8 w-8 text-tnt-amber" strokeWidth={1.5} />
                   <h3 className="mt-3 font-display text-lg tracking-wide uppercase">
-                    {f.title}
+                    {r.title}
                   </h3>
-                  <dl className="mt-4 space-y-2 font-body text-sm">
-                    <div className="flex items-center justify-between border-t border-white/10 pt-2">
-                      <dt className="text-white/50">Capacity</dt>
-                      <dd className="font-bold text-tnt-amber">{f.capacityRange}</dd>
-                    </div>
-                    <div className="flex items-center justify-between border-t border-white/10 pt-2">
-                      <dt className="text-white/50">Fleet size</dt>
-                      <dd className="font-semibold">{f.machines}</dd>
-                    </div>
-                  </dl>
+                  <p className="mt-3 border-t border-white/10 pt-3 font-body text-sm leading-relaxed text-white/70">
+                    {r.description}
+                  </p>
                 </div>
               ))}
             </div>

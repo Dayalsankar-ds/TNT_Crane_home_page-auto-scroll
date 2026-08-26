@@ -8,8 +8,15 @@
  *
  * Each card is one job: amber job-code tab (TNT-142 …), project title, a
  * headline stat, the lift story, and the photo carrying the LOAD/RADIUS
- * CursorReadout — the specs actually run on that job. Content and photos are
- * demo placeholders until real project records arrive.
+ * CursorReadout — the specs actually run on that job.
+ *
+ * PHOTOS are real TNT job-site photography as of 2026-08-26 — see
+ * photos.ts's CASE_PHOTOS docblock for sourcing. The STORY COPY (titles,
+ * tonnage, narrative body, readout numbers) is still placeholder narrative
+ * until real project records arrive — the photos were matched to each
+ * story's general category (refinery/plant, wind, bridge, gantry), not to
+ * its specific numbers, so treat the copy and the imagery as two separate
+ * "real vs. placeholder" questions rather than one.
  */
 
 import { Eyebrow } from "./primitives";
@@ -35,7 +42,7 @@ const CASES: StackItem[] = [
     photo: {
       id: PHOTOS.refineryNight,
       src: CASE_PHOTOS.refineryReactorExchange,
-      alt: "Night lift inside a refinery during a turnaround",
+      alt: "Crawler crane rigged at a refinery/gas plant site",
       gradient: GRADIENTS.navy,
     },
   },
@@ -49,7 +56,7 @@ const CASES: StackItem[] = [
     photo: {
       id: PHOTOS.windTurbine,
       src: CASE_PHOTOS.windFarmTurbineErection,
-      alt: "Crane erecting a wind turbine",
+      alt: "Crawler cranes erecting a wind turbine tower section",
       gradient: GRADIENTS.slate,
     },
   },
@@ -62,7 +69,8 @@ const CASES: StackItem[] = [
     readout: { load: "310T", radius: "22M" },
     photo: {
       id: PHOTOS.siteCrane1,
-      alt: "Tandem crane lift setting a bridge girder",
+      src: CASE_PHOTOS.bridgeGirderSet,
+      alt: "TNT crane setting a bridge girder over water",
       gradient: GRADIENTS.slate,
     },
   },
@@ -76,7 +84,7 @@ const CASES: StackItem[] = [
     photo: {
       id: PHOTOS.plantNight,
       src: CASE_PHOTOS.petrochemicalVesselPlacement,
-      alt: "Petrochemical plant lift at night",
+      alt: "TNT hydraulic gantry lifting a large vessel-sized load",
       gradient: GRADIENTS.maroon,
     },
   },

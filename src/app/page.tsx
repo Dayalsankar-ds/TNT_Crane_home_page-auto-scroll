@@ -66,7 +66,7 @@ export default function Home() {
         <CoreServices /> {/* services (compaction pending) */}
 
         {/* Fleet catalog — dark band #1, follows Services. */}
-        <EquipmentGuide /> {/* fleet catalog — dark band #1 */}
+        <EquipmentGuide /> {/* rigging & attachments catalog — dark band #1 */}
 
         {/* Qualify: full catalog seen, now find the machine */}
         <EquipmentFinder /> {/* find your machine */}

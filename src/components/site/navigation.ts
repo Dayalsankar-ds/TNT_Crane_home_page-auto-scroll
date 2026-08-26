@@ -70,15 +70,21 @@ export const NAV_GROUPS: NavGroup[] = [
     columns: [
       {
         no: "01",
-        heading: "Fleet Classes",
+        // Was "Fleet Classes" (7 crane classes, e.g. Crawler Cranes 80–750 T)
+        // until EquipmentGuide.tsx was replaced with a rigging/attachments
+        // catalog on 2026-08-26 — see that file's docblock. Went 7 → 3 → 6
+        // the same day, as more real photos turned up on cross-check. These
+        // 6 items and their hrefs match its RIGGING array exactly; `meta` is
+        // dropped since there's no honest capacity-range equivalent for
+        // rigging categories the way there was for crane classes.
+        heading: "Rigging & Attachments",
         items: [
-          { index: "01", label: "Crawler Cranes", meta: "80–750 T", icon: "crawler", href: `/#${slugify("Crawler Cranes")}` },
-          { index: "02", label: "All-Terrain Cranes", meta: "75–900 T", icon: "allterrain", href: `/#${slugify("All-Terrain Cranes")}` },
-          { index: "03", label: "Rough-Terrain Cranes", meta: "15–150 T", icon: "carrydeck", href: `/#${slugify("Rough-Terrain Cranes")}` },
-          { index: "04", label: "Boom Trucks", meta: "10–50 T", icon: "boom", href: `/#${slugify("Boom Trucks")}` },
-          { index: "05", label: "Tower Cranes", meta: "5–40 T", icon: "tower", href: `/#${slugify("Tower Cranes")}` },
-          { index: "06", label: "Carry-Deck & Industrial", meta: "8–25 T", icon: "carrydeck", href: `/#${slugify("Carry-Deck & Industrial")}` },
-          { index: "07", label: "Heavy-Lift & Gantry", meta: "Up to 1,300 T", icon: "heavylift", href: `/#${slugify("Heavy-Lift & Gantry")}` },
+          { index: "01", label: "Hydraulic Gantry Systems", icon: "heavylift", href: `/#${slugify("Hydraulic Gantry Systems")}` },
+          { index: "02", label: "Cantilever & Spreader Bar Rigging", icon: "rigging", href: `/#${slugify("Cantilever & Spreader Bar Rigging")}` },
+          { index: "03", label: "In-Plant Overhead Rigging", icon: "engineering", href: `/#${slugify("In-Plant Overhead Rigging")}` },
+          { index: "04", label: "SPMT & Modular Transport", icon: "transport", href: `/#${slugify("SPMT & Modular Transport")}` },
+          { index: "05", label: "Jack-and-Slide Systems", icon: "heavylift", href: `/#${slugify("Jack-and-Slide Systems")}` },
+          { index: "06", label: "Versa-Lift Machinery Moving", icon: "rental", href: `/#${slugify("Versa-Lift Machinery Moving")}` },
         ],
       },
       {
@@ -94,10 +100,10 @@ export const NAV_GROUPS: NavGroup[] = [
       },
     ],
     feature: {
-      eyebrow: "Fleet Guide",
-      title: "Seven classes, one standard",
+      eyebrow: "Rigging & Attachments",
+      title: "The gear behind every lift",
       blurb:
-        "Browse the full catalog with capacities, working radius, and typical duty for every class in the fleet.",
+        "Gantries, below-the-hook fixtures, and in-plant rigging — the equipment that makes a lift possible, not just the crane.",
       href: "/#fleet-guide",
       cta: "Open the guide",
     },
