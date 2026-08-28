@@ -347,7 +347,7 @@ body {
    two 1px borders (utility strip + header) — the TS constant drives JS
    measurement, this drives layout offset. Change both together. */
 :root {
-  --chrome-h: 122px;
+  --chrome-h: 120px;
 }
 
 html {

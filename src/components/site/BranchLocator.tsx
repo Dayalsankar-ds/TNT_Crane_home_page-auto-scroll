@@ -127,7 +127,7 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
 
         {/* Desktop: search · map · detail. Tablet/mobile: stacked in that order,
             which is also the DOM order — no visual/reading-order mismatch. */}
-        <div className="mt-10 grid gap-6 lg:grid-cols-[17rem_1fr_19rem] lg:items-start">
+        <div className="mt-10 grid gap-6 xl:grid-cols-[17rem_1fr_19rem] xl:items-start">
           {/* ── Search + results ───────────────────────────────────────── */}
           <div className="glass rounded-2xl p-4">
             <label htmlFor="branch-search" className="sr-only">

@@ -145,7 +145,7 @@ export default function FamilyStrip() {
         <p className="mt-10 font-body text-base font-semibold tracking-[0.02em] text-[#666] uppercase sm:text-lg">
           Strong brands. One legacy of excellence.
         </p>
-        <ul className="relative left-0 mt-20 grid w-full grid-cols-2 items-center gap-x-6 gap-y-12 px-4 sm:gap-x-12 sm:px-8 lg:mt-24 lg:grid-cols-4 lg:gap-x-8 lg:px-12 lg:left-4">
+        <ul className="mt-20 grid w-full grid-cols-2 items-center justify-items-center gap-x-6 gap-y-12 px-4 sm:gap-x-12 sm:px-8 lg:mt-24 lg:grid-cols-4 lg:gap-x-8 lg:px-12">
           {LOGOS.map((l) => (
             <li key={l.name} className="flex h-20 items-center justify-center sm:h-24 lg:h-28">
               {/* eslint-disable-next-line @next/next/no-img-element */}

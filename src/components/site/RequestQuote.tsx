@@ -47,7 +47,7 @@ export default function RequestQuote() {
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
           {/* Left — statement */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:sticky lg:top-[var(--chrome-h)] lg:self-start">
             <Eyebrow>Request a Quote</Eyebrow>
             <RevealText
               as="h2"
