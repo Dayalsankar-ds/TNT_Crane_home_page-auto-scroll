@@ -12,8 +12,8 @@
  * rights or verification question: the real logos of the brands now unified
  * under TNT.
  *
- * TNT's own wordmark plus the four acquired brands whose kit includes a logo
- * (Southway, RMS Cranes, Eagle West, JMS). Stampede/TNT Canada and Allison
+ * Four acquired brands whose kits include a complete "A TNT Company" lockup:
+ * Southway, RMS Cranes, Eagle West, and JMS. Stampede/TNT Canada and Allison
  * have no logo in the brand kit, and a logo-only strip has no text-fallback
  * slot, so they are simply not shown — this is a "some of the family" strip,
  * not the full roster.
@@ -58,12 +58,11 @@ import { useEffect, useRef } from "react";
 import { getLenis } from "@/components/SmoothScroll";
 import { heroRunEase } from "@/components/useHeroAutoScroll";
 
-const LOGOS: { name: string; src: string; big?: boolean }[] = [
-  { name: "TNT Crane & Rigging", src: "/brand/tnt-primary.png", big: true },
-  { name: "Southway Crane & Rigging", src: "/brand/southway.png" },
-  { name: "RMS Cranes", src: "/brand/rms-cranes.png" },
-  { name: "Eagle West Crane & Rigging", src: "/brand/eagle-west.png" },
-  { name: "JMS Crane & Rigging", src: "/brand/jms.png" },
+const LOGOS: { name: string; src: string; compact?: boolean }[] = [
+  { name: "Southway Crane & Rigging", src: "/brand/southway-updated.png" },
+  { name: "RMS Cranes", src: "/brand/rms-cranes-updated.png" },
+  { name: "Eagle West Crane & Rigging", src: "/brand/eagle-west-updated.png" },
+  { name: "JMS Crane & Rigging", src: "/brand/jms-updated.png", compact: true },
 ];
 
 export default function FamilyStrip() {
@@ -138,29 +137,22 @@ export default function FamilyStrip() {
       id="family"
       className="scroll-mt-32 border-y border-black/10 bg-white"
     >
-      <div className="mx-auto flex max-w-[100rem] flex-col items-center gap-8 px-20 py-10 text-center sm:py-12">
-        {/* Sized up from the 13px Eyebrow spec (2026-08-04) so it reads as the
-           strip's title rather than a kicker — it is the only text here and has
-           a full logo row to hold its own against. Tracking eases off as the
-           size climbs: 0.18em is set for 13px caps and gets gappy well before
-           20px.
-           Bumped again 2026-08-19 (on request, was reading as too faint next
-           to five full-colour logos) — text-lg/xl → text-2xl/3xl, tracking
-           eased further per the note above. */}
-        <p className="font-body text-2xl font-bold tracking-[0.08em] text-black uppercase sm:text-3xl">
-          TNT Family of Companies
+      <div className="mx-auto flex max-w-[120rem] flex-col items-center px-6 py-16 text-center sm:px-10 sm:py-20 lg:px-14 lg:py-24">
+        <h2 className="font-body text-3xl font-bold tracking-[-0.02em] text-black sm:text-4xl lg:text-5xl">
+          <span className="text-[#f8ae1c]">TNT</span> FAMILY OF COMPANIES
+        </h2>
+        <span className="mt-6 h-1 w-20 bg-[#f8ae1c]" aria-hidden="true" />
+        <p className="mt-10 font-body text-base font-semibold tracking-[0.02em] text-[#666] uppercase sm:text-lg">
+          Strong brands. One legacy of excellence.
         </p>
-        <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
+        <ul className="relative left-0 mt-20 grid w-full grid-cols-2 items-center gap-x-6 gap-y-12 px-4 sm:gap-x-12 sm:px-8 lg:mt-24 lg:grid-cols-4 lg:gap-x-8 lg:px-12 lg:left-4">
           {LOGOS.map((l) => (
-            <li
-              key={l.name}
-              className={`flex items-center ${l.big ? "h-20 sm:h-24" : "h-14 sm:h-16"}`}
-            >
+            <li key={l.name} className="flex h-20 items-center justify-center sm:h-24 lg:h-28">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={l.src}
                 alt={l.name}
-                className="h-full w-auto object-contain"
+                className={l.compact ? "h-1/2 w-full object-contain" : "max-h-full w-full object-contain"}
               />
             </li>
           ))}
