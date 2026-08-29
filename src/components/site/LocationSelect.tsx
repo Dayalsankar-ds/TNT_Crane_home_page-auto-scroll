@@ -82,16 +82,23 @@ export default function LocationSelect({
   const selected =
     SERVICE_LOCATIONS.find((l) => l.id === value) ?? SERVICE_LOCATIONS[0];
 
+  const brandScope =
+    selected.region && selected.brand !== "US & Canada network"
+      ? SERVICE_LOCATIONS.filter((l) => l.brand === selected.brand && l.id !== "all")
+      : SERVICE_LOCATIONS;
+
   // Matches the city AND the operating company, so "RMS" finds Denver and
-  // "Eagle" finds Vancouver — people look for markets both ways.
+  // "Eagle" finds Vancouver — people look for markets both ways. When a
+  // company filter is active, the dropdown shows that brand's cities only.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return SERVICE_LOCATIONS;
-    return SERVICE_LOCATIONS.filter(
+    const source = brandScope;
+    if (!q) return source;
+    return source.filter(
       (l) =>
         l.label.toLowerCase().includes(q) || l.brand.toLowerCase().includes(q),
     );
-  }, [query]);
+  }, [brandScope, query]);
 
   // activeIndex indexes the FILTERED list, so it must return to range whenever
   // the query narrows the results. Done at the keystroke rather than in an
@@ -111,14 +118,16 @@ export default function LocationSelect({
 
   // Focus stays on the input, so nothing scrolls the list for us — arrowing
   // past the fold would walk an active option the visitor can't see.
+  const activeItem = filtered[activeIndex] ?? filtered[0] ?? null;
+
   useEffect(() => {
     if (!open) return;
-    const id = filtered[activeIndex]?.id;
+    const id = activeItem?.id;
     if (!id) return;
     document
       .getElementById(`nav-loc-${id}`)
       ?.scrollIntoView({ block: "nearest" });
-  }, [open, activeIndex, filtered]);
+  }, [open, activeItem]);
 
   const close = () => {
     setOpen(false);
@@ -240,7 +249,7 @@ export default function LocationSelect({
                 aria-controls="nav-location-list"
                 aria-autocomplete="list"
                 aria-activedescendant={
-                  filtered[activeIndex] ? `nav-loc-${filtered[activeIndex].id}` : undefined
+                  activeItem ? `nav-loc-${activeItem.id}` : undefined
                 }
                 aria-label="Search locations by city or company"
                 value={query}

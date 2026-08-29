@@ -274,19 +274,19 @@ const MARKETS: {
   {
     region: "gulf-coast",
     brand: "TNT Crane & Rigging",
-    logo: "/brand/tnt.png",
+    logo: "/brand/tnt.svg",
     cities: ["Houston, TX", "Corpus Christi, TX", "Beaumont, TX", "Baton Rouge, LA", "Dallas, TX"],
   },
   {
     region: "rocky-mountain",
     brand: "RMS Cranes",
-    logo: "/brand/rms-cranes.png",
+    logo: "/brand/rms-cranes.svg",
     cities: ["Denver, CO", "Colorado Springs, CO", "Cheyenne, WY", "Casper, WY"],
   },
   {
     region: "southeast",
     brand: "Southway Crane & Rigging",
-    logo: "/brand/southway.png",
+    logo: "/brand/southway.svg",
     cities: ["Atlanta, GA", "Savannah, GA", "Charleston, SC", "Birmingham, AL", "Jacksonville, FL"],
   },
   {
@@ -298,13 +298,13 @@ const MARKETS: {
   {
     region: "northern-rockies",
     brand: "JMS Crane & Rigging",
-    logo: "/brand/jms.png",
+    logo: "/brand/jms.svg",
     cities: ["Billings, MT", "Bozeman, MT", "Soda Springs, ID"],
   },
   {
     region: "western-canada",
     brand: "Eagle West Crane & Rigging",
-    logo: "/brand/eagle-west.png",
+    logo: "/brand/eagle-west.svg",
     cities: ["Vancouver, BC", "Abbotsford, BC", "Kamloops, BC"], // British Columbia
   },
   {
@@ -360,6 +360,14 @@ export const FAMILY_BRANDS: FamilyBrand[] = (() => {
   }
   return out;
 })();
+
+export type FamilyFilter = FamilyBrand & { locationId: LocationId };
+
+/** One filter target per operating company, using its first market city. */
+export const FAMILY_FILTERS: FamilyFilter[] = FAMILY_BRANDS.map((brand) => {
+  const location = SERVICE_LOCATIONS.find((entry) => entry.brand === brand.brand);
+  return { ...brand, locationId: location?.id ?? "all" };
+});
 
 /** The operating company for one location — mark if the kit has one. */
 export function brandOf(locationId: LocationId): {

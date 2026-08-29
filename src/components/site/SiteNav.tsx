@@ -46,6 +46,7 @@ import { CHROME_H } from "./chrome";
 import Image from "next/image";
 import {
   FAMILY_BRANDS,
+  FAMILY_FILTERS,
   NAV_GROUPS,
   SERVICE_LOCATIONS,
   activeGroup,
@@ -80,6 +81,8 @@ export default function SiteNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileSection, setMobileSection] = useState<string | null>(null);
+  const [versionPickerOpen, setVersionPickerOpen] = useState(false);
+  const [navVersion, setNavVersion] = useState<"one" | "two">("one");
   // Which region the Services panel is filtered to. Held here rather than in
   // the panel so the choice survives closing and reopening the menu — someone
   // who told us they're in the Gulf Coast shouldn't have to say it twice.
@@ -222,7 +225,8 @@ export default function SiteNav() {
   }, [mobileOpen]);
 
   return (
-    <header
+    <>
+      <header
       // `inert` while hidden. opacity-0 + pointer-events-none stops the MOUSE
       // but leaves every link in the tab order and the accessibility tree, so
       // a keyboard user starting at the top of the homepage tabbed through the
@@ -267,11 +271,12 @@ export default function SiteNav() {
               because it's above the fold on every route. */}
           <Link href="/" className="flex shrink-0 items-center">
             <Image
-              src="/brand/tnt.png"
+              src="/brand/tnt.svg"
               alt="TNT Crane &amp; Rigging — home"
               width={1200}
               height={579}
               priority
+              unoptimized
               sizes="(min-width: 640px) 133px, 112px"
               className="h-[54px] w-auto sm:h-[64px]"
             />
@@ -401,12 +406,19 @@ export default function SiteNav() {
                     lines. Outer gap 10→6, rails 15/19rem→12.5/17rem and their
                     inner padding 8/10→6/8 hand ~128px to the grid. The panel's
                     own `max-w-7xl` and `py-12` are deliberately untouched. */}
-                <div className="mx-auto flex max-w-7xl gap-6 px-4 py-12 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+                  {localized && navVersion === "two" && (
+                    <FamilyFilters value={location} onChange={setLocation} />
+                  )}
+                  <div className="flex gap-6">
                   {/* Location picker leads the panel from a rail of its own.
                       It's a filter, and a filter belongs upstream of what it
                       filters — left of the columns, read before them. */}
                   {localized && (
                     <div className="w-[12.5rem] shrink-0 border-r border-white/10 pr-6">
+                      {navVersion === "one" && (
+                        <LocationSearch onChange={setLocation} />
+                      )}
                       <LocationSelect value={location} onChange={setLocation} />
                     </div>
                   )}
@@ -448,12 +460,9 @@ export default function SiteNav() {
                         <Icon name="arrow" className="h-5 w-5" />
                       </Link>
 
-                      {/* The family. "All Locations" shows every company that
-                          ships a mark; a chosen market shows just the one that
-                          runs it — which is the claim the panel is making at
-                          that moment. */}
-                      {localized && <FamilyMarks location={location} />}
+                        {localized && navVersion === "one" && <FamilyMarks location={location} />}
                     </div>
+                  </div>
                   </div>
                 </div>
 
@@ -624,19 +633,53 @@ export default function SiteNav() {
           </li>
         </ul>
       </div>
-    </header>
+
+      </header>
+      <div className="fixed right-4 bottom-4 z-[60] flex flex-col items-end gap-2 sm:right-6 sm:bottom-6">
+        {versionPickerOpen && (
+          <div
+            id="nav-version-picker"
+            className="flex flex-col gap-1 rounded-md border border-white/15 bg-tnt-slate p-1 shadow-xl shadow-black/30"
+            role="group"
+            aria-label="Navigation versions"
+          >
+            {(["one", "two"] as const).map((version) => (
+              <button
+                key={version}
+                type="button"
+                onClick={() => setNavVersion(version)}
+                aria-pressed={navVersion === version}
+                className={`min-w-28 rounded-sm px-3 py-2 text-left font-mono text-xs tracking-[0.12em] uppercase transition-colors ${
+                  navVersion === version
+                    ? "bg-tnt-amber text-black"
+                    : "text-white/75 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                Nav version {version === "one" ? "1" : "2"}
+              </button>
+            ))}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => setVersionPickerOpen((open) => !open)}
+          aria-expanded={versionPickerOpen}
+          aria-controls="nav-version-picker"
+          className="rounded-full border border-tnt-amber bg-tnt-amber px-4 py-2.5 font-mono text-xs font-semibold tracking-[0.1em] text-black uppercase shadow-lg shadow-black/25 transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
+        >
+          Nav / {navVersion === "one" ? "01" : "02"}
+        </button>
+      </div>
+    </>
   );
 }
 
 /**
  * Operating-company marks under the feature card.
  *
- * Each logo sits on a white chip. Every mark in the brand kit is drawn for a
- * LIGHT background — TNT, Southway, JMS and Eagle West sit on a black block
- * whose "A TNT Company" lockup is black text, and RMS Cranes is maroon-and-black
- * on transparent, effectively invisible on this panel. The brand guide forbids
- * altering brand colours, so the fix is to give each logo the surface it was
- * drawn for rather than to filter or invert it.
+ * Each logo sits directly on the menu surface. The supplied marks carry their
+ * own black blocks or white lettering, so the menu does not add a white chip
+ * behind them or alter their brand colours.
  *
  * `fill` + object-contain rather than fixed width/height: the marks run from
  * 2:1 (TNT) to 4:1 (Southway), so one width/height pair would letterbox some
@@ -651,39 +694,140 @@ function FamilyMarks({ location }: { location: LocationId }) {
       <p className="font-mono text-[10px] tracking-[0.14em] text-white/40 uppercase">
         {one ? "Operated by" : "Operating companies"}
       </p>
-
       {marks.length > 0 ? (
         <ul className="mt-3 flex flex-wrap gap-2">
-          {marks.map((m) => (
+          {marks.map((mark) => (
             <li
-              key={m.brand}
-              // Chip scaled up from 28×76 on 2026-08-04. The ~2.7:1 ratio is
-              // kept: the marks range from 2:1 to 4:1 and object-contain fits
-              // each inside the chip, so changing the chip's proportion would
-              // silently re-letterbox all of them.
-              className="relative h-10 w-[108px] rounded-sm bg-white p-1.5"
-              // The company name reaches assistive tech here; the image itself
-              // is decorative so it isn't announced twice.
-              aria-label={m.brand}
+              key={mark.brand}
+              className="relative h-10 w-[108px] rounded-sm bg-transparent p-1.5"
+              aria-label={mark.brand}
             >
               <Image
-                src={m.logo}
+                src={mark.logo}
                 alt=""
                 aria-hidden="true"
                 fill
                 sizes="108px"
+                unoptimized
                 className="object-contain"
               />
             </li>
           ))}
         </ul>
       ) : (
-        // Allison and Stampede/TNT Canada ship no mark. Their real name in type
-        // is honest; a stand-in graphic would not be.
         <p className="mt-2 font-body text-sm font-semibold text-white/80">
           {one?.brand}
         </p>
       )}
+    </div>
+  );
+}
+
+function LocationSearch({
+  onChange,
+}: {
+  onChange: (next: LocationId) => void;
+}) {
+  const [query, setQuery] = useState("");
+
+  const selectMatch = (next: string) => {
+    setQuery(next);
+    const match = SERVICE_LOCATIONS.find(
+      (location) =>
+        location.label.toLowerCase() === next.trim().toLowerCase() ||
+        location.brand.toLowerCase() === next.trim().toLowerCase(),
+    );
+    if (match) onChange(match.id);
+  };
+
+  return (
+    <div className="mb-4">
+      <label
+        htmlFor="nav-location-search"
+        className="font-mono text-[11px] tracking-[0.14em] text-white/45 uppercase"
+      >
+        Search
+      </label>
+      <div className="mt-2 flex items-center gap-2 rounded-md border border-white/20 bg-white/5 px-3 py-2.5 focus-within:border-tnt-amber/60">
+        <Icon name="search" aria-hidden="true" className="h-4 w-4 shrink-0 text-white/50" />
+        <input
+          id="nav-location-search"
+          type="search"
+          list="nav-location-search-options"
+          value={query}
+          onChange={(event) => selectMatch(event.target.value)}
+          placeholder="City or company"
+          className="min-w-0 flex-1 bg-transparent font-body text-sm text-white outline-none placeholder:text-white/35"
+        />
+        <datalist id="nav-location-search-options">
+          {SERVICE_LOCATIONS.filter((location) => location.id !== "all").map(
+            (location) => (
+              <option key={location.id} value={location.label}>
+                {location.brand}
+              </option>
+            ),
+          )}
+          {FAMILY_FILTERS.map((company) => (
+            <option key={company.brand} value={company.brand} />
+          ))}
+        </datalist>
+      </div>
+    </div>
+  );
+}
+
+function FamilyFilters({
+  value,
+  onChange,
+}: {
+  value: LocationId;
+  onChange: (next: LocationId) => void;
+}) {
+  return (
+    <div className="mb-8 flex justify-center border-b border-white/10 pb-6">
+      <ul className="flex w-full max-w-3xl flex-wrap items-center justify-center gap-3">
+        <li>
+          <button
+            type="button"
+            onClick={() => onChange("all")}
+            aria-pressed={value === "all"}
+            className={`flex h-12 min-w-20 items-center justify-center rounded-sm border px-3 font-mono text-[10px] tracking-[0.08em] uppercase transition-colors ${
+              value === "all"
+                ? "border-tnt-amber bg-tnt-amber text-black"
+                : "border-white/15 text-white/65 hover:border-tnt-amber/60 hover:text-white"
+            }`}
+          >
+            All
+          </button>
+        </li>
+        {FAMILY_FILTERS.map((company) => {
+          const selected = value === company.locationId;
+          return (
+            <li key={company.brand}>
+              <button
+                type="button"
+                onClick={() => onChange(company.locationId)}
+                aria-label={`Filter services by ${company.brand}`}
+                aria-pressed={selected}
+                className={`relative block h-12 w-28 rounded-sm border p-1 transition-colors ${
+                  selected
+                    ? "border-tnt-amber ring-1 ring-tnt-amber"
+                    : "border-transparent hover:border-white/30"
+                }`}
+              >
+                <Image
+                  src={company.logo}
+                  alt={company.brand}
+                  fill
+                  sizes="84px"
+                  unoptimized
+                  className="object-contain drop-shadow-[0_0_2px_#fff]"
+                />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
