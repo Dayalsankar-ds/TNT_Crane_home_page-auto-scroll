@@ -69,11 +69,14 @@ function BrandMark({ brand }: { brand: string }) {
 export default function LocationSelect({
   value,
   onChange,
+  open,
+  onOpenChange,
 }: {
   value: LocationId;
   onChange: (next: LocationId) => void;
+  open: boolean;
+  onOpenChange: (next: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -81,11 +84,12 @@ export default function LocationSelect({
 
   const selected =
     SERVICE_LOCATIONS.find((l) => l.id === value) ?? SERVICE_LOCATIONS[0];
+  const isBrandScoped =
+    selected.region && selected.brand !== "US & Canada network";
 
-  const brandScope =
-    selected.region && selected.brand !== "US & Canada network"
-      ? SERVICE_LOCATIONS.filter((l) => l.brand === selected.brand && l.id !== "all")
-      : SERVICE_LOCATIONS;
+  const brandScope = isBrandScoped
+    ? SERVICE_LOCATIONS.filter((l) => l.brand === selected.brand && l.id !== "all")
+    : SERVICE_LOCATIONS;
 
   // Matches the city AND the operating company, so "RMS" finds Denver and
   // "Eagle" finds Vancouver — people look for markets both ways. When a
@@ -130,7 +134,7 @@ export default function LocationSelect({
   }, [open, activeItem]);
 
   const close = () => {
-    setOpen(false);
+    onOpenChange(false);
     setQuery("");
     buttonRef.current?.focus();
   };
@@ -175,7 +179,7 @@ export default function LocationSelect({
         else close();
         break;
       case "Tab":
-        setOpen(false);
+        onOpenChange(false);
         search("");
         break;
     }
@@ -196,12 +200,12 @@ export default function LocationSelect({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-labelledby="nav-location-label nav-location-value"
-        onClick={() => (open ? close() : (search(""), setOpen(true)))}
+        onClick={() => (open ? close() : (search(""), onOpenChange(true)))}
         onKeyDown={(e) => {
           if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             search("");
-            setOpen(true);
+            onOpenChange(true);
           }
         }}
         className="mt-2 flex w-full items-center justify-between gap-3 rounded-md border border-white/20 bg-white/5 px-3 py-2.5 text-left transition-colors hover:border-tnt-amber/60 focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
@@ -234,7 +238,7 @@ export default function LocationSelect({
         /* Wider than the trigger: the rail is narrow, but "Colorado Springs, CO"
            over "Eagle West Crane & Rigging" needs room to read without
            truncating. Anchored left so it opens into the panel. */
-        <div className="absolute left-0 z-10 mt-1 w-[20rem] overflow-hidden rounded-md border border-white/20 bg-tnt-slate shadow-2xl shadow-black/50">
+        <div className="absolute left-0 z-10 mt-1 w-[21rem] overflow-hidden rounded-md border border-white/20 bg-tnt-slate shadow-2xl shadow-black/50">
           <div className="border-b border-white/10 p-2">
             <div className="flex items-center gap-2 rounded-md bg-white/10 px-2.5 py-2 ring-1 ring-white/15 focus-within:ring-tnt-amber">
               <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-white/60" />
@@ -255,7 +259,7 @@ export default function LocationSelect({
                 value={query}
                 onChange={(e) => search(e.target.value)}
                 onKeyDown={onInputKeyDown}
-                onBlur={() => setOpen(false)}
+                onBlur={() => onOpenChange(false)}
                 placeholder="Search city or company…"
                 className="w-full bg-transparent font-body text-sm text-white placeholder:text-white/45 focus:outline-none"
               />
@@ -273,7 +277,7 @@ export default function LocationSelect({
             // Without this Lenis takes the wheel and scrolls the page behind the
             // open dropdown instead of the list.
             data-lenis-prevent
-            className="max-h-72 overflow-y-auto py-1"
+            className="max-h-[22rem] overflow-y-auto py-1"
           >
             {filtered.length === 0 && (
               <li className="px-3 py-3 font-body text-sm text-white/55">

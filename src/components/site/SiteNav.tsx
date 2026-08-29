@@ -82,6 +82,7 @@ export default function SiteNav() {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileSection, setMobileSection] = useState<string | null>(null);
   const [versionPickerOpen, setVersionPickerOpen] = useState(false);
+  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
   const [navVersion, setNavVersion] = useState<"one" | "two">("one");
   // Which region the Services panel is filtered to. Held here rather than in
   // the panel so the choice survives closing and reopening the menu — someone
@@ -408,7 +409,13 @@ export default function SiteNav() {
                     own `max-w-7xl` and `py-12` are deliberately untouched. */}
                 <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                   {localized && navVersion === "two" && (
-                    <FamilyFilters value={location} onChange={setLocation} />
+                    <FamilyFilters
+                      value={location}
+                      onChange={(next) => {
+                        setLocation(next);
+                        setLocationPickerOpen(true);
+                      }}
+                    />
                   )}
                   <div className="flex gap-6">
                   {/* Location picker leads the panel from a rail of its own.
@@ -416,10 +423,15 @@ export default function SiteNav() {
                       filters — left of the columns, read before them. */}
                   {localized && (
                     <div className="w-[12.5rem] shrink-0 border-r border-white/10 pr-6">
-                      {navVersion === "one" && (
-                        <LocationSearch onChange={setLocation} />
-                      )}
-                      <LocationSelect value={location} onChange={setLocation} />
+                      <LocationSelect
+                        value={location}
+                        onChange={(next) => {
+                          setLocation(next);
+                          setLocationPickerOpen(true);
+                        }}
+                        open={locationPickerOpen}
+                        onOpenChange={setLocationPickerOpen}
+                      />
                     </div>
                   )}
 
@@ -719,59 +731,6 @@ function FamilyMarks({ location }: { location: LocationId }) {
           {one?.brand}
         </p>
       )}
-    </div>
-  );
-}
-
-function LocationSearch({
-  onChange,
-}: {
-  onChange: (next: LocationId) => void;
-}) {
-  const [query, setQuery] = useState("");
-
-  const selectMatch = (next: string) => {
-    setQuery(next);
-    const match = SERVICE_LOCATIONS.find(
-      (location) =>
-        location.label.toLowerCase() === next.trim().toLowerCase() ||
-        location.brand.toLowerCase() === next.trim().toLowerCase(),
-    );
-    if (match) onChange(match.id);
-  };
-
-  return (
-    <div className="mb-4">
-      <label
-        htmlFor="nav-location-search"
-        className="font-mono text-[11px] tracking-[0.14em] text-white/45 uppercase"
-      >
-        Search
-      </label>
-      <div className="mt-2 flex items-center gap-2 rounded-md border border-white/20 bg-white/5 px-3 py-2.5 focus-within:border-tnt-amber/60">
-        <Icon name="search" aria-hidden="true" className="h-4 w-4 shrink-0 text-white/50" />
-        <input
-          id="nav-location-search"
-          type="search"
-          list="nav-location-search-options"
-          value={query}
-          onChange={(event) => selectMatch(event.target.value)}
-          placeholder="City or company"
-          className="min-w-0 flex-1 bg-transparent font-body text-sm text-white outline-none placeholder:text-white/35"
-        />
-        <datalist id="nav-location-search-options">
-          {SERVICE_LOCATIONS.filter((location) => location.id !== "all").map(
-            (location) => (
-              <option key={location.id} value={location.label}>
-                {location.brand}
-              </option>
-            ),
-          )}
-          {FAMILY_FILTERS.map((company) => (
-            <option key={company.brand} value={company.brand} />
-          ))}
-        </datalist>
-      </div>
     </div>
   );
 }
