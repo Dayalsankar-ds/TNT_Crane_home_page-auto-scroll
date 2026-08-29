@@ -65,6 +65,9 @@ import { slugify } from "./navigation";
 type RiggingCategory = {
   index: string;
   title: string;
+  /** One line, shown on the card face itself. */
+  short: string;
+  /** Full copy — shown only in the compare modal, not on the card. */
   description: string;
   icon: IconName;
   /** Unsplash fallback id — only set where no real photo has been found. */
@@ -78,6 +81,7 @@ const RIGGING: RiggingCategory[] = [
   {
     index: "01",
     title: "Hydraulic Gantry Systems",
+    short: "Fixed-site heavy lifts",
     description:
       "Rail-mounted and hydraulic gantries for repeat heavy lifts in one fixed working area — ports, yards, and fabrication shops.",
     icon: "heavylift",
@@ -87,6 +91,7 @@ const RIGGING: RiggingCategory[] = [
   {
     index: "02",
     title: "Cantilever & Spreader Bar Rigging",
+    short: "Custom below-hook rigging",
     description:
       "Custom cantilever bars and spreader beams for loads a standard hook can't rig safely — set flush against structure where clearance is tight.",
     icon: "rigging",
@@ -96,6 +101,7 @@ const RIGGING: RiggingCategory[] = [
   {
     index: "03",
     title: "In-Plant Overhead Rigging",
+    short: "Inside existing bridge cranes",
     description:
       "Machinery moves and precision positioning inside facilities already running their own overhead bridge cranes.",
     icon: "engineering",
@@ -105,6 +111,7 @@ const RIGGING: RiggingCategory[] = [
   {
     index: "04",
     title: "SPMT & Modular Transport",
+    short: "Self-propelled heavy transport",
     description:
       "Self-propelled modular transporters for the heaviest, most awkward loads — hydraulic axles that steer independently for millimetre placement.",
     icon: "transport",
@@ -114,6 +121,7 @@ const RIGGING: RiggingCategory[] = [
   {
     index: "05",
     title: "Jack-and-Slide Systems",
+    short: "Jack, slide, set",
     description:
       "Hydraulic jacking and skid rails for loads too heavy or awkward to crane — set down, levelled, and walked into final position.",
     icon: "heavylift",
@@ -123,6 +131,7 @@ const RIGGING: RiggingCategory[] = [
   {
     index: "06",
     title: "Versa-Lift Machinery Moving",
+    short: "Crane-free plant relocation",
     description:
       "Toe-jack rigging dollies for plant relocation — transformers, switchgear, and process equipment moved without a crane pick.",
     icon: "rental",
@@ -234,10 +243,13 @@ export default function EquipmentGuide() {
                   </span>
                 </div>
 
-                {/* Footer bar — icon + title/description on the left, compare
+                {/* Footer bar — icon + title/short tag on the left, compare
                    checkbox tile right. `flex-1` makes it eat the card's
                    leftover height so the tile always lands flush on the
-                   bottom edge, whatever the title/description wrapped to. */}
+                   bottom edge, whatever the title wrapped to.
+                   `short`, not `description` (2026-08-27, on request): the
+                   full copy ran long on the card face — it's one line here,
+                   the full text only shows in the compare modal below. */}
                 <div className="flex flex-1 items-stretch justify-between gap-3 bg-black">
                   <div className="flex min-w-0 items-center gap-3 px-4 py-5">
                     <Icon
@@ -250,7 +262,7 @@ export default function EquipmentGuide() {
                         {r.title}
                       </h3>
                       <p className="mt-1.5 font-body text-[12px] leading-snug text-white/50">
-                        {r.description}
+                        {r.short}
                       </p>
                     </div>
                   </div>

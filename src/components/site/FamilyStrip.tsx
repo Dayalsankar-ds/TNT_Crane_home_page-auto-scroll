@@ -59,10 +59,10 @@ import { getLenis } from "@/components/SmoothScroll";
 import { heroRunEase } from "@/components/useHeroAutoScroll";
 
 const LOGOS: { name: string; src: string; compact?: boolean }[] = [
-  { name: "Southway Crane & Rigging", src: "/brand/southway-updated.png" },
-  { name: "RMS Cranes", src: "/brand/rms-cranes-updated.png" },
-  { name: "Eagle West Crane & Rigging", src: "/brand/eagle-west-updated.png" },
-  { name: "JMS Crane & Rigging", src: "/brand/jms-updated.png", compact: true },
+  { name: "Southway Crane & Rigging", src: "/brand/southway.svg" },
+  { name: "RMS Cranes", src: "/brand/rms-cranes.svg" },
+  { name: "Eagle West Crane & Rigging", src: "/brand/eagle-west.svg" },
+  { name: "JMS Crane & Rigging", src: "/brand/jms.svg", compact: true },
 ];
 
 export default function FamilyStrip() {
