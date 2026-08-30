@@ -16,8 +16,8 @@
  * what produces the stacking. The header row is exactly STEP tall, so the
  * visible tab of a covered card is precisely its number + title.
  *
- * Sticky only engages at `lg`; on mobile the cards simply flow normally
- * (stacking a full-height card under a fixed nav is cramped on phones).
+ * The cards are sticky at every breakpoint so the stack behaves the same on
+ * mobile and desktop, with the pinned top offset clearing the fixed chrome.
  *
  * The per-card image carries a CursorReadout LOAD/RADIUS spec chip — the crane
  * data for that card, whether it's a class rating or a job's actual figures.
@@ -149,8 +149,8 @@ function Card({
           // card covers it. Giving the CARD that job instead is what used to
           // leave a band of empty white under its photo. `z-10` only settles
           // paint order against the title rail (z-20) during the push.
-          className={`border-t border-black/10 bg-white lg:sticky ${
-            covers ? "lg:z-10" : ""
+          className={`border-t border-black/10 bg-white sticky ${
+            covers ? "z-10" : ""
           }`}
         >
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -208,9 +208,7 @@ function Card({
                 </CursorReadout>
               </div>
 
-              <div
-                className="flex flex-col"
-              >
+              <div className="flex flex-col">
                 <span className="font-display text-4xl leading-none tracking-wide text-tnt-navy sm:text-5xl">
                   {e.figure}
                 </span>

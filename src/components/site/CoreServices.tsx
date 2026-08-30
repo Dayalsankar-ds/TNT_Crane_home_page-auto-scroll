@@ -31,6 +31,7 @@
  * retired #071034 was removed site-wide on 2026-07-28.
  */
 
+import Image from "next/image";
 import { Eyebrow, Icon, type IconName } from "./primitives";
 import Button from "./Button";
 import RevealText from "./RevealText";
@@ -59,6 +60,15 @@ const LEAD = {
   blurb:
     "Stamped lift plans, ground-bearing analysis, and crane selection — signed by in-house engineers before a single machine mobilizes. Every stage that follows is scoped here first.",
   photo: { id: PHOTOS.crewObserve, alt: "Engineers reviewing a lift plan on site" },
+};
+
+const STAGE_ICONS: Record<string, string> = {
+  "Crane Rental": "/icons/crane.svg",
+  "Specialized Rigging": "/icons/hook.svg",
+  "Machinery Moving": "/icons/forklift.svg",
+  "Heavy Haul & Transport": "/icons/truck.svg",
+  "Industrial Storage": "/icons/cart.svg",
+  "Wind Energy": "/icons/tower-crane.svg",
 };
 
 const STAGES: Stage[] = [
@@ -175,7 +185,14 @@ export default function CoreServices() {
                 <div className="flex items-start justify-between gap-3">
                   {/* Icon well */}
                   <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-tnt-amber/10 text-tnt-amber transition-colors duration-300 group-hover:bg-black group-hover:text-tnt-amber">
-                    <Icon name={s.icon} className="h-6 w-6" />
+                    <Image
+                      src={STAGE_ICONS[s.title] ?? "/icons/crane.svg"}
+                      alt=""
+                      width={24}
+                      height={24}
+                      unoptimized
+                      className="h-6 w-6 object-contain [filter:brightness(0)_saturate(100%)_invert(63%)_sepia(65%)_saturate(721%)_hue-rotate(352deg)_brightness(97%)_contrast(101%)]"
+                    />
                   </span>
                   <span className="flex items-center gap-2 pt-1">
                     <span className="font-mono text-[11px] text-black/30 tabular-nums transition-colors duration-300 group-hover:text-tnt-amber">

@@ -721,6 +721,7 @@ function FamilyMarks({ location }: { location: LocationId }) {
                 fill
                 sizes="108px"
                 unoptimized
+                style={{ filter: "drop-shadow(0 0 1px rgba(255,255,255,0.75))" }}
                 className="object-contain"
               />
             </li>
@@ -780,7 +781,8 @@ function FamilyFilters({
                   fill
                   sizes="84px"
                   unoptimized
-                  className="object-contain drop-shadow-[0_0_2px_#fff]"
+                  style={{ filter: "drop-shadow(0 0 1px rgba(255,255,255,0.75))" }}
+                  className="object-contain"
                 />
               </button>
             </li>

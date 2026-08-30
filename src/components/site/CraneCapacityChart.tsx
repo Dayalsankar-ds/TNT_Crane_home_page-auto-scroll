@@ -60,8 +60,8 @@ export default function CraneCapacityChart() {
   return (
     <div className="overflow-hidden rounded-2xl border border-black/10 bg-tnt-navy text-white">
       {/* Header — title, count, and controls */}
-      <div className="flex flex-col gap-5 border-b border-white/10 p-6 sm:p-8">
-        <div className="flex flex-wrap items-end justify-between gap-4">
+      <div className="flex flex-col gap-4 border-b border-white/10 p-4 sm:gap-5 sm:p-8">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h3
               id="capacity-chart-heading"
@@ -69,45 +69,47 @@ export default function CraneCapacityChart() {
             >
               Full Capacity Chart
             </h3>
-            <p className="mt-1 font-body text-sm text-white/60">
+            <p className="mt-1 font-body text-xs text-white/60 sm:text-sm">
               {CRANE_MODELS.length} machines, every rated capacity and
               manufacturer load chart on file.
             </p>
           </div>
-          <p className="font-mono text-xs tracking-[0.14em] text-tnt-amber tabular-nums uppercase">
+          <p className="font-mono text-[10px] tracking-[0.12em] text-tnt-amber tabular-nums uppercase sm:text-xs sm:tracking-[0.14em]">
             Showing {rows.length} of {CRANE_MODELS.length}
           </p>
         </div>
 
         {/* Controls: type filter tabs + search */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setActiveType("all")}
-              className={`rounded-full border px-3.5 py-1.5 font-body text-xs font-semibold tracking-wide uppercase transition-colors ${
-                activeType === "all"
-                  ? "border-tnt-amber bg-tnt-amber text-black"
-                  : "border-white/20 text-white/70 hover:border-white/50 hover:text-white"
-              }`}
-            >
-              All Classes
-            </button>
-            {TYPE_ORDER.map((t) => (
+          <div className="-mx-1 overflow-x-auto px-1 pb-1 sm:mx-0 sm:overflow-visible sm:p-0">
+            <div className="flex min-w-max gap-2">
               <button
-                key={t}
                 type="button"
-                onClick={() => setActiveType(t)}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 font-body text-xs font-semibold tracking-wide uppercase transition-colors ${
-                  activeType === t
+                onClick={() => setActiveType("all")}
+                className={`rounded-full border px-3.5 py-1.5 font-body text-[10px] font-semibold tracking-wide uppercase transition-colors sm:text-xs ${
+                  activeType === "all"
                     ? "border-tnt-amber bg-tnt-amber text-black"
                     : "border-white/20 text-white/70 hover:border-white/50 hover:text-white"
                 }`}
               >
-                <Icon name={TYPE_ICON[t]} className="h-3.5 w-3.5" strokeWidth={2} />
-                {CRANE_TYPE_LABELS[t]}
+                All Classes
               </button>
-            ))}
+              {TYPE_ORDER.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setActiveType(t)}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 font-body text-[10px] font-semibold tracking-wide uppercase transition-colors sm:text-xs ${
+                    activeType === t
+                      ? "border-tnt-amber bg-tnt-amber text-black"
+                      : "border-white/20 text-white/70 hover:border-white/50 hover:text-white"
+                  }`}
+                >
+                  <Icon name={TYPE_ICON[t]} className="h-3.5 w-3.5" strokeWidth={2} />
+                  {CRANE_TYPE_LABELS[t]}
+                </button>
+              ))}
+            </div>
           </div>
 
           <label className="relative w-full sm:w-64">
@@ -128,18 +130,80 @@ export default function CraneCapacityChart() {
         </div>
       </div>
 
-      {/* Table — `data-lenis-prevent` so a wheel over this nested scroll
-         region moves the table, not the (also-scrollable) modal behind it or
-         the locked page. Same reasoning as the dialog wrapper in
-         EquipmentFinder.tsx. */}
-      <div data-lenis-prevent className="max-h-[32rem] overflow-y-auto overscroll-contain">
+      {/* Table / card list — mobile gets stacked cards, desktop keeps the table */}
+      <div className="sm:hidden">
+        {rows.length > 0 ? (
+          <div className="divide-y divide-white/10">
+            {rows.map((m) => (
+              <article
+                key={`${m.make}-${m.model}-${m.chartHref}`}
+                className="p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 grid h-10 w-10 place-items-center rounded-full bg-white/5 ring-1 ring-white/10">
+                      <Icon
+                        name={TYPE_ICON[m.type]}
+                        className="h-4 w-4 text-tnt-amber"
+                        strokeWidth={1.8}
+                      />
+                    </div>
+                    <div>
+                      <p className="font-body text-[10px] tracking-[0.14em] text-white/50 uppercase">
+                        {CRANE_TYPE_LABELS[m.type]}
+                      </p>
+                      <h4 className="mt-1 font-display text-xl tracking-wide text-white uppercase">
+                        {m.model}
+                      </h4>
+                    </div>
+                  </div>
+                  <div className="font-mono text-xs tracking-[0.12em] text-tnt-amber tabular-nums uppercase">
+                    {m.capacityTons}T
+                  </div>
+                </div>
+
+                <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-white/75">
+                  <div>
+                    <p className="font-body text-[10px] tracking-[0.12em] text-white/45 uppercase">
+                      Make
+                    </p>
+                    <p className="mt-1 text-sm text-white/90">{m.make}</p>
+                  </div>
+                  <div>
+                    <p className="font-body text-[10px] tracking-[0.12em] text-white/45 uppercase">
+                      Capacity
+                    </p>
+                    <p className="mt-1 text-sm text-white/90">{m.capacityTons} Ton</p>
+                  </div>
+                </div>
+
+                <a
+                  href={m.chartHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-1.5 font-body text-[10px] font-semibold tracking-[0.12em] text-tnt-amber uppercase"
+                >
+                  View PDF
+                  <Icon name="arrow" className="h-3 w-3" strokeWidth={2.5} />
+                </a>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="px-4 py-12 text-center text-sm text-white/50">
+            No machines match that search.
+          </div>
+        )}
+      </div>
+
+      <div data-lenis-prevent className="hidden max-h-[60vh] overflow-auto overscroll-contain sm:block sm:max-h-[32rem]">
         <table className="w-full border-collapse font-body text-sm">
           <thead className="sticky top-0 z-10 bg-tnt-navy">
-            <tr className="border-b border-white/10 text-left text-[11px] tracking-[0.14em] text-white/50 uppercase">
-              <th className="px-6 py-3 font-semibold sm:px-8">Class</th>
-              <th className="px-3 py-3 font-semibold">Make</th>
-              <th className="px-3 py-3 font-semibold">Model</th>
-              <th className="px-3 py-3 font-semibold">
+            <tr className="border-b border-white/10 text-left text-[10px] tracking-[0.12em] text-white/50 uppercase sm:text-[11px] sm:tracking-[0.14em]">
+              <th className="px-4 py-3 font-semibold sm:px-8">Class</th>
+              <th className="px-2 py-3 font-semibold sm:px-3">Make</th>
+              <th className="px-2 py-3 font-semibold sm:px-3">Model</th>
+              <th className="px-2 py-3 font-semibold sm:px-3">
                 <button
                   type="button"
                   onClick={() =>
@@ -157,7 +221,7 @@ export default function CraneCapacityChart() {
                   />
                 </button>
               </th>
-              <th className="px-3 py-3 pr-6 font-semibold sm:pr-8">
+              <th className="px-2 py-3 pr-4 font-semibold sm:px-3 sm:pr-8">
                 Load Chart
               </th>
             </tr>
@@ -168,7 +232,7 @@ export default function CraneCapacityChart() {
                 key={`${m.make}-${m.model}-${m.chartHref}`}
                 className="border-b border-white/5 hover:bg-white/[0.04]"
               >
-                <td className="px-6 py-2.5 text-white/70 sm:px-8">
+                <td className="px-4 py-2.5 text-white/70 sm:px-8">
                   <Icon
                     name={TYPE_ICON[m.type]}
                     className="h-4 w-4 text-tnt-amber"
@@ -176,19 +240,19 @@ export default function CraneCapacityChart() {
                   />
                   <span className="sr-only">{CRANE_TYPE_LABELS[m.type]}</span>
                 </td>
-                <td className="px-3 py-2.5 text-white/80">{m.make}</td>
-                <td className="px-3 py-2.5 font-semibold text-white">
+                <td className="px-2 py-2.5 text-xs text-white/80 sm:px-3 sm:text-sm">{m.make}</td>
+                <td className="px-2 py-2.5 font-semibold text-xs text-white sm:px-3 sm:text-sm">
                   {m.model}
                 </td>
-                <td className="px-3 py-2.5 tabular-nums text-white/80">
+                <td className="px-2 py-2.5 tabular-nums text-xs text-white/80 sm:px-3 sm:text-sm">
                   {m.capacityTons} Ton
                 </td>
-                <td className="px-3 py-2.5 pr-6 sm:pr-8">
+                <td className="px-2 py-2.5 pr-4 sm:px-3 sm:pr-8">
                   <a
                     href={m.chartHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 font-body text-xs font-semibold tracking-wide text-tnt-amber uppercase hover:text-tnt-amber-vivid"
+                    className="inline-flex items-center gap-1.5 font-body text-[10px] font-semibold tracking-wide text-tnt-amber uppercase hover:text-tnt-amber-vivid sm:text-xs"
                   >
                     View PDF
                     <Icon name="arrow" className="h-3 w-3" strokeWidth={2.5} />
