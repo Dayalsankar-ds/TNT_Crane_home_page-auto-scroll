@@ -140,19 +140,16 @@ export default function FamilyStrip() {
       <div className="mx-auto max-w-[120rem]">
         <div className="grid lg:grid-cols-2">
           {/* Left Side: Dark Background with Text */}
-          <div className="flex flex-col items-start justify-center bg-[#2b2b2b] px-6 py-12 text-left sm:px-10 sm:py-16 lg:px-14 lg:py-24">
-            <h2 className="font-body text-3xl font-bold tracking-[-0.02em] text-white sm:text-4xl lg:text-5xl">
-              <span className="text-tnt-amber">TNT</span>
-              <br />
-              FAMILY OF
-              <br />
-              COMPANIES
+          <div className="flex flex-col items-start justify-center bg-black px-6 py-12 text-left sm:px-10 sm:py-16 lg:px-14 lg:py-24">
+            <h2 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              <span className="block text-tnt-amber">TNT</span>
+              <span className="block">FAMILY OF</span>
+              <span className="block">COMPANIES</span>
             </h2>
-            <span className="mt-6 h-1 w-16 bg-tnt-amber" aria-hidden="true" />
-            <p className="mt-6 font-body text-sm font-semibold tracking-[0.02em] text-gray-400 uppercase sm:text-base lg:text-lg">
-              Strong brands.
-              <br />
-              One legacy of excellence.
+            <span className="mt-8 h-1.5 w-20 bg-tnt-amber" aria-hidden="true" />
+            <p className="mt-8 font-body text-xs font-semibold tracking-[0.03em] text-gray-500 uppercase sm:text-sm lg:text-base">
+              <span className="block">Strong brands.</span>
+              <span className="block">One legacy of excellence.</span>
             </p>
           </div>
 
