@@ -275,7 +275,24 @@ const MARKETS: {
     region: "gulf-coast",
     brand: "TNT Crane & Rigging",
     logo: "/brand/tnt.svg",
-    cities: ["Houston, TX", "Corpus Christi, TX", "Beaumont, TX", "Baton Rouge, LA", "Dallas, TX"],
+    cities: [
+      "Austin, TX",
+      "Beaumont, TX",
+      "Buda, TX",
+      "Corpus Christi, TX",
+      "Dallas, TX",
+      "Edinburg, TX",
+      "Fort Worth, TX",
+      "Freeport, TX",
+      "Houston, TX",
+      "Midland, TX",
+      "Norco, LA",
+      "Oklahoma City, OK",
+      "Pampa, TX",
+      "San Antonio, TX",
+      "St James, LA",
+      "Tulsa, OK",
+    ],
   },
   {
     region: "rocky-mountain",
@@ -293,7 +310,7 @@ const MARKETS: {
     region: "northeast-permian",
     brand: "Allison Crane & Rigging",
     logo: null, // MISSING from the brand kit
-    cities: ["Williamsport, PA", "Pittsburgh, PA", "Pecos, TX", "Midland, TX"],
+    cities: ["Williamsport, PA", "Pittsburgh, PA", "Pecos, TX"],
   },
   {
     region: "northern-rockies",
@@ -333,6 +350,182 @@ export const SERVICE_LOCATIONS: ServiceLocation[] = [
     })),
   ),
 ];
+
+/** Detailed location information including address, phone, email, and services */
+export type LocationDetails = {
+  branch: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  phone: string;
+  email: string;
+  services: string[];
+};
+
+/** Complete location details for all TNT branches. Keyed by slugified city name. */
+export const LOCATION_DETAILS: Record<string, LocationDetails> = {
+  "austin-tx": {
+    branch: "TNT Austin",
+    address: "11701 Von Quintus Rd",
+    city: "Austin",
+    state: "TX",
+    zip: "78719",
+    phone: "1-512-501-1718",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "beaumont-tx": {
+    branch: "TNT Beaumont",
+    address: "5245 N Twin City Hwy",
+    city: "Beaumont",
+    state: "TX",
+    zip: "77627",
+    phone: "1-409-729-5600",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "buda-tx": {
+    branch: "TNT Buda",
+    address: "194 Commerce Cir Dr",
+    city: "Buda",
+    state: "TX",
+    zip: "78610",
+    phone: "1-800-799-2505",
+    email: "info@tntcrane.com",
+    services: ["Specialized Rigging & Machinery Moving", "Industrial Storage"],
+  },
+  "corpus-christi-tx": {
+    branch: "TNT Corpus Christi",
+    address: "6485 I-37",
+    city: "Corpus Christi",
+    state: "TX",
+    zip: "78409",
+    phone: "1-361-289-5438",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "dallas-tx": {
+    branch: "TNT Dallas",
+    address: "10733 Spangler Rd",
+    city: "Dallas",
+    state: "TX",
+    zip: "75220",
+    phone: "1-214-432-3761",
+    email: "info@tntcrane.com",
+    services: ["Specialized Rigging & Machinery Moving", "Industrial Storage"],
+  },
+  "edinburg-tx": {
+    branch: "TNT Edinburg",
+    address: "1621 E Iowa Rd",
+    city: "Edinburg",
+    state: "TX",
+    zip: "78542",
+    phone: "1-956-287-1700",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "fort-worth-tx": {
+    branch: "TNT Fort Worth",
+    address: "1315 Riverside Dr",
+    city: "Fort Worth",
+    state: "TX",
+    zip: "76111",
+    phone: "1-817-558-0809",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "freeport-tx": {
+    branch: "TNT Freeport",
+    address: "1949 Victoria Ln",
+    city: "Freeport",
+    state: "TX",
+    zip: "77541",
+    phone: "1-979-271-3545",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "houston-tx": {
+    branch: "TNT Houston",
+    address: "925 S Loop W",
+    city: "Houston",
+    state: "TX",
+    zip: "77054",
+    phone: "1-713-644-6113",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "midland-tx": {
+    branch: "TNT Midland",
+    address: "9112 W County Rd 127",
+    city: "Midland",
+    state: "TX",
+    zip: "79706",
+    phone: "1-432-242-4980",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "norco-la": {
+    branch: "TNT Norco",
+    address: "578 Goodhope St",
+    city: "Norco",
+    state: "LA",
+    zip: "70079",
+    phone: "1-985-764-6551",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "oklahoma-city-ok": {
+    branch: "TNT Oklahoma City",
+    address: "8020 SW 74th St",
+    city: "Oklahoma City",
+    state: "OK",
+    zip: "73169",
+    phone: "1-405-745-2318",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "pampa-tx": {
+    branch: "TNT Pampa",
+    address: "12475 US-60",
+    city: "Pampa",
+    state: "TX",
+    zip: "79065",
+    phone: "1-806-686-3880",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "san-antonio-tx": {
+    branch: "TNT San Antonio",
+    address: "14616 I-10",
+    city: "San Antonio",
+    state: "TX",
+    zip: "78124",
+    phone: "1-210-656-7900",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "st-james-la": {
+    branch: "TNT St James",
+    address: "10162 Frontage St",
+    city: "St James",
+    state: "LA",
+    zip: "70086",
+    phone: "1-225-473-1500",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+  "tulsa-ok": {
+    branch: "TNT Tulsa",
+    address: "4812 S Sheridan Rd suite 604",
+    city: "Tulsa",
+    state: "OK",
+    zip: "74145",
+    phone: "1-918-221-0269",
+    email: "info@tntcrane.com",
+    services: ["Crane Rental", "Specialized Rigging & Machinery Moving", "Industrial Storage", "Lift Planning & Engineering"],
+  },
+};
 
 /** The region a location belongs to, or null for "all" / unknown ids. */
 export function regionOf(locationId: LocationId): RegionId | null {
