@@ -135,29 +135,44 @@ export default function FamilyStrip() {
     <section
       ref={sectionRef}
       id="family"
-      className="scroll-mt-32 border-y border-black/10 bg-white"
+      className="scroll-mt-32 border-b border-black/10"
     >
-      <div className="mx-auto flex max-w-[120rem] flex-col items-center px-6 py-6 text-center sm:px-10 sm:py-8 lg:px-14 lg:py-10">
-        <h2 className="font-body text-2xl font-bold tracking-[-0.02em] text-black sm:text-3xl lg:text-4xl">
-          <span className="text-[#f8ae1c]">TNT</span> FAMILY OF COMPANIES
-        </h2>
-        <span className="mt-3 h-1 w-14 bg-[#f8ae1c]" aria-hidden="true" />
-        <p className="mt-4 font-body text-base font-semibold tracking-[0.02em] text-[#666] uppercase sm:text-lg">
-          Strong brands. One legacy of excellence.
-        </p>
-        <ul className="mt-7 grid w-full grid-cols-2 items-center justify-items-center gap-x-4 gap-y-6 px-4 sm:mt-8 sm:gap-x-6 sm:gap-y-8 sm:px-8 lg:mt-9 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-8 lg:px-12">
-          {LOGOS.map((l) => (
-            <li key={l.name} className="flex h-20 items-center justify-center sm:h-24 lg:h-28">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={l.src}
-                alt={l.name}
-                style={{ filter: "drop-shadow(0 0 1px rgba(255,255,255,0.75))" }}
-                className={l.compact ? "h-1/2 w-full object-contain" : "max-h-full w-full object-contain"}
-              />
-            </li>
-          ))}
-        </ul>
+      <div className="mx-auto max-w-[120rem]">
+        <div className="grid lg:grid-cols-2">
+          {/* Left Side: Dark Background with Text */}
+          <div className="flex flex-col items-start justify-center bg-[#2b2b2b] px-6 py-12 text-left sm:px-10 sm:py-16 lg:px-14 lg:py-24">
+            <h2 className="font-body text-3xl font-bold tracking-[-0.02em] text-white sm:text-4xl lg:text-5xl">
+              <span className="text-tnt-amber">TNT</span>
+              <br />
+              FAMILY OF
+              <br />
+              COMPANIES
+            </h2>
+            <span className="mt-6 h-1 w-16 bg-tnt-amber" aria-hidden="true" />
+            <p className="mt-6 font-body text-sm font-semibold tracking-[0.02em] text-gray-400 uppercase sm:text-base lg:text-lg">
+              Strong brands.
+              <br />
+              One legacy of excellence.
+            </p>
+          </div>
+
+          {/* Right Side: Light Background with Logo Grid */}
+          <div className="flex items-center justify-center bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14 lg:py-24">
+            <ul className="grid w-full grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
+              {LOGOS.map((l) => (
+                <li key={l.name} className="flex items-center justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={l.src}
+                    alt={l.name}
+                    style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}
+                    className="max-h-24 w-full object-contain sm:max-h-32 lg:max-h-40"
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
   );
