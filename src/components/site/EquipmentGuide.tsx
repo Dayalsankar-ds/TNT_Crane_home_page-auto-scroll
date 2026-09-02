@@ -1,8 +1,15 @@
 "use client";
 
 /**
- * RIGGING & ATTACHMENTS — the mid-page DARK BAND of the Technical Paper
- * rhythm. Formerly "Fleet Guide": a 7-card catalog of crane CLASSES
+ * RIGGING & ATTACHMENTS — flipped from the mid-page dark band to LIGHT theme
+ * (2026-09-02, on request): section shell bg-tnt-navy/text-white → bg-white,
+ * card faces bg-black → bg-white with a black/12 border (was white/10). The
+ * compare modal stays dark chrome (bg-tnt-navy) on purpose — it's an overlay,
+ * not part of the section flow, and EquipmentFinder's capacity-chart modal
+ * already keeps dark chrome inside an otherwise light section, so this
+ * matches that precedent rather than inventing a new one.
+ *
+ * Formerly "Fleet Guide": a 7-card catalog of crane CLASSES
  * (Crawler, All-Terrain, Tower, …). Replaced entirely (2026-08-26, on
  * request) with a catalog of rigging equipment/attachments instead — same
  * card UI, same checkbox-compare mechanic, different subject.
@@ -191,7 +198,7 @@ export default function EquipmentGuide() {
   }, [compareOpen]);
 
   return (
-    <section id="fleet-guide" className="bg-tnt-navy text-white">
+    <section id="fleet-guide" className="bg-white">
       <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
         <div className="max-w-3xl">
           <Eyebrow>Rigging &amp; Attachments</Eyebrow>
@@ -199,9 +206,9 @@ export default function EquipmentGuide() {
             as="h2"
             barClassName="bg-tnt-amber"
             text="The Gear Behind Every Lift."
-            className="mt-4 font-display text-5xl leading-[0.95] tracking-tight text-white uppercase sm:text-7xl"
+            className="mt-4 font-display text-5xl leading-[0.95] tracking-tight text-black uppercase sm:text-7xl"
           />
-          <p className="mt-4 font-body text-sm text-white/60 sm:text-base">
+          <p className="mt-4 font-body text-sm text-tnt-body sm:text-base">
             Check any categories you need and compare them side by side.
           </p>
         </div>
@@ -220,10 +227,10 @@ export default function EquipmentGuide() {
                 // docblock. A plain element with an id and scroll-mt is
                 // exactly as valid an anchor target as the old <Link> was.
                 id={slugify(r.title)}
-                className={`group flex basis-full flex-col scroll-mt-32 overflow-hidden rounded-2xl border bg-black transition-[transform,border-color] duration-300 ease-out hover:-translate-y-1 sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(25%-1.125rem)] ${
+                className={`group flex basis-full flex-col scroll-mt-32 overflow-hidden rounded-2xl border bg-white transition-[transform,border-color] duration-300 ease-out hover:-translate-y-1 sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(25%-1.125rem)] ${
                   isChecked
                     ? "border-tnt-amber"
-                    : "border-white/10 hover:border-tnt-amber/60"
+                    : "border-black/12 hover:border-tnt-amber/60"
                 }`}
               >
                 {/* Photo */}
@@ -250,7 +257,7 @@ export default function EquipmentGuide() {
                    `short`, not `description` (2026-08-27, on request): the
                    full copy ran long on the card face — it's one line here,
                    the full text only shows in the compare modal below. */}
-                <div className="flex flex-1 items-stretch justify-between gap-3 bg-black">
+                <div className="flex flex-1 items-stretch justify-between gap-3 bg-white">
                   <div className="flex min-w-0 items-center gap-3 px-4 py-5">
                     <Icon
                       name={r.icon}
@@ -258,10 +265,10 @@ export default function EquipmentGuide() {
                       strokeWidth={1.5}
                     />
                     <div>
-                      <h3 className="font-display text-sm leading-tight tracking-wide text-white uppercase">
+                      <h3 className="font-display text-sm leading-tight tracking-wide text-black uppercase">
                         {r.title}
                       </h3>
-                      <p className="mt-1.5 font-body text-[12px] leading-snug text-white/50">
+                      <p className="mt-1.5 font-body text-[12px] leading-snug text-tnt-body">
                         {r.short}
                       </p>
                     </div>
@@ -292,8 +299,8 @@ export default function EquipmentGuide() {
 
         {/* Compare bar — appears once there's something to compare. */}
         {selected.size >= 2 && (
-          <div className="mt-8 flex flex-wrap items-center gap-4 rounded-xl border border-tnt-amber/40 bg-white/5 px-6 py-4">
-            <p className="font-body text-sm text-white/80">
+          <div className="mt-8 flex flex-wrap items-center gap-4 rounded-xl border border-tnt-amber/40 bg-tnt-amber/5 px-6 py-4">
+            <p className="font-body text-sm text-black/80">
               <span className="font-bold text-tnt-amber">{selected.size}</span>{" "}
               categories selected
             </p>
@@ -308,7 +315,7 @@ export default function EquipmentGuide() {
             <button
               type="button"
               onClick={() => setSelected(new Set())}
-              className="font-body text-sm text-white/50 underline-offset-4 hover:text-white hover:underline"
+              className="font-body text-sm text-black/50 underline-offset-4 hover:text-black hover:underline"
             >
               Clear
             </button>

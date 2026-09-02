@@ -61,25 +61,25 @@ export default function Home() {
         {/* Manifesto + scale — Technical Paper opening statement */}
         <StatementSection />
 
-        {/* What we do — sits directly behind the About/manifesto statement
-            (2026-08-19, on request). */}
+        {/* Qualify early — right after the About/legacy intro, ahead of
+            Services and the Trade Guide (2026-09-02, on request). */}
+        <EquipmentFinder /> {/* find your machine */}
+
+        {/* What we do — sits directly behind Machine Finder. */}
         <CoreServices /> {/* services (compaction pending) */}
 
         {/* Fleet catalog — dark band #1, follows Services. */}
         <EquipmentGuide /> {/* rigging & attachments catalog — dark band #1 */}
 
-        {/* Qualify: full catalog seen, now find the machine */}
-        <EquipmentFinder /> {/* find your machine */}
-
         {/* Where we are */}
         <CoverageMap /> {/* nearest branch — dark band #2 (glass) */}
 
-        {/* Trust — iCARE safety program, moved ahead of Case Studies
-            (2026-08-21, on request; was right before ContactSection). */}
-        <SafetyCulture />
-
-        {/* Proof — sticky-stack case studies */}
+        {/* Proof — sticky-stack case studies, moved ahead of Safety
+            (2026-09-02, on request). */}
         <CaseStudies />
+
+        {/* Trust — iCARE safety program */}
+        <SafetyCulture />
 
         {/* Convert — the dark finale */}
         <ContactSection /> {/* reach a human */}

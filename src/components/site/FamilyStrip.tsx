@@ -7,31 +7,55 @@
  * - Clean, understated, premium
  * - Sophisticated hierarchy and spacing
  * - Geometric precision with elegant simplicity
- * - 24% left trapezoid panel + 2×2 logo grid
- * - Shortened center dividers with yellow anchor
- * - Subtle micro-interactions and texture
+ * - Full-bleed split layout: 38% left architectural panel (steep diagonal
+ *   edge, vertically centered content, no gap to the right panel) + a
+ *   2×2 logo grid on the right, anchored by an extended crosshair and a
+ *   central gold diamond
+ * - Flat off-white right panel (no texture — removed 2026-09-02, on request)
+ * - Logos have NO hover effect (removed 2026-09-02, on request): each mark
+ *   renders once at its normalized `weight` size and stays static — the
+ *   scroll-in fade/rise (via IntersectionObserver + logoVisibility) is the
+ *   only motion left in this section
+ * - "TNT" is a large font-display label (bumped 13px → 30px across two
+ *   requests) sitting above the "Family of / Companies" headline, not the
+ *   small tracked <Eyebrow> primitive used elsewhere on the site
  *
- * Layout:
- * - Section header with context ("OUR NETWORK")
- * - Split layout: 24% left + 76% right
- * - Perfectly balanced 2×2 logo grid with invisible zones
- * - Independent logo animations with "A TNT Company" reveal
- * - Off-white background with subtle industrial texture
+ * NAV VERSION GATE (2026-09-02, on request): this is Nav version ONE's
+ * Family-of-Companies section. Version two renders FamilyStripV2.tsx instead
+ * — a deliberately different composition, not a variant of this file. Which
+ * one shows is read from navVersionStore.ts, the same store backing the
+ * "Nav / 01" / "Nav / 02" picker in SiteNav.tsx.
  */
 
 import { useEffect, useRef, useState } from "react";
-import { getLenis } from "@/components/SmoothScroll";
+import { useNavVersion } from "./navVersionStore";
+import FamilyStripV2 from "./FamilyStripV2";
 
-const LOGOS: { name: string; src: string; company: string; id: string }[] = [
-  { name: "Southway Crane & Rigging", src: "/brand/southway.svg", company: "Southway", id: "southway" },
-  { name: "RMS Cranes", src: "/brand/rms-cranes.svg", company: "RMS Cranes", id: "rms" },
-  { name: "Eagle West Crane & Rigging", src: "/brand/eagle-west.svg", company: "Eagle West", id: "eagle" },
-  { name: "JMS Crane & Rigging", src: "/brand/jms.svg", company: "JMS", id: "jms" },
+const LOGOS: {
+  name: string;
+  src: string;
+  company: string;
+  id: string;
+  /** Visual-weight multiplier on the logo's max box size — 1 = full size.
+   *  Normalizes SVGs of different natural density/dimensions against each
+   *  other rather than trusting each file's own intrinsic size. */
+  weight: number;
+}[] = [
+  { name: "Southway Crane & Rigging", src: "/brand/southway.svg", company: "Southway", id: "southway", weight: 1 },
+  { name: "RMS Cranes", src: "/brand/rms-cranes.svg", company: "RMS Cranes", id: "rms", weight: 1 },
+  { name: "Eagle West Crane & Rigging", src: "/brand/eagle-west.svg", company: "Eagle West", id: "eagle", weight: 1 },
+  { name: "JMS Crane & Rigging", src: "/brand/jms.svg", company: "JMS", id: "jms", weight: 0.85 },
 ];
 
 export default function FamilyStrip() {
+  // Gated on the "Nav / 01" vs "Nav / 02" picker (see navVersionStore.ts) —
+  // version two renders FamilyStripV2 entirely instead. Read before the
+  // early return below so every hook in this component still runs on every
+  // render, version two included (rules of hooks) — the IntersectionObserver
+  // effect just never finds a section to observe in that branch, since
+  // sectionRef never attaches to a rendered <section> when we bail out.
+  const [navVersion] = useNavVersion();
   const sectionRef = useRef<HTMLElement>(null);
-  const [hoveredLogo, setHoveredLogo] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [logoVisibility, setLogoVisibility] = useState<Record<string, boolean>>({
     southway: false,
@@ -65,91 +89,90 @@ export default function FamilyStrip() {
     };
   }, []);
 
+  if (navVersion === "two") return <FamilyStripV2 />;
+
   return (
     <section
       ref={sectionRef}
       id="family"
-      className="relative overflow-hidden py-32 lg:py-40"
-      style={{
-        backgroundColor: "#FCFCFC",
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.025'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-      }}
+      className="relative overflow-hidden"
+      style={{ backgroundColor: "#FCFCFC" }}
     >
-      {/* Section Header */}
-      <div className="mx-auto mb-24 max-w-[1400px] px-6 text-center sm:px-10 lg:mb-32 lg:px-16">
-        <p className="font-body text-xs font-bold tracking-[0.1em] text-[#7A7A7A] uppercase">
-          OUR NETWORK
-        </p>
-        <h2 className="mt-3 font-display text-5xl font-bold tracking-tight text-black sm:text-6xl lg:text-7xl">
-          Family of Companies
-        </h2>
-        <p className="mx-auto mt-8 max-w-3xl font-body text-base text-[#666] sm:text-lg lg:text-xl">
-          A trusted network delivering crane, rigging and specialized lifting solutions across North America.
-        </p>
-      </div>
-
-      {/* Main Layout Container */}
-      <div className="mx-auto max-w-[1400px] px-6 sm:px-10 lg:px-16">
-        <div className="grid gap-24 lg:grid-cols-[1fr_2fr] lg:gap-24 items-start">
-          {/* LEFT PANEL: Trapezoid (24% equiv) */}
+      {/* Main Layout Container — full-bleed (2026-09-02, on request): no
+          outer padding or max-width, so the section runs edge-to-edge on
+          all four sides instead of sitting in a centered, margined column. */}
+      <div className="w-full">
+        {/* items-stretch + no lg gap (was items-start + gap-24): the left
+            panel now spans the full row height instead of just its own
+            content height, so it reads as a structural slab rather than a
+            floating card. Edge-to-edge on desktop so the panel's steep
+            diagonal is what separates it from the canvas, not a gutter. */}
+        <div className="grid gap-16 lg:min-h-[560px] lg:grid-cols-[38%_62%] lg:items-stretch lg:gap-0">
+          {/* LEFT PANEL: architectural slab (38%) */}
           <div
-            className={`relative flex flex-col justify-start transition-all duration-700 ${
+            className={`relative flex flex-col justify-center bg-tnt-slate transition-all duration-700 ${
               isVisible ? "translate-x-0 opacity-100" : "-translate-x-12 opacity-0"
             }`}
             style={{
-              backgroundColor: "#222222",
-              clipPath: "polygon(0 0, 100% 0, 90% 100%, 0 100%)",
-              padding: "72px",
-              minHeight: "360px",
+              clipPath: "polygon(0 0, 100% 0, 55% 100%, 0 100%)",
+              padding: "56px",
             }}
           >
             {/* Left Panel Content */}
-            <div>
-              <p className="font-display text-5xl font-black leading-tight text-[#F5B21A] tracking-tight">
+            <div className="max-w-md">
+              {/* Well above the shared <Eyebrow> primitive's fixed 13px
+                  (bumped 13px → 16px → 24px, 2026-09-02, on request) — a
+                  plain <p> instead of <Eyebrow className="..."> since
+                  Tailwind's utility order isn't source order, so an appended
+                  override class isn't guaranteed to beat the primitive's own
+                  text-[13px]. */}
+              <p className="font-display text-3xl tracking-[0.1em] text-tnt-amber uppercase">
                 TNT
               </p>
-              <h3 className="mt-3 font-display text-6xl font-bold leading-tight text-white tracking-tight">
-                Family of Companies
+              <h3 className="mt-4 font-display text-6xl leading-[0.92] tracking-tight text-white uppercase lg:text-7xl">
+                Family of
+                <br />
+                Companies
               </h3>
 
-              {/* Yellow Accent Line */}
-              <div className="mt-10 h-1 w-20 bg-[#F5B21A]" />
+              {/* Gold Accent Line */}
+              <div className="mt-12 h-1 w-20 bg-tnt-amber" />
 
               {/* Tagline */}
-              <p className="mt-10 font-body text-lg leading-relaxed text-[#999]">
+              <p className="mt-12 font-body text-sm leading-relaxed tracking-[0.08em] text-white/50 uppercase">
                 <span className="block">Strong Brands.</span>
-                <span className="block">One Legacy.</span>
-                <span className="block">Shared Excellence.</span>
+                <span className="block">One Legacy of</span>
+                <span className="block">Excellence.</span>
               </p>
             </div>
           </div>
 
-          {/* RIGHT PANEL: Logo Grid (76% equiv) */}
-          <div className="relative">
+          {/* RIGHT PANEL: Logo Grid (62%) */}
+          <div className="relative flex items-center justify-center px-4 py-10 sm:px-8 lg:px-16 lg:py-0">
             {/* Center Dividers with Diamond */}
             <div className="absolute inset-0 pointer-events-none">
-              {/* Vertical Line (shortened) */}
+              {/* Vertical Line */}
               <div
                 className="absolute left-1/2 w-px bg-[#EAEAEA] transform -translate-x-1/2"
                 style={{
-                  top: "calc(50% - 70px)",
-                  bottom: "calc(50% - 70px)",
-                  height: "140px",
+                  top: "calc(50% - 220px)",
+                  bottom: "calc(50% - 220px)",
+                  height: "440px",
                 }}
               />
-              {/* Horizontal Line (shortened) */}
+              {/* Horizontal Line */}
               <div
-                className="absolute top-1/2 h-px bg-[#EAEAEA] transform -translate-y-1/2"
+                className="absolute top-1/2 h-px bg-[#E5E5E5] transform -translate-y-1/2"
                 style={{
-                  left: "calc(50% - 70px)",
-                  right: "calc(50% - 70px)",
-                  width: "140px",
+                  left: "calc(50% - 220px)",
+                  right: "calc(50% - 220px)",
+                  width: "440px",
                 }}
               />
-              {/* Central Yellow Diamond */}
+              {/* Central Gold Diamond */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                 <div
-                  className="bg-[#F5B21A]"
+                  className="bg-tnt-amber"
                   style={{
                     width: "12px",
                     height: "12px",
@@ -159,9 +182,11 @@ export default function FamilyStrip() {
               </div>
             </div>
 
-            {/* 2×2 Logo Grid */}
-            <div className="grid grid-cols-2 gap-24 sm:gap-28 lg:gap-32">
-              {LOGOS.map((logo, index) => (
+            {/* 2×2 Logo Grid — gaps trimmed back with the shorter section
+                (2026-09-02) so the grid doesn't force the row taller than
+                the panel's own min-height. */}
+            <div className="grid grid-cols-2 gap-y-10 gap-x-12 sm:gap-x-16 lg:gap-y-14 lg:gap-x-16">
+              {LOGOS.map((logo) => (
                 <div
                   key={logo.id}
                   className={`relative flex flex-col items-center justify-center transition-all duration-500 ${
@@ -169,91 +194,25 @@ export default function FamilyStrip() {
                       ? "translate-y-0 opacity-100"
                       : "translate-y-8 opacity-0"
                   }`}
-                  onMouseEnter={() => setHoveredLogo(logo.id)}
-                  onMouseLeave={() => setHoveredLogo(null)}
                 >
-                  {/* Logo Container */}
-                  <div
-                    className={`relative h-32 w-full sm:h-40 lg:h-48 transition-all duration-300 ${
-                      hoveredLogo && hoveredLogo !== logo.id
-                        ? "opacity-40"
-                        : "opacity-100"
-                    } ${hoveredLogo === logo.id ? "scale-104" : "scale-100"}`}
-                    style={{
-                      transform: hoveredLogo === logo.id ? "scale(1.04)" : "scale(1)",
-                    }}
-                  >
-                    {/* Invisible Hover Zone */}
-                    <div
-                      className={`absolute inset-0 rounded-lg transition-all duration-300 ${
-                        hoveredLogo === logo.id
-                          ? "bg-white/80 shadow-2xl"
-                          : "bg-transparent"
-                      }`}
-                      style={{
-                        boxShadow: hoveredLogo === logo.id ? "0 12px 48px rgba(0,0,0,0.12)" : "none",
-                        padding: "20px",
-                      }}
-                    >
-                      {/* Logo Image */}
-                      <img
-                        src={logo.src}
-                        alt={logo.name}
-                        className="h-full w-full object-contain"
-                      />
-                    </div>
-
-                    {/* Orange Underline Animation */}
-                    {hoveredLogo === logo.id && (
-                      <div
-                        className="absolute bottom-0 left-1/2 h-1 bg-orange-500 transform -translate-x-1/2"
-                        style={{
-                          width: "50%",
-                          animation: "slideInWidth 300ms ease-out forwards",
-                        }}
-                      />
-                    )}
+                  {/* Logo Container — no hover effect (removed 2026-09-02,
+                      on request): was a scale/dim/underline/label set on
+                      mouse enter, now just renders the mark at its
+                      normalized `weight` size. */}
+                  <div className="relative flex h-20 w-full items-center justify-center sm:h-24 lg:h-28">
+                    <img
+                      src={logo.src}
+                      alt={logo.name}
+                      className="h-full w-full object-contain"
+                      style={{ transform: `scale(${logo.weight})` }}
+                    />
                   </div>
-
-                  {/* "A TNT Company" Label */}
-                  {hoveredLogo === logo.id && (
-                    <p className="mt-6 animate-fade-in font-body text-sm font-semibold tracking-wide text-[#666] uppercase">
-                      A TNT Company
-                    </p>
-                  )}
                 </div>
               ))}
             </div>
           </div>
         </div>
       </div>
-
-      {/* CSS Animations */}
-      <style>{`
-        @keyframes slideInWidth {
-          from {
-            width: 0;
-          }
-          to {
-            width: 50%;
-          }
-        }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-4px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fadeIn 300ms ease-out forwards;
-        }
-      `}</style>
     </section>
   );
 }

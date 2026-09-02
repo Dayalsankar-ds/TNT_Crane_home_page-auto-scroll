@@ -13,8 +13,18 @@
  * navigation control — no separate arrows/progress bar (removed 2026-07-30;
  * the cards being clickable made them redundant). Clicking a card highlights
  * it in brand maroon (not dimmed; maroon reads as "selected", dimming reads
- * as "disabled") and swaps in that stat's description on the black panel
- * below.
+ * as "disabled") and swaps in that stat's description.
+ *
+ * DESCRIPTION PLACEMENT is responsive (2026-09-02, on request — was one
+ * full-width bar under the photo at every breakpoint):
+ *   - lg+:      left side of the photo itself, over a left-to-right black
+ *               scrim, with the 7-card panel still anchored on the right —
+ *               a true two-column composition.
+ *   - below lg: still the original full-width black bar under the photo.
+ *               A second overlay doesn't fit beside the card panel at these
+ *               widths (it already wants ~92% of the row), so rather than
+ *               cram both into a collision, smaller viewports keep the
+ *               pre-2026-09-02 stacked layout.
  *
  * Auto-advances every 4s (2026-07-30) while the section is in view, unless
  * the user prefers reduced motion. Any manual navigation (card click, arrow
@@ -217,6 +227,18 @@ export default function StorySlideshow() {
           className="absolute inset-0 h-full w-full object-cover"
         />
 
+        {/* Left-side scrim (2026-09-02, on request: description moved from
+           the bottom bar to the left side of the photo at lg+) — the photo
+           has no dark region of its own on the left, so the amber
+           description text needs a wash to stay legible sitting on top of
+           it. Only shown at lg+, matching the description block below,
+           which also only appears at that breakpoint (see its comment for
+           why smaller viewports keep the old stacked bottom-bar layout). */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-black/85 via-black/45 to-transparent lg:block"
+        />
+
         {/* Gutter wrapper — same mx-auto max-w-7xl frame every other section
            uses, so the panel stays centered within it on ultra-wide screens.
            Padding on an absolutely-positioned parent doesn't inset an
@@ -225,6 +247,22 @@ export default function StorySlideshow() {
            gutter is applied directly on the panel below, at the same px-4
            sm:px-6 lg:px-8 scale every other section's margin uses. */}
         <div className="pointer-events-none absolute inset-y-4 inset-x-0 mx-auto max-w-7xl sm:inset-y-6 lg:inset-y-8">
+          {/* Left-side description (lg+ only) — mirrors the description that
+             used to sit in the full-width bar below the photo at every
+             breakpoint. Below lg there isn't enough spare width beside the
+             card panel (which itself needs ~92% of the row down there) for
+             a second overlay to sit next to it without the two colliding,
+             so smaller viewports keep that original bottom bar instead —
+             see its own comment further down. */}
+          <div className="pointer-events-none absolute inset-y-0 left-8 hidden w-[36%] max-w-md items-center lg:flex">
+            <p
+              key={index}
+              className="story-fade-up font-display text-xl leading-relaxed tracking-wide text-tnt-amber lg:text-2xl"
+            >
+              {current.description}
+            </p>
+          </div>
+
           <div className="pointer-events-auto absolute inset-y-0 right-4 w-[92%] max-w-md overflow-hidden bg-white shadow-2xl sm:right-6 lg:right-8 lg:max-w-xl">
             <dl className="grid h-full grid-cols-2">
               {SLIDES.map((s, i) => {
@@ -296,11 +334,11 @@ export default function StorySlideshow() {
         </div>
       </div>
 
-      {/* Content panel — the slide's description, directly beneath the
-         photo/stat-grid row now that the arrows and progress bar are gone;
-         the stat cards themselves are the only navigation control. Keyed on
-         `index` so each slide change is a fresh mount, which is what makes
-         the CSS entrance animation replay.
+      {/* Content panel — the slide's description. lg+ (2026-09-02, on
+         request): the description moved to the left side of the photo
+         above, so this bar is `lg:hidden` and only carries the mobile/
+         tablet layout now, where there isn't room for a second overlay
+         beside the card panel (see its comment above).
          bg-black restored (2026-08-19, on request) — briefly bg-tnt-maroon
          to match SafetyCulture/iCARE, reverted back.
          min-h fixed (2026-08-20, on request) — was purely content-driven, so
@@ -313,7 +351,7 @@ export default function StorySlideshow() {
          viewport heights and broke the "fits without scrolling" requirement
          that sizing was tuned for. `items-center` still centers whichever
          text is shorter within the fixed box. */}
-      <div className="flex min-h-[170px] items-center justify-center bg-black px-8 py-3 text-center sm:min-h-[97px] sm:px-12 sm:py-4 lg:min-h-[149px]">
+      <div className="flex min-h-[170px] items-center justify-center bg-black px-8 py-3 text-center sm:min-h-[97px] sm:px-12 sm:py-4 lg:hidden">
         <p
           key={index}
           className="story-fade-up max-w-3xl font-display text-lg leading-relaxed tracking-wide text-tnt-amber sm:text-xl lg:text-2xl"

@@ -29,6 +29,14 @@
  *
  * Palette: black / white / gold. NOT navy — the brand book has no navy, and the
  * retired #071034 was removed site-wide on 2026-07-28.
+ *
+ * DARK THEME (2026-09-02, on request): the section shell flipped from
+ * bg-white to bg-black/text-white — the LEAD article and closing CTA were
+ * already black panels, so this just extends the same black to the section
+ * background and the 02–07 grid cards, which were the only white surfaces
+ * left. Grid-card icon-well hover inverted (amber fill / black glyph, was
+ * black fill / amber glyph) since a black hover fill no longer reads against
+ * a black card.
  */
 
 import Image from "next/image";
@@ -82,7 +90,7 @@ const STAGES: Stage[] = [
 
 export default function CoreServices() {
   return (
-    <section id="services" className="scroll-mt-32 bg-white">
+    <section id="services" className="scroll-mt-32 bg-black text-white">
       {/* Marks the stage the nav's deep link asked for. Now that each stage is
           its own row the scroll also lands correctly, but the highlight still
           answers "which one did I click?" on arrival. */}
@@ -95,9 +103,9 @@ export default function CoreServices() {
           <RevealText
             as="h2"
             text="One Partner, End to End"
-            className="mt-3 font-display text-4xl tracking-wide text-black uppercase sm:text-5xl lg:text-6xl"
+            className="mt-3 font-display text-4xl tracking-wide text-white uppercase sm:text-5xl lg:text-6xl"
           />
-          <p className="mt-5 font-body text-base leading-relaxed text-tnt-body sm:text-lg">
+          <p className="mt-5 font-body text-base leading-relaxed text-white/70 sm:text-lg">
             Most lifts pass through four contractors before the load is set. Ours
             pass through one. Engineering, rigging, transport, and storage run on
             a single scope of work, a single schedule, and a single point of
@@ -181,21 +189,21 @@ export default function CoreServices() {
               {/* No shadow at any state. Depth comes from the hairline border
                   going gold, a barely-there gold wash, and a 2px lift — enough
                   to register as interactive without a drop shadow. */}
-              <article className="relative flex h-full flex-col rounded-xl border border-black/12 bg-white p-5 transition-[translate,border-color,background-color] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:border-tnt-amber group-hover:bg-tnt-amber/[0.04] focus-within:border-tnt-amber sm:p-6">
+              <article className="relative flex h-full flex-col rounded-xl border border-white/12 bg-white/[0.03] p-5 transition-[translate,border-color,background-color] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:border-tnt-amber group-hover:bg-tnt-amber/[0.06] focus-within:border-tnt-amber sm:p-6">
                 <div className="flex items-start justify-between gap-3">
                   {/* Icon well */}
-                  <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-tnt-amber/10 text-tnt-amber transition-colors duration-300 group-hover:bg-black group-hover:text-tnt-amber">
+                  <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-tnt-amber/10 text-tnt-amber transition-colors duration-300 group-hover:bg-tnt-amber group-hover:text-black">
                     <Image
                       src={STAGE_ICONS[s.title] ?? "/icons/crane.svg"}
                       alt=""
                       width={24}
                       height={24}
                       unoptimized
-                      className="h-6 w-6 object-contain [filter:brightness(0)_saturate(100%)_invert(63%)_sepia(65%)_saturate(721%)_hue-rotate(352deg)_brightness(97%)_contrast(101%)]"
+                      className="h-6 w-6 object-contain transition-[filter] duration-300 [filter:brightness(0)_saturate(100%)_invert(63%)_sepia(65%)_saturate(721%)_hue-rotate(352deg)_brightness(97%)_contrast(101%)] group-hover:[filter:brightness(0)_saturate(100%)]"
                     />
                   </span>
                   <span className="flex items-center gap-2 pt-1">
-                    <span className="font-mono text-[11px] text-black/30 tabular-nums transition-colors duration-300 group-hover:text-tnt-amber">
+                    <span className="font-mono text-[11px] text-white/30 tabular-nums transition-colors duration-300 group-hover:text-tnt-amber">
                       {s.index}
                     </span>
                     <span className="font-body text-[10px] font-bold tracking-[0.2em] text-tnt-amber uppercase">
@@ -204,12 +212,12 @@ export default function CoreServices() {
                   </span>
                 </div>
 
-                <h3 className="mt-5 font-display text-xl tracking-wide text-black uppercase">
+                <h3 className="mt-5 font-display text-xl tracking-wide text-white uppercase">
                   {s.title}
                 </h3>
                 {/* flex-1 pushes the CTA to a common baseline across the row,
                     so blurbs of different lengths still align. */}
-                <p className="mt-2 flex-1 font-body text-[13px] leading-relaxed text-tnt-body">
+                <p className="mt-2 flex-1 font-body text-[13px] leading-relaxed text-white/60">
                   {s.blurb}
                 </p>
 
@@ -217,12 +225,12 @@ export default function CoreServices() {
                     body from its action. */}
                 <span
                   aria-hidden="true"
-                  className="mt-5 block h-px w-full bg-black/10 transition-colors duration-300 group-hover:bg-tnt-amber/40"
+                  className="mt-5 block h-px w-full bg-white/10 transition-colors duration-300 group-hover:bg-tnt-amber/40"
                 />
 
                 {/* Learn more — the whole card is the hit area via the stretched
                     link, so this is the affordance, not the target. */}
-                <span className="mt-4 flex items-center gap-2 font-body text-sm font-semibold text-black transition-colors duration-300 group-hover:text-tnt-amber">
+                <span className="mt-4 flex items-center gap-2 font-body text-sm font-semibold text-white transition-colors duration-300 group-hover:text-tnt-amber">
                   Learn more
                   <Icon
                     name="arrow"
@@ -255,26 +263,31 @@ export default function CoreServices() {
         </ol>
 
         {/* ── Closing CTA ──────────────────────────────────────────────── */}
-        <div className="mt-12 overflow-hidden rounded-2xl bg-black sm:mt-14">
+        {/* Solid amber fill (2026-09-02, on request) — was bg-black with a
+            white/10 border; flipped to the site's standard bg-tnt-amber +
+            text-black pairing (same convention as the nav CTA, active chips,
+            etc.) so it pops against the now-black section instead of nearly
+            disappearing into it. Buttons drop `onDark` since the fill itself
+            is light now — primary/secondary "light" skins (black fill /
+            black outline) are what read on amber. */}
+        <div className="mt-12 overflow-hidden rounded-2xl bg-tnt-amber sm:mt-14">
           <div className="flex flex-col gap-7 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between lg:p-12">
             <div>
-              <p className="font-display text-2xl leading-tight tracking-wide text-white uppercase sm:text-3xl lg:text-4xl">
+              <p className="font-display text-2xl leading-tight tracking-wide text-black uppercase sm:text-3xl lg:text-4xl">
                 One partner.
                 <br />
-                <span className="text-tnt-amber">
-                  From lift planning to final set.
-                </span>
+                From lift planning to final set.
               </p>
-              <p className="mt-3 max-w-lg font-body text-sm leading-relaxed text-white/60 sm:text-base">
+              <p className="mt-3 max-w-lg font-body text-sm leading-relaxed text-black/70 sm:text-base">
                 Tell us the load, the site, and the window. We&rsquo;ll scope the
                 rest.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
-              <Button href="#quote" variant="primary" onDark>
+              <Button href="#quote" variant="primary">
                 Request a quote
               </Button>
-              <Button href="#contact" variant="secondary" onDark>
+              <Button href="#contact" variant="secondary">
                 Talk to an engineer
               </Button>
             </div>

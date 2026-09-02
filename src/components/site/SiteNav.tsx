@@ -43,6 +43,7 @@ import TopInfoBar from "./TopInfoBar";
 import { Icon } from "./primitives";
 import LocationSelect, { wasEscapeHandled } from "./LocationSelect";
 import { CHROME_H } from "./chrome";
+import { useNavVersion } from "./navVersionStore";
 import Image from "next/image";
 import {
   FAMILY_BRANDS,
@@ -83,7 +84,9 @@ export default function SiteNav() {
   const [mobileSection, setMobileSection] = useState<string | null>(null);
   const [versionPickerOpen, setVersionPickerOpen] = useState(false);
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
-  const [navVersion, setNavVersion] = useState<"one" | "two">("one");
+  // Shared with FamilyStrip/FamilyStripV2 via a module-level store — see
+  // navVersionStore.ts for why this isn't local useState anymore.
+  const [navVersion, setNavVersion] = useNavVersion();
   // Which region the Services panel is filtered to. Held here rather than in
   // the panel so the choice survives closing and reopening the menu — someone
   // who told us they're in the Gulf Coast shouldn't have to say it twice.
