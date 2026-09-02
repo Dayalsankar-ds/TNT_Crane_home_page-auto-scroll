@@ -1,176 +1,178 @@
 "use client";
 
 /**
- * FAMILY STRIP — slim trust band, right after the hero.
+ * FAMILY STRIP — Premium enterprise section showcasing TNT Family of Companies.
  *
- * Occupies the slot that briefly held CertificationsStrip (ISO 9001, NCCCO,
- * OSHA VPP, ISNetworld, Avetta). That badge row moved back to SafetyCulture
- * (its original home) after this strip couldn't get real, rights-cleared
- * certification logos on short notice — see SafetyCulture.tsx's docblock for
- * the full reasoning. This strip does the same job — a fast trust signal
- * right off the hero — with content TNT already owns outright, so there's no
- * rights or verification question: the real logos of the brands now unified
- * under TNT.
+ * Design: Modern geometric layout with:
+ * - Left trapezoid panel (dark charcoal #222222) with angled right edge
+ * - Right white panel with 2×2 logo grid
+ * - Geometric dividers with central TNT yellow diamond
+ * - Hover interactions and entrance animations
+ * - Fortune 500 industrial aesthetic
  *
- * Four acquired brands whose kits include a complete "A TNT Company" lockup:
- * Southway, RMS Cranes, Eagle West, and JMS. Stampede/TNT Canada and Allison
- * have no logo in the brand kit, and a logo-only strip has no text-fallback
- * slot, so they are simply not shown — this is a "some of the family" strip,
- * not the full roster.
- *
- * The full card-grid version (FamilyOfCompanies.tsx, which did carry a text
- * fallback for those two) was deleted on 2026-08-06 with the rest of the
- * non-homepage sections; it is in git history if the roster is ever needed
- * in full.
- *
- * The marks run in FULL COLOUR (2026-08-04, user decision — they were
- * grayscaled before). Each is its own brand's palette, so the row is
- * deliberately polychrome rather than tuned to the TNT gold/maroon.
- *
- * Fixed-height / auto-width per logo, not a shared box: the marks range from
- * roughly 2:1 (TNT) to 4:1 (Southway/RMS/Eagle West), so a fixed WIDTH would
- * letterbox some and crop others. Height is what stays constant.
- *
- * TNT runs taller than the rest (2026-08-18, on request): it's the Primary
- * mark now (near-square, 1200×987 — see SiteNav.tsx's docblock on the swap),
- * so matching the row's shared height would render it noticeably smaller in
- * WIDTH than the 2:1–4:1 marks beside it. `items-center` on the row keeps it
- * vertically centered against them at the taller size.
- *
- * AUTO-SCROLL ON TO ABOUT US (2026-08-20, on request; wait shortened 4s→3s
- * same day): 3s after this strip first scrolls into view, the page carries
- * itself on to the Statement/"About Us" section (#statement) — this is a
- * slim logo band nobody is meant to linger on, not a stop. Lands on the
- * section's very top so the full card grid + description fit one viewport
- * without further scrolling (see StorySlideshow.tsx's container sizing,
- * tuned for exactly this). One-shot, not a repeating tour: the observer
- * disconnects itself the moment it fires once, whether the timer completes
- * or gets cancelled, so scrolling back up to re-look at the logos later never
- * re-triggers it. Cancels instantly on the user's own wheel or touch — same
- * "never fight a scroll already happening" rule useHeroAutoScroll follows —
- * and never arms at all under prefers-reduced-motion, where getLenis() is
- * null for the whole session (no window.scrollTo fallback, same reasoning as
- * that hook: someone who asked for less motion should not get a programmatic
- * scroll anyway).
+ * Layout: Full-width, split panel design
+ * - Left (32%): Dark trapezoid with heading and tagline
+ * - Right (68%): White background with logo grid
+ * - Grid dividers create visual hierarchy
+ * - Premium whitespace and sharp typography
  */
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { getLenis } from "@/components/SmoothScroll";
 import { heroRunEase } from "@/components/useHeroAutoScroll";
 
-const LOGOS: { name: string; src: string; compact?: boolean }[] = [
-  { name: "Southway Crane & Rigging", src: "/brand/southway.svg" },
-  { name: "RMS Cranes", src: "/brand/rms-cranes.svg" },
-  { name: "Eagle West Crane & Rigging", src: "/brand/eagle-west.svg" },
-  { name: "JMS Crane & Rigging", src: "/brand/jms.svg", compact: true },
+const LOGOS: { name: string; src: string; id: string }[] = [
+  { name: "Southway Crane & Rigging", src: "/brand/southway.svg", id: "southway" },
+  { name: "RMS Cranes", src: "/brand/rms-cranes.svg", id: "rms" },
+  { name: "Eagle West Crane & Rigging", src: "/brand/eagle-west.svg", id: "eagle" },
+  { name: "JMS Crane & Rigging", src: "/brand/jms.svg", id: "jms" },
 ];
 
 export default function FamilyStrip() {
   const sectionRef = useRef<HTMLElement>(null);
+  const [hoveredLogo, setHoveredLogo] = useState<string | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
 
-    // A wheel delta under this magnitude is trackpad-inertia decay, not a
-    // deliberate new scroll — same reasoning, same value, as
-    // useHeroAutoScroll's CANCEL_DELTA. Without this floor every arrival
-    // silently cancelled itself: the very wheel gesture that carried the
-    // user down to the strip was still emitting trailing events at the
-    // instant the section crossed the intersection threshold.
-    const CANCEL_DELTA = 12;
-    // How long after arriving to wait before a wheel/touch counts as a fresh
-    // interruption rather than the tail of the arrival gesture. Inertial
-    // trackpads keep emitting small deltas for a few hundred ms after the
-    // finger lifts — this is comfortably past that.
-    const ARM_DELAY_MS = 500;
-
-    let timer = 0;
-    let armTimer = 0;
-    const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) >= CANCEL_DELTA) cancel();
-    };
-    function cancel() {
-      window.clearTimeout(timer);
-      window.clearTimeout(armTimer);
-      window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", cancel);
-    }
-
     const io = new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return;
-        io.disconnect(); // one shot — never re-arms on a later visit
-
-        const lenis = getLenis();
-        if (!lenis) return; // reduced-motion: no programmatic scroll, ever
-
-        timer = window.setTimeout(() => {
-          cancel();
-          const target = document.getElementById("statement");
-          if (target) lenis.scrollTo(target, { duration: 1.5, easing: heroRunEase });
-        }, 3000);
-
-        // Arm cancellation only once the arrival gesture has had time to
-        // settle, so a genuine later scroll/touch can still interrupt it.
-        armTimer = window.setTimeout(() => {
-          window.addEventListener("wheel", onWheel, { passive: true });
-          window.addEventListener("touchstart", cancel, { passive: true });
-        }, ARM_DELAY_MS);
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
       },
-      { threshold: 0.5 },
+      { threshold: 0.3 },
     );
     io.observe(section);
 
     return () => {
       io.disconnect();
-      cancel();
     };
   }, []);
 
   return (
-    // `#family` — the nav's Family of Companies link used to point at
-    // /coverage; that route is gone (2026-08-04, single-page site) and this
-    // strip is the only surviving place the family is shown.
     <section
       ref={sectionRef}
       id="family"
-      className="scroll-mt-32 border-b border-black/10"
+      className="relative overflow-hidden bg-white py-32"
     >
-      <div className="mx-auto max-w-[120rem]">
-        <div className="grid lg:grid-cols-2">
-          {/* Left Side: Dark Background with Text */}
-          <div className="flex flex-col items-start justify-center bg-black px-6 py-12 text-left sm:px-10 sm:py-16 lg:px-14 lg:py-24">
-            <h2 className="font-display text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              <span className="block text-tnt-amber">TNT</span>
-              <span className="block">FAMILY OF</span>
-              <span className="block">COMPANIES</span>
-            </h2>
-            <span className="mt-8 h-1.5 w-20 bg-tnt-amber" aria-hidden="true" />
-            <p className="mt-8 font-body text-xs font-semibold tracking-[0.03em] text-gray-500 uppercase sm:text-sm lg:text-base">
-              <span className="block">Strong brands.</span>
-              <span className="block">One legacy of excellence.</span>
-            </p>
+      <div className="mx-auto max-w-[1400px]">
+        {/* Main Container: Split Layout */}
+        <div className="grid gap-0 lg:grid-cols-[32%_68%]">
+          {/* LEFT PANEL: Dark Trapezoid with Content */}
+          <div
+            className={`relative flex flex-col items-start justify-center px-8 py-16 sm:px-12 sm:py-20 lg:px-16 lg:py-24 transition-all duration-700 ${
+              isVisible ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
+            }`}
+            style={{
+              backgroundColor: "#222222",
+              clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)",
+            }}
+          >
+            {/* Heading */}
+            <div className="relative z-10">
+              <h2 className="font-display text-6xl font-black leading-tight tracking-tight text-white sm:text-7xl lg:text-8xl">
+                <span className="block text-[#F5B21A]">TNT</span>
+                <span className="block">FAMILY OF</span>
+                <span className="block">COMPANIES</span>
+              </h2>
+
+              {/* Yellow Divider Line */}
+              <div className="mt-8 h-1.5 w-32 bg-[#F5B21A] sm:w-40" />
+
+              {/* Tagline */}
+              <p className="mt-10 font-body text-sm font-semibold tracking-wide text-[#7A7A7A] uppercase sm:text-base lg:text-lg">
+                <span className="block">Strong Brands.</span>
+                <span className="block">One Legacy of</span>
+                <span className="block">Excellence.</span>
+              </p>
+            </div>
           </div>
 
-          {/* Right Side: Light Background with Logo Grid */}
-          <div className="flex items-center justify-center bg-white px-6 py-12 sm:px-10 sm:py-16 lg:px-14 lg:py-24">
-            <ul className="grid w-full grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
-              {LOGOS.map((l) => (
-                <li key={l.name} className="flex items-center justify-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={l.src}
-                    alt={l.name}
-                    style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}
-                    className="max-h-24 w-full object-contain sm:max-h-32 lg:max-h-40"
+          {/* RIGHT PANEL: White Grid with Logos and Dividers */}
+          <div className="relative flex flex-col items-center justify-center bg-white px-8 py-16 sm:px-12 sm:py-20 lg:px-16 lg:py-24">
+            {/* 2×2 Grid Container */}
+            <div className="relative w-full max-w-2xl">
+              {/* Grid Lines (Dividers) */}
+              <div className="absolute inset-0 pointer-events-none">
+                {/* Vertical Line */}
+                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#EAEAEA] transform -translate-x-1/2" />
+                {/* Horizontal Line */}
+                <div className="absolute top-1/2 left-0 right-0 h-px bg-[#EAEAEA] transform -translate-y-1/2" />
+                {/* Central Yellow Diamond */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                  <div
+                    className="w-4 h-4 bg-[#F5B21A]"
+                    style={{ transform: "rotate(45deg)" }}
                   />
-                </li>
-              ))}
-            </ul>
+                </div>
+              </div>
+
+              {/* Logo Grid (2×2) */}
+              <div className="grid grid-cols-2 gap-8 sm:gap-12 lg:gap-16">
+                {LOGOS.map((logo, index) => (
+                  <div
+                    key={logo.id}
+                    className={`relative flex items-center justify-center h-32 sm:h-40 lg:h-48 transition-all duration-500 ${
+                      isVisible
+                        ? "translate-y-0 opacity-100"
+                        : "translate-y-8 opacity-0"
+                    }`}
+                    style={{
+                      transitionDelay: isVisible ? `${index * 100}ms` : "0ms",
+                    }}
+                    onMouseEnter={() => setHoveredLogo(logo.id)}
+                    onMouseLeave={() => setHoveredLogo(null)}
+                  >
+                    <div
+                      className={`relative cursor-pointer transition-all duration-300 ${
+                        hoveredLogo && hoveredLogo !== logo.id
+                          ? "opacity-60"
+                          : "opacity-100"
+                      } ${hoveredLogo === logo.id ? "scale-105 drop-shadow-2xl" : "scale-100"}`}
+                    >
+                      {/* Logo Image */}
+                      <img
+                        src={logo.src}
+                        alt={logo.name}
+                        className="h-full w-full object-contain"
+                        style={{
+                          filter: "drop-shadow(0 2px 8px rgba(0, 0, 0, 0.06))",
+                        }}
+                      />
+
+                      {/* Orange Underline Animation (on hover) */}
+                      {hoveredLogo === logo.id && (
+                        <div className="absolute bottom-0 left-1/2 h-1 bg-orange-500 transform -translate-x-1/2 animate-pulse"
+                          style={{
+                            width: "60%",
+                            animation: "slideInWidth 300ms ease-out forwards",
+                          }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* CSS Animation Keyframes */}
+      <style>{`
+        @keyframes slideInWidth {
+          from {
+            width: 0;
+          }
+          to {
+            width: 60%;
+          }
+        }
+      `}</style>
     </section>
   );
 }
