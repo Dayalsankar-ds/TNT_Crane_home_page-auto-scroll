@@ -44,6 +44,7 @@ import { Icon } from "./primitives";
 import LocationSelect, { wasEscapeHandled } from "./LocationSelect";
 import { CHROME_H } from "./chrome";
 import { useNavVersion } from "./navVersionStore";
+import { useAboutVersion } from "./aboutVersionStore";
 import Image from "next/image";
 import {
   FAMILY_BRANDS,
@@ -83,10 +84,15 @@ export default function SiteNav() {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileSection, setMobileSection] = useState<string | null>(null);
   const [versionPickerOpen, setVersionPickerOpen] = useState(false);
+  const [aboutPickerOpen, setAboutPickerOpen] = useState(false);
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
   // Shared with FamilyStrip/FamilyStripV2 via a module-level store — see
   // navVersionStore.ts for why this isn't local useState anymore.
   const [navVersion, setNavVersion] = useNavVersion();
+  // Shared with StorySlideshow (toggles its own desktop-style vs.
+  // mobile-style description layout) via the same kind of module-level
+  // store — see aboutVersionStore.ts.
+  const [aboutVersion, setAboutVersion] = useAboutVersion();
   // Which region the Services panel is filtered to. Held here rather than in
   // the panel so the choice survives closing and reopening the menu — someone
   // who told us they're in the Gulf Coast shouldn't have to say it twice.
@@ -650,40 +656,82 @@ export default function SiteNav() {
       </div>
 
       </header>
-      <div className="fixed right-4 bottom-4 z-[60] flex flex-col items-end gap-2 sm:right-6 sm:bottom-6">
-        {versionPickerOpen && (
-          <div
-            id="nav-version-picker"
-            className="flex flex-col gap-1 rounded-md border border-white/15 bg-tnt-slate p-1 shadow-xl shadow-black/30"
-            role="group"
-            aria-label="Navigation versions"
+      {/* Two pill buttons side by side (2026-09-02, on request — was a
+          single stacked column). Each keeps its own popover directly above
+          it via its own flex-col wrapper; the outer row just lays those two
+          wrappers out horizontally, bottom-aligned. */}
+      <div className="fixed right-4 bottom-4 z-[60] flex items-end gap-2 sm:right-6 sm:bottom-6">
+        <div className="flex flex-col items-end gap-2">
+          {versionPickerOpen && (
+            <div
+              id="nav-version-picker"
+              className="flex flex-col gap-1 rounded-md border border-white/15 bg-tnt-slate p-1 shadow-xl shadow-black/30"
+              role="group"
+              aria-label="Navigation versions"
+            >
+              {(["one", "two"] as const).map((version) => (
+                <button
+                  key={version}
+                  type="button"
+                  onClick={() => setNavVersion(version)}
+                  aria-pressed={navVersion === version}
+                  className={`min-w-28 rounded-sm px-3 py-2 text-left font-mono text-xs tracking-[0.12em] uppercase transition-colors ${
+                    navVersion === version
+                      ? "bg-tnt-amber text-black"
+                      : "text-white/75 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  Nav version {version === "one" ? "1" : "2"}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setVersionPickerOpen((open) => !open)}
+            aria-expanded={versionPickerOpen}
+            aria-controls="nav-version-picker"
+            className="rounded-full border border-tnt-amber bg-tnt-amber px-4 py-2.5 font-mono text-xs font-semibold tracking-[0.1em] text-black uppercase shadow-lg shadow-black/25 transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
           >
-            {(["one", "two"] as const).map((version) => (
-              <button
-                key={version}
-                type="button"
-                onClick={() => setNavVersion(version)}
-                aria-pressed={navVersion === version}
-                className={`min-w-28 rounded-sm px-3 py-2 text-left font-mono text-xs tracking-[0.12em] uppercase transition-colors ${
-                  navVersion === version
-                    ? "bg-tnt-amber text-black"
-                    : "text-white/75 hover:bg-white/10 hover:text-white"
-                }`}
-              >
-                Nav version {version === "one" ? "1" : "2"}
-              </button>
-            ))}
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={() => setVersionPickerOpen((open) => !open)}
-          aria-expanded={versionPickerOpen}
-          aria-controls="nav-version-picker"
-          className="rounded-full border border-tnt-amber bg-tnt-amber px-4 py-2.5 font-mono text-xs font-semibold tracking-[0.1em] text-black uppercase shadow-lg shadow-black/25 transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
-        >
-          Nav / {navVersion === "one" ? "01" : "02"}
-        </button>
+            Nav / {navVersion === "one" ? "01" : "02"}
+          </button>
+        </div>
+
+        <div className="flex flex-col items-end gap-2">
+          {aboutPickerOpen && (
+            <div
+              id="about-version-picker"
+              className="flex flex-col gap-1 rounded-md border border-white/15 bg-tnt-slate p-1 shadow-xl shadow-black/30"
+              role="group"
+              aria-label="About Us versions"
+            >
+              {(["one", "two"] as const).map((version) => (
+                <button
+                  key={version}
+                  type="button"
+                  onClick={() => setAboutVersion(version)}
+                  aria-pressed={aboutVersion === version}
+                  className={`min-w-28 rounded-sm px-3 py-2 text-left font-mono text-xs tracking-[0.12em] uppercase transition-colors ${
+                    aboutVersion === version
+                      ? "bg-tnt-amber text-black"
+                      : "text-white/75 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  About version {version === "one" ? "1" : "2"}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setAboutPickerOpen((open) => !open)}
+            aria-expanded={aboutPickerOpen}
+            aria-controls="about-version-picker"
+            className="rounded-full border border-tnt-amber bg-tnt-amber px-4 py-2.5 font-mono text-xs font-semibold tracking-[0.1em] text-black uppercase shadow-lg shadow-black/25 transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
+          >
+            About / {aboutVersion === "one" ? "01" : "02"}
+          </button>
+        </div>
       </div>
     </>
   );

@@ -15,16 +15,19 @@
  * it in brand maroon (not dimmed; maroon reads as "selected", dimming reads
  * as "disabled") and swaps in that stat's description.
  *
- * DESCRIPTION PLACEMENT is responsive (2026-09-02, on request — was one
- * full-width bar under the photo at every breakpoint):
- *   - lg+:      left side of the photo itself, over a left-to-right black
- *               scrim, with the 7-card panel still anchored on the right —
- *               a true two-column composition.
- *   - below lg: still the original full-width black bar under the photo.
- *               A second overlay doesn't fit beside the card panel at these
- *               widths (it already wants ~92% of the row), so rather than
- *               cram both into a collision, smaller viewports keep the
- *               pre-2026-09-02 stacked layout.
+ * DESCRIPTION PLACEMENT — ABOUT VERSION GATE (2026-09-02): originally this
+ * was purely responsive (left-of-photo on wide screens, a bar underneath on
+ * narrow ones). On request, it's now gated on aboutVersionStore.ts instead —
+ * the same store backing the "About /01 /02" picker in SiteNav.tsx — so
+ * either composition can be previewed at any viewport width:
+ *   - version "one": left side of the photo itself, over a left-to-right
+ *               black scrim, with the 7-card panel still anchored on the
+ *               right — a true two-column composition (the old lg+ layout).
+ *   - version "two": a full-width black bar under the photo (the old
+ *               below-lg layout). A second overlay doesn't fit beside the
+ *               card panel at narrow widths (it already wants ~92% of the
+ *               row), which is why this layout existed in the first place —
+ *               now it's a deliberate choice rather than a width fallback.
  *
  * Auto-advances every 4s (2026-07-30) while the section is in view, unless
  * the user prefers reduced motion. Any manual navigation (card click, arrow
@@ -40,6 +43,7 @@ import {
   type TouchEvent,
 } from "react";
 import { Icon, type IconName } from "./primitives";
+import { useAboutVersion } from "./aboutVersionStore";
 
 type Slide = {
   icon: IconName;
@@ -117,6 +121,7 @@ const SLIDES: Slide[] = [
 const TOTAL = SLIDES.length;
 
 export default function StorySlideshow() {
+  const [aboutVersion] = useAboutVersion();
   const [index, setIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const touchStartX = useRef<number | null>(null);
@@ -228,16 +233,18 @@ export default function StorySlideshow() {
         />
 
         {/* Left-side scrim (2026-09-02, on request: description moved from
-           the bottom bar to the left side of the photo at lg+) — the photo
-           has no dark region of its own on the left, so the amber
+           the bottom bar to the left side of the photo for version "one") —
+           the photo has no dark region of its own on the left, so the amber
            description text needs a wash to stay legible sitting on top of
-           it. Only shown at lg+, matching the description block below,
-           which also only appears at that breakpoint (see its comment for
-           why smaller viewports keep the old stacked bottom-bar layout). */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-black/85 via-black/45 to-transparent lg:block"
-        />
+           it. Gated on the same About-version check as the description
+           block below, not a breakpoint (see the docblock's ABOUT VERSION
+           GATE note). */}
+        {aboutVersion === "one" && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent"
+          />
+        )}
 
         {/* Gutter wrapper — same mx-auto max-w-7xl frame every other section
            uses, so the panel stays centered within it on ultra-wide screens.
@@ -247,21 +254,23 @@ export default function StorySlideshow() {
            gutter is applied directly on the panel below, at the same px-4
            sm:px-6 lg:px-8 scale every other section's margin uses. */}
         <div className="pointer-events-none absolute inset-y-4 inset-x-0 mx-auto max-w-7xl sm:inset-y-6 lg:inset-y-8">
-          {/* Left-side description (lg+ only) — mirrors the description that
-             used to sit in the full-width bar below the photo at every
-             breakpoint. Below lg there isn't enough spare width beside the
-             card panel (which itself needs ~92% of the row down there) for
-             a second overlay to sit next to it without the two colliding,
-             so smaller viewports keep that original bottom bar instead —
-             see its own comment further down. */}
-          <div className="pointer-events-none absolute inset-y-0 left-8 hidden w-[36%] max-w-md items-center lg:flex">
-            <p
-              key={index}
-              className="story-fade-up font-display text-xl leading-relaxed tracking-wide text-tnt-amber lg:text-2xl"
-            >
-              {current.description}
-            </p>
-          </div>
+          {/* Left-side description (version "one" only) — mirrors the
+             description that used to sit in the full-width bar below the
+             photo. There isn't enough spare width beside the card panel
+             (which itself needs ~92% of the row) for a second overlay to
+             sit next to it without the two colliding, which is why version
+             "two" keeps the bottom-bar layout instead — see its own comment
+             further down. */}
+          {aboutVersion === "one" && (
+            <div className="pointer-events-none absolute inset-y-0 left-8 flex w-[36%] max-w-md items-center">
+              <p
+                key={index}
+                className="story-fade-up font-display text-xl leading-relaxed tracking-wide text-tnt-amber lg:text-2xl"
+              >
+                {current.description}
+              </p>
+            </div>
+          )}
 
           <div className="pointer-events-auto absolute inset-y-0 right-4 w-[92%] max-w-md overflow-hidden bg-white shadow-2xl sm:right-6 lg:right-8 lg:max-w-xl">
             <dl className="grid h-full grid-cols-2">
@@ -334,11 +343,11 @@ export default function StorySlideshow() {
         </div>
       </div>
 
-      {/* Content panel — the slide's description. lg+ (2026-09-02, on
-         request): the description moved to the left side of the photo
-         above, so this bar is `lg:hidden` and only carries the mobile/
-         tablet layout now, where there isn't room for a second overlay
-         beside the card panel (see its comment above).
+      {/* Content panel — the slide's description, version "two" only
+         (2026-09-02, on request: gated on aboutVersionStore.ts rather than
+         `lg:hidden` now, so this bar can be previewed at any viewport width
+         — see the docblock's ABOUT VERSION GATE note; version "one" puts
+         the description beside the photo instead, above).
          bg-black restored (2026-08-19, on request) — briefly bg-tnt-maroon
          to match SafetyCulture/iCARE, reverted back.
          min-h fixed (2026-08-20, on request) — was purely content-driven, so
@@ -351,14 +360,16 @@ export default function StorySlideshow() {
          viewport heights and broke the "fits without scrolling" requirement
          that sizing was tuned for. `items-center` still centers whichever
          text is shorter within the fixed box. */}
-      <div className="flex min-h-[170px] items-center justify-center bg-black px-8 py-3 text-center sm:min-h-[97px] sm:px-12 sm:py-4 lg:hidden">
-        <p
-          key={index}
-          className="story-fade-up max-w-3xl font-display text-lg leading-relaxed tracking-wide text-tnt-amber sm:text-xl lg:text-2xl"
-        >
-          {current.description}
-        </p>
-      </div>
+      {aboutVersion === "two" && (
+        <div className="flex min-h-[170px] items-center justify-center bg-black px-8 py-3 text-center sm:min-h-[97px] sm:px-12 sm:py-4">
+          <p
+            key={index}
+            className="story-fade-up max-w-3xl font-display text-lg leading-relaxed tracking-wide text-tnt-amber sm:text-xl lg:text-2xl"
+          >
+            {current.description}
+          </p>
+        </div>
+      )}
     </section>
   );
 }
