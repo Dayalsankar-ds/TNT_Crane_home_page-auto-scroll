@@ -96,11 +96,30 @@ export default function EquipmentFinder() {
                   className="h-full"
                   style={{ backgroundImage: GRADIENTS.slate }}
                 >
+                  {/* Matching the photo's height to the content column
+                     (2026-09-03, on request). A content-sized grid row takes
+                     its height from the TALLEST item's own natural size —
+                     for the <img>, a replaced element, that's its real
+                     intrinsic aspect ratio (this photo's actual crop is a
+                     tall 1718×2560) once no explicit ratio applies at lg
+                     (previously `lg:aspect-auto`). That natural height
+                     (~858px) was floored the WHOLE row even though the
+                     content column only needs ~612px — `min-height`
+                     overrides don't help here since nothing is shrinking the
+                     item below its natural size; the row simply IS that
+                     size. `lg:absolute lg:inset-0` removes the image from
+                     normal flow at lg, so it stops contributing any
+                     intrinsic size to the row at all — the row then sizes
+                     purely from the content column, and the image (against
+                     CursorReadout's `relative` wrapper) fills whatever
+                     height that produces via object-cover, same as before
+                     below lg where it still sizes by its own aspect ratio
+                     (there's no sibling to match in the stacked layout). */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/photos/tnt-crawler-bridge-lift.jpg"
                     alt="TNT crawler crane setting a bridge girder at a job site"
-                    className="aspect-4/5 h-full w-full object-cover sm:aspect-3/4 lg:aspect-auto"
+                    className="aspect-4/5 h-full w-full object-cover sm:aspect-3/4 lg:absolute lg:inset-0 lg:aspect-auto"
                   />
                 </div>
               </CursorReadout>

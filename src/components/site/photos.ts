@@ -102,6 +102,24 @@ export const CASE_PHOTOS = {
     "/photos/cases/tnt-176-petrochemical-vessel-placement.jpg",
 } as const;
 
+/**
+ * SERVICES — real TNT photography for individual service cards (2026-09-03,
+ * replacing an Unsplash placeholder on the Full-Scope Capability section's
+ * lead feature). Sourced from tntcrane.com's own uploads, downloaded and
+ * inspected before use, same rigor as the Fleet Guide / Case Studies photos:
+ *   - craneRentalAtCraneCoolerLift: a TNT-branded all-terrain crane mid-lift
+ *     at a commercial site, "TNT Crane & Rigging" wordmark clearly visible
+ *     on the counterweight and cab door (tntcrane.com, AT-Crane_Cooler-
+ *     Lift-3) — general enough to represent the rental fleet broadly rather
+ *     than one specific job type.
+ *
+ * Local path, same arrangement as RIGGING_PHOTOS/CASE_PHOTOS: bypasses
+ * `IMG()`.
+ */
+export const SERVICE_PHOTOS = {
+  craneRentalAtCraneCoolerLift: "/photos/services/crane-rental-at-crane-cooler-lift.jpg",
+} as const;
+
 // Tonal fallbacks shown behind each photo — a dead URL degrades to a gradient,
 // never a broken-image icon.
 // Rebuilt on BLACK 2026-07-28 — the brand palette has no navy, and these

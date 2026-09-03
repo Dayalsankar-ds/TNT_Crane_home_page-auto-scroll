@@ -119,8 +119,8 @@ export const NAV_GROUPS: NavGroup[] = [
           // JOURNEY order, matching the lifecycle in CoreServices — plan, lift,
           // rig, move, transport, store, renewable. The panel and the section
           // are one numbering system or neither number means anything.
-          { index: "01", label: "Lift Planning & Engineering", icon: "engineering", href: `/#${slugify("Lift Planning & Engineering")}` },
-          { index: "02", label: "Crane Rental", icon: "rental", href: `/#${slugify("Crane Rental")}` },
+          { index: "01", label: "Crane Rental", icon: "rental", href: `/#${slugify("Crane Rental")}` },
+          { index: "02", label: "Lift Planning & Engineering", icon: "engineering", href: `/#${slugify("Lift Planning & Engineering")}` },
           { index: "03", label: "Specialized Rigging", icon: "rigging", href: `/#${slugify("Specialized Rigging")}` },
           { index: "04", label: "Machinery Moving", icon: "heavylift", href: `/#${slugify("Machinery Moving")}` },
           { index: "05", label: "Heavy Haul & Transport", icon: "transport", href: `/#${slugify("Heavy Haul & Transport")}` },

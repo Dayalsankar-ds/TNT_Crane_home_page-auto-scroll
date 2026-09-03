@@ -30,6 +30,10 @@ export default function ParallaxFrame({
   className = "",
   children,
 }: {
+  /** Either an Unsplash photo ID (run through `IMG()`) or a local path
+   *  starting with "/" (e.g. from SERVICE_PHOTOS/CASE_PHOTOS/RIGGING_PHOTOS
+   *  in photos.ts), used as-is — same local-path convention those exports
+   *  already use elsewhere (see EquipmentGuide.tsx's `localPhoto` field). */
   id: string;
   alt: string;
   className?: string;
@@ -70,7 +74,7 @@ export default function ParallaxFrame({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         ref={imgRef}
-        src={IMG(id, 1800)}
+        src={id.startsWith("/") ? id : IMG(id, 1800)}
         alt={alt}
         loading="lazy"
         style={{ scale: OVERSCAN }}

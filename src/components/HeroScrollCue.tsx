@@ -31,11 +31,26 @@
  * in useHeroAutoScroll: every position below the hero reports exactly 1 once
  * clamped, so a clamped reading would hold this at full opacity for the entire
  * rest of the page.
+ *
+ * ONE-SHOT PER VISIT (2026-09-03, on request): useHeroAutoScroll's hijack now
+ * fires at most once per visit — see its ONE-SHOT PER VISIT docblock note.
+ * This cue is the OTHER door to the same backward run (replay() below
+ * deliberately bypasses that hook), so left alone it would keep advertising
+ * and performing a "repeat" the hook itself no longer allows — exactly the
+ * behavior the request was to disable. `hasHeroRunTriggered()` forces the
+ * cue to stay hidden/inert once the shared one-shot budget is spent, and
+ * `replay()` now spends that same budget on click, so a manual replay can't
+ * leave the forward run able to re-arm at frame 1 afterward.
  */
 
 import { useEffect, useRef, type RefObject } from "react";
 import { getLenis } from "@/components/SmoothScroll";
-import { HERO_RUN_S, heroRunEase } from "@/components/useHeroAutoScroll";
+import {
+  HERO_RUN_S,
+  heroRunEase,
+  hasHeroRunTriggered,
+  markHeroRunTriggered,
+} from "@/components/useHeroAutoScroll";
 import { Icon } from "@/components/site/primitives";
 
 /** Progress (0–1 through the pin) where the cue starts arriving and where it is
@@ -97,8 +112,13 @@ export default function HeroScrollCue({
       // Unclamped — see the file header.
       const p = distance > 0 ? -rect.top / distance : 0;
 
+      // hasHeroRunTriggered() short-circuits the same way PAST_HERO does:
+      // once the shared one-shot budget is spent (by this cue's own click,
+      // or by useHeroAutoScroll's wheel-triggered run), the backward run is
+      // gone for the rest of the visit and the cue advertising it would be
+      // wrong to show, same reasoning as the PAST_HERO case below.
       const t =
-        p > PAST_HERO
+        hasHeroRunTriggered() || p > PAST_HERO
           ? 0
           : Math.min(
               1,
@@ -150,6 +170,14 @@ export default function HeroScrollCue({
   const replay = () => {
     const section = sectionRef.current;
     if (!section) return;
+
+    // Spends the shared one-shot budget (2026-09-03, on request): this is
+    // the OTHER door to the backward run, and leaving it un-gated would let
+    // a click land back at frame 1 with the forward auto-scroll still able
+    // to re-arm there — the exact repeat the request was to disable. See
+    // this file's ONE-SHOT PER VISIT note and useHeroAutoScroll.ts's.
+    markHeroRunTriggered();
+
     const top = window.scrollY + section.getBoundingClientRect().top;
 
     // Null under reduced motion, where Lenis is never booted. That mode is

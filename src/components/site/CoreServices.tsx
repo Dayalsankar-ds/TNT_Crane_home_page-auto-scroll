@@ -44,7 +44,7 @@ import { Eyebrow, Icon, type IconName } from "./primitives";
 import Button from "./Button";
 import RevealText from "./RevealText";
 import ParallaxFrame from "./ParallaxFrame";
-import { PHOTOS } from "./photos";
+import { SERVICE_PHOTOS } from "./photos";
 import { slugify } from "./navigation";
 import TargetHighlight from "./TargetHighlight";
 
@@ -59,28 +59,43 @@ type Stage = {
   icon: IconName;
 };
 
-/** Stage 01 leads as a full-width feature; it's the step everything else hangs
- *  off, and saying so is the section's whole point. */
+/** Stage 01 leads as a full-width feature — the step given the biggest
+ *  visual treatment on the page.
+ *
+ *  2026-09-03 (on request): swapped from Lift Planning & Engineering to
+ *  Crane Rental, TNT's core service. Index/stage are renumbered to match
+ *  the new reading order (01 → 07 top-to-bottom), which means the STAGE
+ *  labels no longer track the PLAN → LIFT → RIG → ... real-world sequence
+ *  the section's numbering was originally built to carry (see the docblock
+ *  above and navigation.ts, renumbered to match) — "Lift" now reads before
+ *  "Plan". Accepted tradeoff: featuring the core service outweighs strict
+ *  chronological labeling here. */
 const LEAD = {
   index: "01",
-  stage: "Plan",
-  title: "Lift Planning & Engineering",
+  stage: "Lift",
+  title: "Crane Rental",
   blurb:
-    "Stamped lift plans, ground-bearing analysis, and crane selection — signed by in-house engineers before a single machine mobilizes. Every stage that follows is scoped here first.",
-  photo: { id: PHOTOS.crewObserve, alt: "Engineers reviewing a lift plan on site" },
+    "Operated or bare rental — by the day, month, or project, from 8 to 1,300 tons. TNT's core service and the fleet every other capability on this page supports.",
+  // Real TNT photography (2026-09-03, on request — was PHOTOS.craneSlab, an
+  // Unsplash stock photo) — see SERVICE_PHOTOS in photos.ts for sourcing.
+  photo: {
+    id: SERVICE_PHOTOS.craneRentalAtCraneCoolerLift,
+    alt: "TNT all-terrain crane mid-lift at a commercial job site",
+  },
 };
 
 const STAGE_ICONS: Record<string, string> = {
-  "Crane Rental": "/icons/crane.svg",
   "Specialized Rigging": "/icons/hook.svg",
   "Machinery Moving": "/icons/forklift.svg",
   "Heavy Haul & Transport": "/icons/truck.svg",
   "Industrial Storage": "/icons/cart.svg",
   "Wind Energy": "/icons/tower-crane.svg",
+  // "Lift Planning & Engineering" has no dedicated icon asset yet — falls
+  // through to the /icons/crane.svg default below.
 };
 
 const STAGES: Stage[] = [
-  { index: "02", stage: "Lift", title: "Crane Rental", blurb: "Operated or bare rental — by the day, month, or project, from 8 to 1,300 tons.", icon: "rental" },
+  { index: "02", stage: "Plan", title: "Lift Planning & Engineering", blurb: "Stamped lift plans, ground-bearing analysis, and crane selection — signed by in-house engineers before a single machine mobilizes.", icon: "engineering" },
   { index: "03", stage: "Rig", title: "Specialized Rigging", blurb: "Hydraulic gantries, jack-and-slide, and precision skidding where a crane can't reach.", icon: "rigging" },
   { index: "04", stage: "Move", title: "Machinery Moving", blurb: "SPMTs and skates for turnkey plant relocation — set, aligned, and levelled in place.", icon: "heavylift" },
   { index: "05", stage: "Transport", title: "Heavy Haul & Transport", blurb: "Permitted heavy-haul and modular transporters, routed and escorted end to end.", icon: "transport" },
@@ -166,7 +181,7 @@ export default function CoreServices() {
                 onDark
                 className="mt-7 self-start"
               >
-                Start with a lift plan
+                Request a crane rental
               </Button>
             </div>
           </ParallaxFrame>

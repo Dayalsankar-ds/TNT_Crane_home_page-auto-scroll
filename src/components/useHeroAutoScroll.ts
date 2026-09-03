@@ -42,6 +42,34 @@
  * a single tween over the added distance would have sped up the hero's own
  * frame playback to fit inside the same HERO_RUN_S. The UP run (last frame
  * back to first) is untouched by any of this.
+ *
+ * ONE-SHOT PER VISIT (2026-09-03, on request): both ends used to re-arm
+ * every time scroll position returned to them, so scrolling back to the top
+ * and back down again replayed the whole hijack, and the UP run let anyone
+ * at the last frame replay it backward on demand — indefinitely, either one,
+ * as many times as the position revisited an end. On request, the mechanism
+ * now fires at most ONCE per visit, whichever direction gets there first
+ * (in practice always DOWN, landing at the opening frame): `hasTriggeredOnce`
+ * flips the moment a run starts (not waits for completion — an interrupted
+ * run has already used its one shot, the same call this file makes about
+ * hijacking being worth being deliberate over) and `armFor` refuses to arm
+ * either direction ever again after that. This permanently retires the UP
+ * run in the overwhelming majority of visits, since DOWN almost always fires
+ * first — that's the intended effect, not a side effect: "disable the scroll
+ * back/repeat functionality" was the explicit ask. `hasTriggeredOnce` is a
+ * module-level flag, same convention as navVersionStore.ts/
+ * aboutVersionStore.ts — it survives client-side navigation away from and
+ * back to the homepage (still "the same visit") and only resets on an actual
+ * page reload.
+ *
+ * HeroScrollCue's "Scroll Up" button is a SECOND, independent way to replay
+ * the sequence — it deliberately bypasses this hook's wheel handling (see
+ * that file's docblock), so this hook has no visibility into a click there
+ * on its own. hasHeroRunTriggered()/markHeroRunTriggered() are exported
+ * specifically so that component can read and spend the same one-shot
+ * budget: the cue hides itself once the budget is spent, and a click
+ * spends it too, so a manual replay can't leave the forward run able to
+ * re-arm. One budget, two doors.
  */
 
 import { useEffect, type RefObject } from "react";
@@ -96,6 +124,29 @@ export const heroRunEase = (t: number) =>
 
 type Dir = "down" | "up";
 
+/** Whether the one-shot hijack has already fired this visit — see the
+ *  ONE-SHOT PER VISIT note above. Module-level so it survives remounts from
+ *  client-side navigation, not just this hook's own lifetime. */
+let hasTriggeredOnce = false;
+
+/** Read-only check for other components that need to respect the same
+ *  one-shot budget — currently HeroScrollCue, whose "Scroll Up" replay
+ *  button is a second, independent way back to frame 1 that this hook has
+ *  no visibility into on its own (see markHeroRunTriggered below). */
+export function hasHeroRunTriggered() {
+  return hasTriggeredOnce;
+}
+
+/** Spends the one-shot from OUTSIDE this hook's own wheel handling.
+ *  HeroScrollCue's click-to-replay deliberately bypasses this hook (it's an
+ *  ordinary interruptible scroll, not the locked hijack — see that file's
+ *  docblock), so nothing here would otherwise know a replay happened. Call
+ *  this wherever an alternate path also plays the hero sequence, so the
+ *  forward run can't re-arm afterward. */
+export function markHeroRunTriggered() {
+  hasTriggeredOnce = true;
+}
+
 export default function useHeroAutoScroll({
   sectionRef,
   enabled,
@@ -138,8 +189,10 @@ export default function useHeroAutoScroll({
       return -section.getBoundingClientRect().top / d;
     };
 
-    /** Which run, if any, this position should arm. */
+    /** Which run, if any, this position should arm. Refuses to arm either
+     *  direction once the one-shot has already fired this visit. */
     const armFor = (p: number): Dir | null => {
+      if (hasTriggeredOnce) return null;
       if (p >= -ARM_MARGIN && p <= ARM_MARGIN) return "down"; // opening frame
       if (p >= 1 - ARM_MARGIN && p <= 1 + ARM_MARGIN) return "up"; // last frame
       return null; // mid-sequence, or nowhere near the hero
@@ -219,6 +272,10 @@ export default function useHeroAutoScroll({
     const run = (dir: Dir) => {
       armed = null;
       running = dir;
+      // Spends the one shot now, not on completion — an interrupted run
+      // still used its trigger, and a cancelled hijack is not an invitation
+      // to try again. See the ONE-SHOT PER VISIT docblock note.
+      hasTriggeredOnce = true;
       lenis.scrollTo(dir === "down" ? endY() : startY(), {
         duration: HERO_RUN_S,
         easing: heroRunEase,
