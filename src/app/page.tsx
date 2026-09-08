@@ -2,7 +2,10 @@
 // .bak variants were deleted on 2026-08-06 in the dead-code sweep — they are
 // in git history if a rollback is ever needed:
 //   git show 5d89d04:src/components/HeroScrollExperience.tsx
-import HeroScrollExperience from "@/components/HeroScrollExperienceR3F";
+//
+// HeroVersioned (2026-09-08) wraps this hero alongside a second, manual-scroll
+// variant behind a floating "Hero 1 / 2" toggle — see heroVersionStore.ts.
+import HeroVersioned from "@/components/site/HeroVersioned";
 import FamilyStrip from "@/components/site/FamilyStrip";
 import StatementSection from "@/components/site/StatementSection";
 import EquipmentFinder from "@/components/site/EquipmentFinder";
@@ -52,8 +55,9 @@ export default function Home() {
     // which stays hidden over it anyway.
     <div id="top" className="-mt-[var(--chrome-h)] bg-black text-white">
         {/* HERO — mechanism (scrub, pin, modes) is locked; do not restyle.
-            Carries the page's <h1> as an opening overlay (HeroHeadline). */}
-        <HeroScrollExperience />
+            Carries the page's <h1> as an opening overlay (HeroHeadline).
+            HeroVersioned also renders the floating Hero 1/2 toggle. */}
+        <HeroVersioned />
 
         {/* Trust, fast — TNT's own family-of-companies logos right off the hero */}
         <FamilyStrip />

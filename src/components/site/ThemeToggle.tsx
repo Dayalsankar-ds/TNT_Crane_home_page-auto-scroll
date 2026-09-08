@@ -1,13 +1,17 @@
 "use client";
 
 /**
- * THEME TOGGLE — standalone floating "Theme 1 / 2" picker (2026-09-07,
- * on request). Bottom-LEFT so it doesn't collide with the existing
- * bottom-right Nav/About version pickers in SiteNav.tsx.
+ * THEME TOGGLE — floating "Theme 1 / 2" picker (2026-09-07, on request).
+ * Rendered by layout.tsx inside the shared bottom-left toggle row, next to
+ * HeroToggle (2026-09-08) — so it doesn't collide with the bottom-right
+ * Nav/About version pickers in SiteNav.tsx.
  *
  * Same popover-above-a-pill pattern as those pickers, for visual
  * consistency, but backed by its own themeVersionStore rather than being
  * folded into the Nav/About widget group — kept separate on request.
+ *
+ * No positioning of its own — the shared row in layout.tsx owns the fixed
+ * placement so this and HeroToggle line up as siblings.
  */
 
 import { useState } from "react";
@@ -18,7 +22,7 @@ export default function ThemeToggle() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-4 left-4 z-[60] flex flex-col items-start gap-2 sm:bottom-6 sm:left-6">
+    <div className="flex flex-col items-start gap-2">
       {open && (
         <div
           id="theme-version-picker"
