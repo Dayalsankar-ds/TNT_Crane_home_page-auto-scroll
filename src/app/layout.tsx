@@ -5,6 +5,7 @@ import "./globals.css";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
 import SmoothScroll from "@/components/SmoothScroll";
+import ThemeToggle from "@/components/site/ThemeToggle";
 
 // Geist stays the body default so the existing hero's inherited font is unchanged.
 const geistSans = Geist({
@@ -59,6 +60,9 @@ export default function RootLayout({
         <SmoothScroll />
         {/* Fixed nav + shared footer wrap every route */}
         <SiteNav />
+        {/* Standalone Theme 1/2 floating toggle (bottom-left, separate from
+            the Nav/About pickers in SiteNav) */}
+        <ThemeToggle />
         {/* The nav is fixed, so it overlays page content. Inner routes used to
             clear it only by accident — their first section's `py-20` happened
             to exceed the old 102px chrome. Raising the bar to 122px put the

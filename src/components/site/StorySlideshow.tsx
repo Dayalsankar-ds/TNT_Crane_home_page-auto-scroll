@@ -44,6 +44,7 @@ import {
 } from "react";
 import { Icon, type IconName } from "./primitives";
 import { useAboutVersion } from "./aboutVersionStore";
+import { useThemeVersion } from "./themeVersionStore";
 
 type Slide = {
   icon: IconName;
@@ -122,6 +123,7 @@ const TOTAL = SLIDES.length;
 
 export default function StorySlideshow() {
   const [aboutVersion] = useAboutVersion();
+  const [themeVersion] = useThemeVersion();
   const [index, setIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const touchStartX = useRef<number | null>(null);
@@ -293,7 +295,7 @@ export default function StorySlideshow() {
                     aria-current={isActive ? "true" : undefined}
                     aria-label={`${s.label}: ${s.value}`}
                     className={`flex flex-col items-center justify-center gap-1.5 px-4 py-3 text-center transition-colors duration-300 sm:gap-2 sm:py-4 ${
-                      isActive ? "bg-tnt-maroon" : ""
+                      isActive ? (themeVersion === "two" ? "bg-tnt-slate" : "bg-tnt-maroon") : ""
                     } ${isFirst ? "col-span-2" : ""} ${
                       !isFirst && i % 2 === 1 ? "border-r border-black/10" : ""
                     } ${i < SLIDES.length - 2 ? "border-b border-black/10" : ""}`}
