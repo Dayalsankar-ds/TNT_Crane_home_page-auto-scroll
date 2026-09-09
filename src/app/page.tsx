@@ -40,6 +40,10 @@ import RequestQuote from "@/components/site/RequestQuote";
  * StatementSection too, on request — it now lands ahead of Fleet Guide,
  * so "what we do" follows "who we are" before the equipment catalog.
  *
+ * 2026-09-09: CoreServices moved back to sit immediately after
+ * StatementSection (About Us), ahead of EquipmentFinder — Services now
+ * follows About Us directly rather than after the machine-finder step.
+ *
  * 2026-07-30 (later same day): a slim strip added right after the hero. First
  * built as CertificationsStrip (credential chips), but couldn't get real,
  * rights-cleared certification logos — repurposed as FamilyStrip instead:
@@ -62,15 +66,14 @@ export default function Home() {
         {/* Trust, fast — TNT's own family-of-companies logos right off the hero */}
         <FamilyStrip />
 
-        {/* Manifesto + scale — Technical Paper opening statement */}
+        {/* Manifesto + scale — Technical Paper opening statement (About Us) */}
         <StatementSection />
 
-        {/* Qualify early — right after the About/legacy intro, ahead of
-            Services and the Trade Guide (2026-09-02, on request). */}
-        <EquipmentFinder /> {/* find your machine */}
-
-        {/* What we do — sits directly behind Machine Finder. */}
+        {/* What we do — sits directly behind About Us (2026-09-09, on request). */}
         <CoreServices /> {/* services (compaction pending) */}
+
+        {/* Qualify early — after About/Services, ahead of the Trade Guide. */}
+        <EquipmentFinder /> {/* find your machine */}
 
         {/* Fleet catalog — dark band #1, follows Services. */}
         <EquipmentGuide /> {/* rigging & attachments catalog — dark band #1 */}
