@@ -70,6 +70,28 @@
  * budget: the cue hides itself once the budget is spent, and a click
  * spends it too, so a manual replay can't leave the forward run able to
  * re-arm. One budget, two doors.
+ *
+ * HERO BECOMES UNREACHABLE ONCE PASSED (2026-09-10, on request): the
+ * one-shot above only ever stopped the auto-hijack from firing a SECOND
+ * time — an ordinary manual scroll (drag the scrollbar, hold Page Up, many
+ * slow wheel ticks) could still carry someone back up through the pin to
+ * look at it again, hijack or no hijack. That is now blocked outright:
+ * `heroPassed` flips the first time scroll position is observed strictly
+ * past the pin's bottom edge — whether that happened via the DOWN run
+ * completing or via nothing but ordinary scrolling — and once it has, the
+ * per-tick scroll handler clamps any position that would move back above
+ * that edge straight back down to it, immediately, for the rest of the
+ * visit. Only a reload clears it, same as `hasTriggeredOnce`.
+ *
+ * This rides the existing `onScroll` handler rather than a new listener,
+ * so it is not wheel-only the way the hijack itself is — it catches
+ * whatever input actually moved `window.scrollY`: wheel, touch, keyboard
+ * (Home/Page Up/Arrow Up), or a scrollbar drag alike. One accepted
+ * consequence: SiteNav's "Home" link targets `#top`, which sits inside the
+ * now-sealed pin, so clicking it after the hero has been passed is a
+ * no-op — the clamp overrides the jump on the very next scroll tick. That
+ * trade-off was surfaced and accepted before this was built, not an
+ * oversight.
  */
 
 import { useEffect, type RefObject } from "react";
@@ -146,6 +168,11 @@ export function hasHeroRunTriggered() {
 export function markHeroRunTriggered() {
   hasTriggeredOnce = true;
 }
+
+/** Whether scroll position has ever been observed past the hero's bottom
+ *  edge this visit — see the HERO BECOMES UNREACHABLE ONCE PASSED docblock
+ *  note above. Module-level for the same reason as `hasTriggeredOnce`. */
+let heroPassed = false;
 
 export default function useHeroAutoScroll({
   sectionRef,
@@ -276,6 +303,11 @@ export default function useHeroAutoScroll({
       // still used its trigger, and a cancelled hijack is not an invitation
       // to try again. See the ONE-SHOT PER VISIT docblock note.
       hasTriggeredOnce = true;
+      // DOWN is the direction that leaves the hero behind; UP lands back at
+      // frame 1, still inside it. Set here (not left to onScroll noticing
+      // the position later) so a fast, fully-interrupted run still seals
+      // the boundary behind it — see HERO BECOMES UNREACHABLE ONCE PASSED.
+      if (dir === "down") heroPassed = true;
       lenis.scrollTo(dir === "down" ? endY() : startY(), {
         duration: HERO_RUN_S,
         easing: heroRunEase,
@@ -332,6 +364,32 @@ export default function useHeroAutoScroll({
     // is already doing every frame.
     const onScroll = () => {
       if (running) return;
+
+      // Catches the "never hijacked, just scrolled past slowly" case — the
+      // DOWN branch of run() already sets this for the hijacked case, but a
+      // manual scroll straight past the pin (below TRIGGER_DELTA, or from
+      // rest) never calls run() at all. > 1, not >= : exactly AT the last
+      // frame is still "in" the hero, not past it.
+      if (!heroPassed && rawProgress() > 1 + ARM_MARGIN) heroPassed = true;
+
+      // THE WALL. Once heroPassed, any position this tick reports above the
+      // pin's bottom edge is a scroll attempt going back INTO the hero —
+      // wheel, touch, keyboard, or a scrollbar drag alike, since this reads
+      // window.scrollY after the fact rather than the gesture that produced
+      // it. Snap back immediately rather than let it settle: an animated
+      // correction would still show the hero for a moment mid-tween, which
+      // is the one thing this is supposed to prevent. `force` matters here
+      // for the same reason it does in cancel() — without it a scrollTo
+      // made mid-gesture can lose to the gesture's own momentum.
+      if (heroPassed) {
+        const boundary = endY();
+        if (window.scrollY < boundary - 1) {
+          armed = null;
+          lenis.scrollTo(boundary, { immediate: true, force: true });
+          return;
+        }
+      }
+
       armed = armFor(rawProgress());
     };
 

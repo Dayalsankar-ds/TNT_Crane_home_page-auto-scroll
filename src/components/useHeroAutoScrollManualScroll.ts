@@ -5,11 +5,20 @@
  *
  * Copied 2026-09-08 from the sibling TNT_Crane_home_page-manual-scroll
  * project as a second hero version, alongside this project's own
- * useHeroAutoScroll.ts. This is the OLDER form of that hook — it predates
- * the one-shot-per-visit refinement (2026-09-03) the project's own copy
- * carries, so both ends re-arm every time scroll position returns to them
- * rather than firing once per visit. Kept as-is (not upgraded) so this file
- * is a faithful copy of the other project's hero, not a merge of the two.
+ * useHeroAutoScroll.ts. This was originally the OLDER form of that hook —
+ * it predated the one-shot-per-visit refinement (2026-09-03) the project's
+ * own copy carries, so both ends re-armed every time scroll position
+ * returned to them.
+ *
+ * ONE-SHOT PER VISIT (2026-09-10, on request): brought over from
+ * useHeroAutoScroll.ts so both hero versions behave identically on this
+ * point — the auto-scroll hijack (either direction) fires at most once per
+ * visit, and only a page reload resets it. Kept as a second, independent
+ * module-level flag rather than importing the sibling hook's — the two
+ * hero versions are still meant to run side-by-side without one arming or
+ * disarming the other. See HeroScrollCueManualScroll.tsx, which spends the
+ * same budget for its own click-to-replay button (the same two-doors,
+ * one-budget arrangement the project hero uses).
  *
  * One wheel gesture plays the whole hero, either way.
  *
@@ -105,6 +114,33 @@ export const heroRunEase = (t: number) =>
 
 type Dir = "down" | "up";
 
+/** Whether this hero version's one-shot hijack has already fired this visit.
+ *  Module-level so it survives remounts from client-side navigation, not
+ *  just this hook's own lifetime — same convention as useHeroAutoScroll.ts's
+ *  own flag, but a separate variable, on purpose (see the docblock above). */
+let hasTriggeredOnce = false;
+
+/** Read-only check for HeroScrollCueManualScroll's replay button, which
+ *  bypasses this hook's own wheel handling and so has no visibility into the
+ *  budget on its own. */
+export function hasHeroRunTriggeredManualScroll() {
+  return hasTriggeredOnce;
+}
+
+/** Spends the one-shot from OUTSIDE this hook's own wheel handling — called
+ *  by HeroScrollCueManualScroll's replay click, so the forward run can't
+ *  re-arm after a manual replay. */
+export function markHeroRunTriggeredManualScroll() {
+  hasTriggeredOnce = true;
+}
+
+/** Whether scroll position has ever been observed past the hero's bottom
+ *  edge this visit — see useHeroAutoScroll.ts's HERO BECOMES UNREACHABLE
+ *  ONCE PASSED note (2026-09-10, on request; brought over here the same
+ *  way the one-shot budget was). A separate module-level flag, same reason
+ *  as `hasTriggeredOnce` above: the two hero versions run independently. */
+let heroPassed = false;
+
 export default function useHeroAutoScrollManualScroll({
   sectionRef,
   enabled,
@@ -147,8 +183,10 @@ export default function useHeroAutoScrollManualScroll({
       return -section.getBoundingClientRect().top / d;
     };
 
-    /** Which run, if any, this position should arm. */
+    /** Which run, if any, this position should arm. Refuses to arm either
+     *  direction once the one-shot has already fired this visit. */
     const armFor = (p: number): Dir | null => {
+      if (hasTriggeredOnce) return null;
       if (p >= -ARM_MARGIN && p <= ARM_MARGIN) return "down"; // opening frame
       if (p >= 1 - ARM_MARGIN && p <= 1 + ARM_MARGIN) return "up"; // last frame
       return null; // mid-sequence, or nowhere near the hero
@@ -228,6 +266,14 @@ export default function useHeroAutoScrollManualScroll({
     const run = (dir: Dir) => {
       armed = null;
       running = dir;
+      // Spends the one shot now, not on completion — an interrupted run
+      // still used its trigger. See the ONE-SHOT PER VISIT docblock note.
+      hasTriggeredOnce = true;
+      // DOWN leaves the hero behind; UP lands back at frame 1, still inside
+      // it. Set here so a fast, fully-interrupted run still seals the
+      // boundary — see useHeroAutoScroll.ts's HERO BECOMES UNREACHABLE
+      // ONCE PASSED note.
+      if (dir === "down") heroPassed = true;
       lenis.scrollTo(dir === "down" ? endY() : startY(), {
         duration: HERO_RUN_S,
         easing: heroRunEase,
@@ -284,6 +330,25 @@ export default function useHeroAutoScrollManualScroll({
     // is already doing every frame.
     const onScroll = () => {
       if (running) return;
+
+      // Catches "never hijacked, just scrolled past slowly" — run()'s DOWN
+      // branch already sets this for the hijacked case, but a manual scroll
+      // straight past the pin never calls run() at all.
+      if (!heroPassed && rawProgress() > 1 + ARM_MARGIN) heroPassed = true;
+
+      // THE WALL — see useHeroAutoScroll.ts's HERO BECOMES UNREACHABLE ONCE
+      // PASSED note. Immediate, not animated: an eased correction would
+      // still show the hero for a moment mid-tween, the one thing this
+      // exists to prevent.
+      if (heroPassed) {
+        const boundary = endY();
+        if (window.scrollY < boundary - 1) {
+          armed = null;
+          lenis.scrollTo(boundary, { immediate: true, force: true });
+          return;
+        }
+      }
+
       armed = armFor(rawProgress());
     };
 

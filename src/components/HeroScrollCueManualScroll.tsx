@@ -5,11 +5,17 @@
  *
  * Copied 2026-09-08 from the sibling TNT_Crane_home_page-manual-scroll
  * project as part of that project's hero, as a second version alongside this
- * project's own HeroScrollCue.tsx. Pairs with
- * useHeroAutoScrollManualScroll.ts (the older, pre-one-shot form of the
- * hook) rather than this project's own useHeroAutoScroll.ts — kept
- * self-contained (its own local HERO_RUN_S/heroRunEase) rather than sharing
- * constants with this project's hook, matching how the source project had it.
+ * project's own HeroScrollCue.tsx. Pairs with useHeroAutoScrollManualScroll.ts
+ * rather than this project's own useHeroAutoScroll.ts — kept self-contained
+ * (its own local HERO_RUN_S/heroRunEase) rather than sharing constants with
+ * this project's hook, matching how the source project had it.
+ *
+ * ONE-SHOT PER VISIT (2026-09-10, on request): a click here now spends the
+ * same one-shot budget useHeroAutoScrollManualScroll.ts's wheel-triggered
+ * runs do, and the button hides itself once that budget is gone — same
+ * two-doors-one-budget arrangement as HeroScrollCue.tsx/useHeroAutoScroll.ts.
+ * Without this, a click could still replay the sequence indefinitely even
+ * after the hook's own wheel-triggered runs had permanently disarmed.
  *
  * Click-to-replay control for the hero's backward run. Clicking it plays the
  * whole sequence back to frame 1, animated the same way the hero itself
@@ -43,6 +49,10 @@
 
 import { useEffect, useRef, type RefObject } from "react";
 import { getLenis } from "@/components/SmoothScroll";
+import {
+  hasHeroRunTriggeredManualScroll,
+  markHeroRunTriggeredManualScroll,
+} from "@/components/useHeroAutoScrollManualScroll";
 import { Icon } from "@/components/site/primitives";
 
 /** Seconds for the replay-to-top scroll. Long enough to read as a camera move
@@ -114,8 +124,13 @@ export default function HeroScrollCueManualScroll({
       // Unclamped — see the file header.
       const p = distance > 0 ? -rect.top / distance : 0;
 
+      // hasHeroRunTriggeredManualScroll() short-circuits the same way
+      // PAST_HERO does: once the shared one-shot budget is spent (by this
+      // cue's own click, or by the hook's wheel-triggered run), the backward
+      // run is gone for the rest of the visit and the cue advertising it
+      // would be wrong to show.
       const t =
-        p > PAST_HERO
+        hasHeroRunTriggeredManualScroll() || p > PAST_HERO
           ? 0
           : Math.min(
               1,
@@ -126,8 +141,7 @@ export default function HeroScrollCueManualScroll({
       wrap.style.opacity = String(shown);
       wrap.style.transform = `translate3d(0, ${(1 - shown) * RISE}px, 0)`;
 
-      // Same guard HeroHeadline puts on its actions, and for the same reason:
-      // a transparent button left clickable and tabbable is an invisible
+      // A transparent button left clickable and tabbable is an invisible
       // control sitting over the page. Threshold a hair above 0 so a barely
       // opaque button is not hittable either.
       const button = buttonRef.current;
@@ -160,6 +174,13 @@ export default function HeroScrollCueManualScroll({
   const replay = () => {
     const section = sectionRef.current;
     if (!section) return;
+
+    // Spends the shared one-shot budget (2026-09-10, on request): this is
+    // the OTHER door to the backward run, and leaving it un-gated would let
+    // a click land back at frame 1 with the forward auto-scroll still able
+    // to re-arm there.
+    markHeroRunTriggeredManualScroll();
+
     const top = window.scrollY + section.getBoundingClientRect().top;
 
     // Null under reduced motion, where Lenis is never booted. That mode is

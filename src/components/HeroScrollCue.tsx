@@ -129,8 +129,7 @@ export default function HeroScrollCue({
       wrap.style.opacity = String(shown);
       wrap.style.transform = `translate3d(0, ${(1 - shown) * RISE}px, 0)`;
 
-      // Same guard HeroHeadline puts on its actions, and for the same reason:
-      // a transparent button left clickable and tabbable is an invisible
+      // A transparent button left clickable and tabbable is an invisible
       // control sitting over the page. Threshold a hair above 0 so a barely
       // opaque button is not hittable either.
       const button = buttonRef.current;
