@@ -1,9 +1,10 @@
 "use client";
 
 /**
- * HERO VERSION STORE — same pattern as navVersionStore.ts / aboutVersionStore.ts
- * / themeVersionStore.ts, for the standalone "Hero 1 / 2" floating toggle
- * (HeroToggle.tsx).
+ * HERO VERSION STORE — same pattern as navVersionStore.ts / aboutVersionStore.ts,
+ * for the standalone "Hero 1 / 2" floating toggle (HeroToggle.tsx). (A sibling
+ * themeVersionStore.ts once existed for a "Theme 1 / 2" toggle; removed
+ * 2026-09-10 when theme one — brand maroon — was dropped project-wide.)
  *
  * Hero "one" is HeroScrollExperienceR3F — the shipped hero, untouched.
  * Hero "two" is HeroScrollExperienceManualScroll — the manual-scroll variant

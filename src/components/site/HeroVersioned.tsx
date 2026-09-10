@@ -3,8 +3,7 @@
 /**
  * HERO VERSIONED — swaps between the two hero implementations based on
  * heroVersionStore. The floating toggle that drives it (HeroToggle) is
- * rendered separately, by layout.tsx, alongside ThemeToggle — see that
- * file's docblock.
+ * rendered separately, by layout.tsx — see that file's docblock.
  *
  * Keyed by version so switching remounts the hero fresh (fresh frame
  * preload, fresh scroll-mode detection) rather than reusing state across

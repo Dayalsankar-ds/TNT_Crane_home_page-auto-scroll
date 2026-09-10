@@ -2,18 +2,19 @@
 
 /**
  * HERO TOGGLE — floating "Hero 1 / 2" picker (2026-09-08, on request).
- * Rendered by layout.tsx inside the shared bottom-left toggle row, right
- * next to ThemeToggle, so it doesn't collide with the Nav/About pickers in
- * SiteNav.tsx (bottom-right).
+ * Rendered by layout.tsx inside the shared bottom-left toggle row, so it
+ * doesn't collide with the Nav/About pickers in SiteNav.tsx (bottom-right).
+ * Used to sit next to ThemeToggle in that row; ThemeToggle was removed
+ * 2026-09-10 when theme one (maroon) was dropped project-wide, so this is
+ * now the row's only member.
  *
  * Backed by heroVersionStore rather than folded into SiteNav's own group —
  * the hero lives in page.tsx, not SiteNav, so a shared module store is what
  * connects the two (see that file's docblock).
  *
  * No positioning of its own — the shared row in layout.tsx owns the fixed
- * placement so this and ThemeToggle line up as siblings. Popover renders
- * above the button (row order flipped from the toggle's original top-right
- * placement) to match the bottom-anchored group.
+ * placement. Popover renders above the button (row order flipped from the
+ * toggle's original top-right placement) to match the bottom-anchored group.
  */
 
 import { useState } from "react";

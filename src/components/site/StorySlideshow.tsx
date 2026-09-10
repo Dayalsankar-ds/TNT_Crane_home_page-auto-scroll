@@ -12,8 +12,10 @@
  * crossfade). Each stat card is paired 1:1 with a slide and is itself the
  * navigation control — no separate arrows/progress bar (removed 2026-07-30;
  * the cards being clickable made them redundant). Clicking a card highlights
- * it in brand maroon (not dimmed; maroon reads as "selected", dimming reads
- * as "disabled") and swaps in that stat's description.
+ * it in a dark-slate fill (not dimmed; the fill reads as "selected", dimming
+ * reads as "disabled") and swaps in that stat's description. Originally
+ * brand maroon — swapped to slate 2026-09-10 when theme one (maroon) was
+ * removed project-wide; see SafetyCulture.tsx's docblock for the same swap.
  *
  * DESCRIPTION PLACEMENT — ABOUT VERSION GATE (2026-09-02): originally this
  * was purely responsive (left-of-photo on wide screens, a bar underneath on
@@ -44,7 +46,6 @@ import {
 } from "react";
 import { Icon, type IconName } from "./primitives";
 import { useAboutVersion } from "./aboutVersionStore";
-import { useThemeVersion } from "./themeVersionStore";
 
 type Slide = {
   icon: IconName;
@@ -123,7 +124,6 @@ const TOTAL = SLIDES.length;
 
 export default function StorySlideshow() {
   const [aboutVersion] = useAboutVersion();
-  const [themeVersion] = useThemeVersion();
   const [index, setIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const touchStartX = useRef<number | null>(null);
@@ -295,7 +295,7 @@ export default function StorySlideshow() {
                     aria-current={isActive ? "true" : undefined}
                     aria-label={`${s.label}: ${s.value}`}
                     className={`flex flex-col items-center justify-center gap-1.5 px-4 py-3 text-center transition-colors duration-300 sm:gap-2 sm:py-4 ${
-                      isActive ? (themeVersion === "two" ? "bg-tnt-slate" : "bg-tnt-maroon") : ""
+                      isActive ? "bg-tnt-slate" : ""
                     } ${isFirst ? "col-span-2" : ""} ${
                       !isFirst && i % 2 === 1 ? "border-r border-black/10" : ""
                     } ${i < SLIDES.length - 2 ? "border-b border-black/10" : ""}`}
