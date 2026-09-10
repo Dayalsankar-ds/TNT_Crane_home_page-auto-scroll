@@ -7,8 +7,10 @@
  *  - The top half is bright sky and the yellow jib for most of the sequence, so
  *    top-anchored white type has almost no contrast to work with. (The loader
  *    already owns the top-left anyway.)
- *  - Dead centre is reserved: the branded jib plate crosses it around frame 100
- *    and the closing logo lands there at frame 289. Copy there fights the film.
+ *  - Dead centre is reserved: the branded jib plate crosses it around frame 100.
+ *    Copy there fights the film. (The closing logo that used to land there at
+ *    frame 289 no longer plays at all — see heroSequence.ts's 2026-09-10 trim
+ *    — but the reservation stands on the jib-plate crossing alone.)
  *  - Bottom-left is the only region that is dark or mid-tone in the opening
  *    frames, and it shares the loader's `max-w-5xl` measure so the two blocks
  *    hang off the same left edge.

@@ -57,10 +57,21 @@ export type HeroSequence = {
  * numbering stays one continuous sequence. q:v 40 was chosen empirically:
  * V4 averaged ~70KB/frame and this footage compressed heavier at the same
  * quality setting (~103KB/frame at q:v 75) — q:v 40 brought it back to
- * ~69KB/frame with no visible quality loss on inspection. 290 frames,
- * ~20MB total. `sectionVh` is scaled from V4's 480vh by the frame-count
- * ratio (480 × 290⁄314 ≈ 443) to preserve the same ~1.53vh-per-frame scrub
- * pace rather than carrying V4's absolute value over unchanged.
+ * ~69KB/frame with no visible quality loss on inspection. 290 frames total
+ * as encoded, ~20MB.
+ *
+ * TRIMMED TO CLIP 01 ONLY (2026-09-10, on request): `count` cut from 290 to
+ * 193 — Clip 02 (frames 193–289: the camera pulling back from a macro shot
+ * of the branded plate to the static "TNT CRANE & RIGGING" logo over
+ * clouds) no longer plays at all, in either the manual scrub or the
+ * auto-scroll hijack. The hero now ends on Clip 01's own last frame (real
+ * jobsite footage) and goes straight on to Family of Companies from there.
+ * Frames 193–289 are unused but left on disk in frames-v5/, not deleted —
+ * ask if you also want those removed to shrink the repo.
+ * `sectionVh` is rescaled to the trimmed count by the same ratio the
+ * original 443 was derived by (480 × 290⁄314 ≈ 443): 443 × 193⁄290 ≈ 295,
+ * preserving the ~1.53vh-per-frame scrub pace rather than leaving 97
+ * frames' worth of scrub distance pinned on nothing.
  *
  * V5's own masters ("Clip 01.mp4" / "Clip 02.mp4") have since moved too —
  * see this file's top docblock — from the repo-root `Video/Updated video/`
@@ -69,9 +80,9 @@ export type HeroSequence = {
 export const SEQUENCE_V5: HeroSequence = {
   dir: "/video/frames-v5",
   start: 0,
-  count: 290,
+  count: 193,
   ext: "webp",
-  sectionVh: 443,
+  sectionVh: 295,
 };
 
 /** The sequence the hero renders. */

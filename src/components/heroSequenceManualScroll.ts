@@ -34,14 +34,23 @@ export type HeroSequence = {
 /**
  * "Hero Section 3": drone flythrough over a TNT job site at dusk (crawler
  * crane setting a load, aerial site pass), resolving to the TNT Crane &
- * Rigging logo above the clouds. 386 4K frames, Adobe Media Encoder export,
- * at ~1vh of scroll per frame.
+ * Rigging logo above the clouds. 386 4K frames total as encoded, Adobe
+ * Media Encoder export, at ~1vh of scroll per frame.
+ *
+ * TRIMMED TO THE JOBSITE FOOTAGE ONLY (2026-09-10, on request, matching the
+ * same cut made to heroSequence.ts's V5): `count` cut from 386 to 286 —
+ * frames 286–385 (the camera pulling back through a macro shot of the
+ * branded plate to the static logo over clouds) no longer play. Ends on the
+ * last clean jobsite frame instead, straight on to Family of Companies.
+ * Frames 286–385 are unused but left on disk in frames-v3/, not deleted.
+ * `sectionVh` rescaled to the trimmed count, same ratio as before: 480 ×
+ * 286⁄386 ≈ 356.
  */
 export const SEQUENCE_V3: HeroSequence = {
   dir: "/video/frames-v3",
   start: 0,
-  count: 386,
-  sectionVh: 480,
+  count: 286,
+  sectionVh: 356,
 };
 
 /** The sequence the hero renders. */
@@ -61,8 +70,8 @@ const OPT_QUALITY = 60;
  * Same frame, routed through Next's built-in image optimizer (`sharp`,
  * already a transitive dep of `next`) instead of served raw from `public/`.
  * Re-encodes the JPEG to WebP/AVIF on the fly, which is what actually shrinks
- * the 386-frame preload — no ffmpeg or master footage required to get this
- * win, unlike re-encoding the source frames themselves.
+ * the preload — no ffmpeg or master footage required to get this win, unlike
+ * re-encoding the source frames themselves.
  */
 export const optimizedFramePath = (seq: HeroSequence, n: number) =>
   `/_next/image?url=${encodeURIComponent(framePath(seq, n))}&w=${OPT_WIDTH}&q=${OPT_QUALITY}`;

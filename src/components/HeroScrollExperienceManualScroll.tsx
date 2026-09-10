@@ -5,18 +5,19 @@
  *
  * Copied 2026-09-08 from the sibling TNT_Crane_home_page-manual-scroll
  * project as a second hero version, alongside this project's own
- * HeroScrollExperienceR3F.tsx. NOT wired into any page yet — dropped in for
- * side-by-side comparison / future use. To try it, swap the import in
- * app/page.tsx from "@/components/HeroScrollExperienceR3F" to
- * "@/components/HeroScrollExperienceManualScroll".
+ * HeroScrollExperienceR3F.tsx. Wired in as "Hero version two" behind
+ * HeroToggle's floating picker (see heroVersionStore.ts) rather than swapped
+ * into page.tsx directly.
  *
  * Differences from this project's own hero:
- *  - Frame sequence: heroSequenceManualScroll.ts's V3 (386 JPEG frames,
- *    served through Next's image optimizer) instead of heroSequence.ts's V5
- *    (290 WebP frames, served raw).
- *  - Auto-scroll hook: useHeroAutoScrollManualScroll.ts, the older
- *    pre-one-shot form — both ends re-arm every time scroll position returns
- *    to them, rather than firing once per visit.
+ *  - Frame sequence: heroSequenceManualScroll.ts's V3 (JPEG frames, served
+ *    through Next's image optimizer; trimmed 2026-09-10 to end on the
+ *    jobsite footage, same as V5 — see that file's docblock) instead of
+ *    heroSequence.ts's V5 (WebP frames, served raw).
+ *  - Auto-scroll hook: useHeroAutoScrollManualScroll.ts — originally the
+ *    older, pre-one-shot form of this project's own hook, brought up to the
+ *    same one-shot-per-visit and scroll-lock behavior 2026-09-10 (see that
+ *    file's docblock for what's still deliberately kept separate).
  *  - Adds a manual, 1:1 scroll-tracking effect and a touch-momentum killer
  *    inside the pin (see below) that this project's own hero does not have.
  *  - Its own HeroScrollCueManualScroll.tsx (self-contained, no shared
