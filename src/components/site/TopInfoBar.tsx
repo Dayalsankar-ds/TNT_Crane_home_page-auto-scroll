@@ -44,6 +44,17 @@ export default function TopInfoBar() {
             <Icon name="mail" className="h-4 w-4 shrink-0 text-tnt-amber" />
             info@tntcrane.com
           </a>
+          {/* Phone, `lg`-only — the inverse of the nav rail's `xl:block`
+              number (2026-09-10). The eight-item bar has no room for it at
+              `lg`, so it lands here in that band and hides again at `xl`
+              where the rail takes it back. Exactly one is ever visible. */}
+          <a
+            href="tel:+18007992505"
+            className="flex items-center gap-2 font-mono text-[12px] tracking-wide text-white/70 transition-colors hover:text-tnt-amber xl:hidden"
+          >
+            <Icon name="payment" className="h-4 w-4 shrink-0 text-tnt-amber" />
+            1-800-799-2505
+          </a>
         </div>
 
         {/* Social */}

@@ -4,9 +4,22 @@
  * The bar used to carry nine flat top-level links, four of which pointed at
  * single-section pages (/charts, /for-sale, /industries, /services). Those are
  * children wearing a parent's clothes, and eleven items in one 64px row is why
- * the desktop nav could not engage until `xl`. This collapses them to four
- * groups, each opening a panel that exposes the ~23 real destinations the site
- * actually has.
+ * the desktop nav could not engage until `xl`. That was collapsed to four
+ * grouped panels (Equipment / Services / Coverage / Company).
+ *
+ * 2026-09-10: respecified to eight top-level items, as supplied by the client
+ * — Home · About · Services · Fleet · Careers · News · For Sale · Contact us.
+ * Items that own real content keep their panel (About, Services, Fleet); the
+ * rest are flat links with no caret. Two consequences worth knowing:
+ *
+ *  - Careers, News and For Sale carry `href: null`. Their routes went on
+ *    2026-08-04 and nothing replaced them, so they render inert rather than
+ *    linking nowhere. Give them a destination (a section, a route, or an
+ *    external ATS link — the sister sites send Careers to a Paycom ATS) and
+ *    they become live with no component change.
+ *  - The old Coverage group's destinations (#coverage, #family) moved under
+ *    About, which is now the only panel that reaches them. Nothing on the
+ *    homepage became unreachable in the reshuffle.
  *
  * Data only — no "use client" — so the mobile accordion, the desktop panels,
  * and any future sitemap render from the same list and cannot drift.
@@ -47,65 +60,75 @@ export type NavColumn = {
   items: NavChild[];
 };
 
+/** Closing card on the right edge of a panel. */
+export type NavFeature = {
+  eyebrow: string;
+  title: string;
+  blurb: string;
+  href: string;
+  cta: string;
+};
+
 export type NavGroup = {
   label: string;
-  /** The group's own landing page — the trigger is a real link, not a dead
-   *  button, so the panel is an enhancement rather than the only way in. */
-  href: string;
+  /** The group's own landing anchor — the trigger is a real link, not a dead
+   *  button, so the panel is an enhancement rather than the only way in.
+   *
+   *  `null` means the item has no destination on this site yet, and renders
+   *  inert rather than as a link to nowhere — the same convention
+   *  SiteFooter.tsx already uses for its unbuilt legal links. Careers, News
+   *  and For Sale sit here (2026-09-10): the nav bar was specified with them,
+   *  but their routes were deleted on 2026-08-04 and no section replaced them. */
+  href: string | null;
+  /** Empty on a flat item, which then opens no panel and shows no caret. */
   columns: NavColumn[];
-  /** Closing card on the right edge of the panel. */
-  feature: {
-    eyebrow: string;
-    title: string;
-    blurb: string;
-    href: string;
-    cta: string;
-  };
+  /** Omitted on flat items, which have no panel to close. */
+  feature?: NavFeature;
 };
 
 export const NAV_GROUPS: NavGroup[] = [
+  // Flat: the hero occupies #top, so this is the one item whose destination is
+  // the page itself rather than a section within it.
+  { label: "Home", href: "/#top", columns: [] },
   {
-    label: "Equipment",
-    href: "/#fleet-guide",
+    label: "About",
+    href: "/#statement",
     columns: [
       {
         no: "01",
-        // Was "Fleet Classes" (7 crane classes, e.g. Crawler Cranes 80–750 T)
-        // until EquipmentGuide.tsx was replaced with a rigging/attachments
-        // catalog on 2026-08-26 — see that file's docblock. Went 7 → 3 → 6
-        // the same day, as more real photos turned up on cross-check. These
-        // 6 items and their hrefs match its RIGGING array exactly; `meta` is
-        // dropped since there's no honest capacity-range equivalent for
-        // rigging categories the way there was for crane classes.
-        heading: "Rigging & Attachments",
+        // Coverage Map and Family of Companies moved in here on 2026-09-10,
+        // when the eight-item bar removed the Coverage group they used to sit
+        // under. "Contact Us" left in the other direction — it is a top-level
+        // item now, so repeating it here would be the same link twice.
+        heading: "About TNT",
         items: [
-          { index: "01", label: "Hydraulic Gantry Systems", icon: "heavylift", href: `/#${slugify("Hydraulic Gantry Systems")}` },
-          { index: "02", label: "Cantilever & Spreader Bar Rigging", icon: "rigging", href: `/#${slugify("Cantilever & Spreader Bar Rigging")}` },
-          { index: "03", label: "In-Plant Overhead Rigging", icon: "engineering", href: `/#${slugify("In-Plant Overhead Rigging")}` },
-          { index: "04", label: "SPMT & Modular Transport", icon: "transport", href: `/#${slugify("SPMT & Modular Transport")}` },
-          { index: "05", label: "Jack-and-Slide Systems", icon: "heavylift", href: `/#${slugify("Jack-and-Slide Systems")}` },
-          { index: "06", label: "Versa-Lift Machinery Moving", icon: "rental", href: `/#${slugify("Versa-Lift Machinery Moving")}` },
+          // An /our-story route briefly lived here on 2026-08-06 and was
+          // deleted the same day. This points back at the homepage's Statement
+          // section, which is where "who we are" lives on a single-page site.
+          { label: "Who We Are", href: "/#statement", icon: "commercial" },
+          { label: "Coverage Map", href: "/#coverage", icon: "pin" },
+          { label: "Family of Companies", href: "/#family", icon: "commercial" },
+          { label: "Safety & Record", href: "/#safety", icon: "engineering" },
+          { label: "Case Studies", href: "/#projects", icon: "heavylift" },
         ],
       },
-      {
-        no: "02",
-        // Load Charts (/charts) and Equipment For Sale (/for-sale) were dropped
-        // with their routes on 2026-08-04 — neither has a homepage section to
-        // anchor to. "Find Your Machine" is all that survives, so this column
-        // is now named for what it actually holds.
-        heading: "Find Equipment",
-        items: [
-          { label: "Find Your Machine", href: "/#equipment", icon: "search" },
-        ],
-      },
+      // Dropped with their routes on 2026-08-04, none having a homepage
+      // section: the "Client Portal" column — Rental Agreements, Credit
+      // Application and Payment Portal all pointed at /contact#self-service
+      // (ClientSelfService, which the homepage does not render). Worth noting
+      // the cross-check found NO sister site ships a client portal either.
     ],
+    // The careers feature went with /careers on 2026-08-04. Replaced with the
+    // iCARE safety program, which IS on the homepage (#safety) — copy drawn
+    // from SafetyCulture rather than invented, so the panel still makes a point
+    // instead of listing.
     feature: {
-      eyebrow: "Rigging & Attachments",
-      title: "The gear behind every lift",
+      eyebrow: "Safety",
+      title: "iCARE, on every lift",
       blurb:
-        "Gantries, below-the-hook fixtures, and in-plant rigging — the equipment that makes a lift possible, not just the crane.",
-      href: "/#fleet-guide",
-      cta: "Open the guide",
+        "The safety program every crew works to — planned, briefed, and audited on site, from the first pick to the last.",
+      href: "/#safety",
+      cta: "See the program",
     },
   },
   {
@@ -143,68 +166,50 @@ export const NAV_GROUPS: NavGroup[] = [
     },
   },
   {
-    label: "Coverage",
-    href: "/#coverage",
+    // Renamed from "Equipment" on 2026-09-10 to the client's "Fleet". NOTE the
+    // label now over-promises slightly: on the sister sites "Fleet"/"CHARTS"
+    // means crane classes with capacities and load-chart PDFs, and this panel
+    // holds the rigging/attachments catalog instead — the crane-class chart
+    // data (craneChartData.ts) was removed with EquipmentFinder the same day.
+    label: "Fleet",
+    href: "/#fleet-guide",
     columns: [
       {
         no: "01",
-        heading: "Where We Are",
+        // Was "Fleet Classes" (7 crane classes, e.g. Crawler Cranes 80–750 T)
+        // until EquipmentGuide.tsx was replaced with a rigging/attachments
+        // catalog on 2026-08-26 — see that file's docblock. Went 7 → 3 → 6
+        // the same day, as more real photos turned up on cross-check. These
+        // 6 items and their hrefs match its RIGGING array exactly; `meta` is
+        // dropped since there's no honest capacity-range equivalent for
+        // rigging categories the way there was for crane classes.
+        heading: "Rigging & Attachments",
         items: [
-          { label: "Coverage Map", href: "/#coverage", icon: "pin" },
-          // "Areas Served" (/coverage#areas) dropped 2026-08-04 — AreasServed
-          // renders only on the deleted route, not on the homepage.
-          { label: "Family of Companies", href: "/#family", icon: "commercial" },
+          { index: "01", label: "Hydraulic Gantry Systems", icon: "heavylift", href: `/#${slugify("Hydraulic Gantry Systems")}` },
+          { index: "02", label: "Cantilever & Spreader Bar Rigging", icon: "rigging", href: `/#${slugify("Cantilever & Spreader Bar Rigging")}` },
+          { index: "03", label: "In-Plant Overhead Rigging", icon: "engineering", href: `/#${slugify("In-Plant Overhead Rigging")}` },
+          { index: "04", label: "SPMT & Modular Transport", icon: "transport", href: `/#${slugify("SPMT & Modular Transport")}` },
+          { index: "05", label: "Jack-and-Slide Systems", icon: "heavylift", href: `/#${slugify("Jack-and-Slide Systems")}` },
+          { index: "06", label: "Versa-Lift Machinery Moving", icon: "rental", href: `/#${slugify("Versa-Lift Machinery Moving")}` },
         ],
       },
     ],
     feature: {
-      eyebrow: "Nearest Branch",
-      title: "One fleet, US and Canada",
+      eyebrow: "Rigging & Attachments",
+      title: "The gear behind every lift",
       blurb:
-        "Search the branch network by city or state and reach the yard that already runs your corridor.",
-      // Was /coverage#branch-search (BranchLocator). That component is not on
-      // the homepage; CoverageMap is the surviving nearest-branch section.
-      href: "/#coverage",
-      cta: "Find a branch",
+        "Gantries, below-the-hook fixtures, and in-plant rigging — the equipment that makes a lift possible, not just the crane.",
+      href: "/#fleet-guide",
+      cta: "Open the guide",
     },
   },
-  {
-    label: "Company",
-    href: "/#statement",
-    columns: [
-      {
-        no: "01",
-        heading: "About TNT",
-        items: [
-          // An /our-story route briefly lived here on 2026-08-06 and was
-          // deleted the same day. This points back at the homepage's Statement
-          // section, which is where "who we are" lives on a single-page site.
-          { label: "Who We Are", href: "/#statement", icon: "commercial" },
-          { label: "Safety & Record", href: "/#safety", icon: "engineering" },
-          { label: "Case Studies", href: "/#projects", icon: "heavylift" },
-          { label: "Contact Us", href: "/#contact", icon: "mail" },
-        ],
-      },
-      // Dropped with their routes on 2026-08-04, none having a homepage
-      // section: News and Careers (/about#news, /careers), and the whole
-      // "Client Portal" column — Rental Agreements, Credit Application and
-      // Payment Portal all pointed at /contact#self-service (ClientSelfService,
-      // which the homepage does not render). "Contact Us" was the one live link
-      // in that column and moved up into "About TNT".
-    ],
-    // The careers feature went with /careers on 2026-08-04. Replaced with the
-    // iCARE safety program, which IS on the homepage (#safety) — copy drawn
-    // from SafetyCulture rather than invented, so the panel still makes a point
-    // instead of listing.
-    feature: {
-      eyebrow: "Safety",
-      title: "iCARE, on every lift",
-      blurb:
-        "The safety program every crew works to — planned, briefed, and audited on site, from the first pick to the last.",
-      href: "/#safety",
-      cta: "See the program",
-    },
-  },
+  // The three inert items. Each was a real route until 2026-08-04 and has no
+  // homepage section, so there is nothing honest to point at yet — see the
+  // `href` docs on NavGroup above.
+  { label: "Careers", href: null, columns: [] },
+  { label: "News", href: null, columns: [] },
+  { label: "For Sale", href: null, columns: [] },
+  { label: "Contact us", href: "/#contact", columns: [] },
 ];
 
 /* ==========================================================================
@@ -575,7 +580,7 @@ export function brandOf(locationId: LocationId): {
 type LocationContent = {
   services: string[];
   industries: string[];
-  feature: NavGroup["feature"];
+  feature: NavFeature;
 };
 
 const LOCATION_CONTENT: Record<RegionId, LocationContent> = {
@@ -707,11 +712,11 @@ const SERVICES_GROUP = NAV_GROUPS.find((g) => g.label === "Services")!;
  */
 export function servicesPanelFor(locationId: LocationId): {
   columns: NavColumn[];
-  feature: NavGroup["feature"];
+  feature: NavFeature;
 } {
   const loc = SERVICE_LOCATIONS.find((l) => l.id === locationId);
   if (!loc?.region) {
-    return { columns: SERVICES_GROUP.columns, feature: SERVICES_GROUP.feature };
+    return { columns: SERVICES_GROUP.columns, feature: SERVICES_GROUP.feature! };
   }
   const content = LOCATION_CONTENT[loc.region];
   const allow = (heading: string) =>
@@ -775,6 +780,6 @@ const EXTRA_ROUTES: Record<string, string> = {
 export function activeGroup(pathname: string): string | null {
   const extra = EXTRA_ROUTES[pathname];
   if (extra) return extra;
-  const hit = NAV_GROUPS.find((g) => g.href === pathname);
+  const hit = NAV_GROUPS.find((g) => g.href !== null && g.href === pathname);
   return hit ? hit.label : null;
 }

@@ -292,60 +292,105 @@ export default function SiteNav() {
             />
           </Link>
 
-          {/* Desktop group triggers — four items now fit at `lg`, matching the
-              breakpoint TopInfoBar and the sticky offsets already use. */}
-          <ul className="hidden items-center gap-1 lg:flex">
+          {/* Desktop triggers. Eight items as of 2026-09-10, so the gap and
+              padding tighten a step to keep the row on one line at `lg` — the
+              four-group bar had room to spare and this does not.
+
+              Three shapes here, not one: a panel item (has columns) is a link
+              with a caret that opens on hover; a flat item with an href is a
+              plain link; a flat item with `href: null` has no destination yet
+              and renders as inert text rather than a link to nowhere. */}
+          <ul className="hidden items-center gap-0.5 lg:flex">
             {NAV_GROUPS.map((g) => {
               const isOpen = shownGroup === g.label;
               const isCurrent = current === g.label;
+              const hasPanel = g.columns.length > 0;
+              const cls = `flex items-center gap-1.5 rounded-md px-2.5 py-2 font-body text-base font-semibold whitespace-nowrap transition-colors ${
+                isOpen || isCurrent
+                  ? "text-tnt-amber"
+                  : "text-white/85 hover:text-tnt-amber"
+              }`;
+
+              if (g.href === null) {
+                return (
+                  <li key={g.label}>
+                    {/* aria-disabled, not `disabled`: this is a span, and the
+                        label still has to be readable by a screen reader —
+                        it announces the item exists but goes nowhere yet. */}
+                    <span
+                      aria-disabled="true"
+                      className="flex items-center rounded-md px-2.5 py-2 font-body text-base font-semibold whitespace-nowrap text-white/40"
+                    >
+                      {g.label}
+                    </span>
+                  </li>
+                );
+              }
+
               return (
-                <li key={g.label} onMouseEnter={() => scheduleOpen(g.label)}>
+                <li
+                  key={g.label}
+                  onMouseEnter={hasPanel ? () => scheduleOpen(g.label) : undefined}
+                >
                   <Link
                     href={g.href}
-                    aria-expanded={isOpen}
-                    aria-haspopup="true"
+                    aria-expanded={hasPanel ? isOpen : undefined}
+                    aria-haspopup={hasPanel ? "true" : undefined}
                     aria-current={isCurrent ? "page" : undefined}
                     onClick={() => setOpenGroup(null)}
-                    onFocus={() => setOpenGroup(g.label)}
-                    onKeyDown={(e) => {
-                      if (e.key === "ArrowDown") {
-                        e.preventDefault();
-                        setOpenGroup(g.label);
-                      }
-                    }}
+                    onFocus={
+                      hasPanel ? () => setOpenGroup(g.label) : undefined
+                    }
+                    onKeyDown={
+                      hasPanel
+                        ? (e) => {
+                            if (e.key === "ArrowDown") {
+                              e.preventDefault();
+                              setOpenGroup(g.label);
+                            }
+                          }
+                        : undefined
+                    }
                     // 16px to match the panel's stepped-up labels (2026-08-04)
                     // — the trigger and the column it opens are the same rung
                     // of the hierarchy and looked mismatched a step apart.
-                    className={`flex items-center gap-1.5 rounded-md px-3 py-2 font-body text-base font-semibold whitespace-nowrap transition-colors ${
-                      isOpen || isCurrent
-                        ? "text-tnt-amber"
-                        : "text-white/85 hover:text-tnt-amber"
-                    }`}
+                    className={cls}
                   >
                     {g.label}
-                    <svg
-                      viewBox="0 0 12 12"
-                      aria-hidden="true"
-                      className={`h-3 w-3 ${isOpen ? "rotate-180" : ""}`}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m2.5 4.5 3.5 3.5 3.5-3.5" />
-                    </svg>
+                    {hasPanel && (
+                      <svg
+                        viewBox="0 0 12 12"
+                        aria-hidden="true"
+                        className={`h-3 w-3 ${isOpen ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="m2.5 4.5 3.5 3.5 3.5-3.5" />
+                      </svg>
+                    )}
                   </Link>
                 </li>
               );
             })}
           </ul>
 
-          {/* Contact rail */}
+          {/* Contact rail.
+
+              The phone is `xl`-only as of 2026-09-10. Eight top-level items
+              (up from four) need 667px of the row; with the 184px wordmark and
+              a 236px rail that totalled 1087px against the 960px available at
+              `lg`, which pushed "Get a Quote" clean off the right edge —
+              measured, not guessed. Dropping the 134px number (plus its gap)
+              brings the row to ~933px and it fits again. Nothing is lost:
+              TopInfoBar carries the number below `xl` instead, and above `xl`
+              this rail is unchanged. */}
           <div className="hidden items-center gap-5 lg:flex">
             <a
               href="tel:+18007992505"
-              className="font-mono text-base font-semibold whitespace-nowrap text-white transition-colors hover:text-tnt-amber"
+              className="hidden font-mono text-base font-semibold whitespace-nowrap text-white transition-colors hover:text-tnt-amber xl:block"
             >
               1-800-799-2505
             </a>
@@ -389,13 +434,19 @@ export default function SiteNav() {
             text over a translucent panel would sit on whatever section
             happened to be scrolling underneath. */}
         {shownGroup &&
-          NAV_GROUPS.filter((g) => g.label === shownGroup).map((g) => {
+          NAV_GROUPS.filter(
+            // The columns check is what keeps a flat item from ever rendering
+            // an empty panel. Flat items don't call scheduleOpen either, so
+            // this is belt-and-braces — but it's also what lets `feature` be
+            // asserted below: a group with columns always authors one.
+            (g) => g.label === shownGroup && g.columns.length > 0,
+          ).map((g) => {
             // Services is the one group whose answer depends on where you are.
             // Everything else is national and renders as authored.
             const localized = g.label === "Services";
             const { columns, feature } = localized
               ? servicesPanelFor(location)
-              : { columns: g.columns, feature: g.feature };
+              : { columns: g.columns, feature: g.feature! };
             // Remounting on the location key replays the swap animation. A
             // transition would be the obvious choice, but transitions inside
             // this backdrop-filtered header freeze mid-flight under the scroll
@@ -521,43 +572,58 @@ export default function SiteNav() {
             const cols = localized
               ? servicesPanelFor(location).columns
               : g.columns;
+            // Same three shapes as the desktop bar: accordion, plain link, or
+            // inert label. The accordion toggle only renders when there is
+            // something under it to reveal.
+            const hasPanel = cols.length > 0;
             return (
               <li key={g.label} className="border-b border-white/10 last:border-0">
                 <div className="flex items-center">
-                  <Link
-                    href={g.href}
-                    onClick={() => setMobileOpen(false)}
-                    aria-current={current === g.label ? "page" : undefined}
-                    className={`flex-1 rounded-md px-3 py-3.5 font-display text-base tracking-wide uppercase ${
-                      current === g.label ? "text-tnt-amber" : "text-white"
-                    }`}
-                  >
-                    {g.label}
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setMobileSection((v) => (v === g.label ? null : g.label))
-                    }
-                    aria-expanded={expanded}
-                    aria-label={`${expanded ? "Collapse" : "Expand"} ${g.label}`}
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-md text-white/70"
-                  >
-                    <svg
-                      viewBox="0 0 12 12"
-                      aria-hidden="true"
-                      className={`h-3 w-3 transition-transform duration-200 ${
-                        expanded ? "rotate-180" : ""
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+                  {g.href === null ? (
+                    <span
+                      aria-disabled="true"
+                      className="flex-1 rounded-md px-3 py-3.5 font-display text-base tracking-wide text-white/40 uppercase"
                     >
-                      <path d="m2.5 4.5 3.5 3.5 3.5-3.5" />
-                    </svg>
-                  </button>
+                      {g.label}
+                    </span>
+                  ) : (
+                    <Link
+                      href={g.href}
+                      onClick={() => setMobileOpen(false)}
+                      aria-current={current === g.label ? "page" : undefined}
+                      className={`flex-1 rounded-md px-3 py-3.5 font-display text-base tracking-wide uppercase ${
+                        current === g.label ? "text-tnt-amber" : "text-white"
+                      }`}
+                    >
+                      {g.label}
+                    </Link>
+                  )}
+                  {hasPanel && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setMobileSection((v) => (v === g.label ? null : g.label))
+                      }
+                      aria-expanded={expanded}
+                      aria-label={`${expanded ? "Collapse" : "Expand"} ${g.label}`}
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-md text-white/70"
+                    >
+                      <svg
+                        viewBox="0 0 12 12"
+                        aria-hidden="true"
+                        className={`h-3 w-3 transition-transform duration-200 ${
+                          expanded ? "rotate-180" : ""
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="m2.5 4.5 3.5 3.5 3.5-3.5" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
 
                 {expanded && (
