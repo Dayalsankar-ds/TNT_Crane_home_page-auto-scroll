@@ -1,13 +1,11 @@
 "use client";
 
 /**
- * RIGGING & ATTACHMENTS — flipped from the mid-page dark band to LIGHT theme
- * (2026-09-02, on request): section shell bg-tnt-navy/text-white → bg-white,
- * card faces bg-black → bg-white with a black/12 border (was white/10). The
- * compare modal stays dark chrome (bg-tnt-navy) on purpose — it's an overlay,
- * not part of the section flow, and EquipmentFinder's capacity-chart modal
- * already keeps dark chrome inside an otherwise light section, so this
- * matches that precedent rather than inventing a new one.
+ * RIGGING & ATTACHMENTS — flipped back to a LIGHT theme (2026-09-10, on
+ * request, same day as the black-theme flip): section shell
+ * bg-black/text-white → bg-white, card faces bg-black → bg-white with a
+ * black/12 border (was white/10). The compare modal stays dark chrome
+ * (bg-tnt-navy) throughout — it's an overlay, not part of the section flow.
  *
  * Formerly "Fleet Guide": a 7-card catalog of crane CLASSES
  * (Crawler, All-Terrain, Tower, …). Replaced entirely (2026-08-26, on
@@ -213,10 +211,9 @@ export default function EquipmentGuide() {
           </p>
         </div>
 
-        {/* FLEX, not grid (2026-08-04, carried over from Fleet Guide). At 3
-            cards this never wraps to a short leftover row the way 7 did, but
-            the basis math is kept identical so a 4th category can drop in
-            later without redoing the layout. */}
+        {/* FLEX, not grid (2026-08-04, carried over from Fleet Guide).
+            lg basis is 3-per-row (2026-09-10, on request) — 6 cards now
+            wrap into a clean 3/3 grid instead of 4-then-2. */}
         <div className="mt-16 flex flex-wrap justify-start gap-6">
           {RIGGING.map((r) => {
             const isChecked = selected.has(r.index);
@@ -227,7 +224,7 @@ export default function EquipmentGuide() {
                 // docblock. A plain element with an id and scroll-mt is
                 // exactly as valid an anchor target as the old <Link> was.
                 id={slugify(r.title)}
-                className={`group flex basis-full flex-col scroll-mt-32 overflow-hidden rounded-2xl border bg-white transition-[transform,border-color] duration-300 ease-out hover:-translate-y-1 sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(25%-1.125rem)] ${
+                className={`group flex basis-full flex-col scroll-mt-32 overflow-hidden rounded-2xl border bg-white transition-[transform,border-color] duration-300 ease-out hover:-translate-y-1 sm:basis-[calc(50%-0.75rem)] lg:basis-[calc(33.333%-1rem)] ${
                   isChecked
                     ? "border-tnt-amber"
                     : "border-black/12 hover:border-tnt-amber/60"
