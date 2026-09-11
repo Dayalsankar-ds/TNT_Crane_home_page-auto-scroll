@@ -14,14 +14,17 @@
  *    through Next's image optimizer; trimmed 2026-09-10 to end on the
  *    jobsite footage, same as V5 — see that file's docblock) instead of
  *    heroSequence.ts's V5 (WebP frames, served raw).
- *  - Auto-scroll hook: useHeroAutoScrollManualScroll.ts — originally the
- *    older, pre-one-shot form of this project's own hook, brought up to the
- *    same one-shot-per-visit and scroll-lock behavior 2026-09-10 (see that
- *    file's docblock for what's still deliberately kept separate).
- *  - Adds a manual, 1:1 scroll-tracking effect and a touch-momentum killer
- *    inside the pin (see below) that this project's own hero does not have.
- *  - Its own HeroScrollCueManualScroll.tsx (self-contained, no shared
- *    constants with the hook) rather than this project's HeroScrollCue.tsx.
+ *  - Auto-scroll hook: useHeroAutoScrollManualScroll.ts — kept as a fully
+ *    separate module from this project's own useHeroAutoScroll.ts, but
+ *    brought to identical behavior across every change so far (one-shot,
+ *    the becomes-unreachable wall, and 2026-09-10's rewrite into an
+ *    unconditional, un-cancellable autoplay — no more manual scrubbing).
+ *
+ * 2026-09-10: this file used to carry two extra effects here (a 1:1
+ * lerp-zeroing scroll tracker, and a touch-momentum killer) purely to make
+ * MANUAL scrubbing inside the pin feel direct, plus its own
+ * HeroScrollCueManualScroll.tsx replay cue. All three are gone along with
+ * manual scrubbing itself — see the autoplay hook's own docblock.
  *
  * Shares HeroHeadline.tsx, HeroFrameGL.tsx (via three/gl.ts) and
  * SmoothScroll.tsx with this project's own hero — those are identical
@@ -39,9 +42,7 @@ import {
   optimizedFramePath as seqFramePath,
 } from "@/components/heroSequenceManualScroll";
 import HeroHeadline from "@/components/HeroHeadline";
-import HeroScrollCueManualScroll from "@/components/HeroScrollCueManualScroll";
 import useHeroAutoScrollManualScroll from "@/components/useHeroAutoScrollManualScroll";
-import { getLenis } from "@/components/SmoothScroll";
 
 const HeroFrameGL = dynamic(
   () => import("@/components/three/gl").then((m) => m.HeroFrameGL),
@@ -153,110 +154,20 @@ export default function HeroScrollExperienceManualScroll() {
     };
   }, [mode]);
 
-  // ---- Manual, 1:1 scroll tracking inside the pin ---------------------------
-  // SmoothScroll's Lenis instance eases toward each wheel tick's target
-  // (lerp: 0.1) rather than applying it immediately, so releasing the wheel
-  // lets the scroll glide a few frames further before settling — which reads
-  // as the hero still animating on its own. Lenis reads `options.lerp` fresh
-  // on every wheel event, and its Animate step treats a falsy lerp as "jump
-  // straight to the target" (no damping at all) rather than "damp with 0
-  // strength" — so zeroing it while inside the pin makes each wheel tick land
-  // exactly where the wheel stopped, immediately. Outside the pin, the site's
-  // normal glide (SmoothScroll's lerp: 0.1) is restored.
-  useEffect(() => {
-    if (mode !== "scrub") return;
-    const section = sectionRef.current;
-    if (!section) return;
-    const lenis = getLenis();
-    if (!lenis) return; // reduced motion — Lenis is never booted there
+  // The two effects that used to live here (a 1:1 lerp-zeroing scroll
+  // tracker, and a touch-momentum killer) existed solely to make MANUAL
+  // scrubbing inside the pin feel direct. Removed 2026-09-10 along with
+  // manual scrubbing itself — the autoplay hook below claims the scroll the
+  // moment frames are ready and holds it locked, so there is no longer a
+  // window in which a user's own wheel/touch gesture drives the pin at all.
 
-    const SITE_LERP = 0.1; // must match SmoothScroll's Lenis config
-
-    const update = () => {
-      const distance = section.offsetHeight - window.innerHeight;
-      const p =
-        distance > 0 ? -section.getBoundingClientRect().top / distance : 1;
-      lenis.options.lerp = p >= 0 && p <= 1 ? 0 : SITE_LERP;
-    };
-
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-      lenis.options.lerp = SITE_LERP;
-    };
-  }, [mode]);
-
-  // ---- Kill native touch momentum inside the pin ----------------------------
-  // HeroFrameGL reads scroll position directly every frame with no easing of
-  // its own (see its useFrame), so the hero can only keep animating after a
-  // finger lifts if the document's actual scroll position is still changing —
-  // which native touch-scroll momentum does, exactly like flinging any long
-  // page. Lenis never sees this (`syncTouch` is off site-wide), so the lerp
-  // trick above doesn't reach it either. The only way to stop it is to take
-  // over the gesture itself: read the finger's raw delta and apply it to
-  // scrollY immediately, one-to-one, with nothing injected at release.
-  useEffect(() => {
-    if (mode !== "scrub") return;
-    const section = sectionRef.current;
-    if (!section) return;
-
-    let tracking = false;
-    let lastY = 0;
-
-    const inPin = () => {
-      const distance = section.offsetHeight - window.innerHeight;
-      if (distance <= 0) return false;
-      const p = -section.getBoundingClientRect().top / distance;
-      return p >= 0 && p <= 1;
-    };
-
-    const onTouchStart = (e: TouchEvent) => {
-      // Multi-touch (pinch/zoom) is left alone — only a single dragging
-      // finger is a scroll gesture here.
-      if (e.touches.length !== 1 || !inPin()) return;
-      tracking = true;
-      lastY = e.touches[0].clientY;
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (!tracking || e.touches.length !== 1) return;
-      const y = e.touches[0].clientY;
-      const delta = lastY - y; // finger moving up = scrolling down
-      lastY = y;
-      // Cancels the browser's own scroll for this gesture so nothing but
-      // this handler's 1:1 delta ever moves the page while tracking.
-      if (e.cancelable) e.preventDefault();
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const next = Math.min(max, Math.max(0, window.scrollY + delta));
-      window.scrollTo({ top: next, behavior: "instant" });
-    };
-
-    // No momentum on release — tracking simply stops, and scroll stays
-    // exactly at the last touchmove's position.
-    const onTouchEnd = () => {
-      tracking = false;
-    };
-
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
-    return () => {
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("touchcancel", onTouchEnd);
-    };
-  }, [mode]);
-
-  // ---- Auto-play a full run when a flick lands at either end of the pin -----
-  // Manual 1:1 scrubbing (above) stays untouched mid-sequence; this only arms
-  // right at the opening or closing frame. See useHeroAutoScrollManualScroll.ts.
+  // Plays the whole sequence itself, once, the moment frames are ready — no
+  // manual scrubbing, no gesture to start it. See that hook's own docblock
+  // for the full mechanism (Lenis lock, keyboard blocking, the
+  // becomes-unreachable wall afterward).
   useHeroAutoScrollManualScroll({
     sectionRef,
+    frameCount: FRAME_COUNT,
     enabled: mode === "scrub" && framesReady,
   });
 
@@ -318,10 +229,6 @@ export default function HeroScrollExperienceManualScroll() {
         {/* Opening statement — the page's only <h1>. Rides the same scroll
             progress as the frame surface and clears before the logo reveal. */}
         <HeroHeadline sectionRef={sectionRef} isStatic={isStatic} />
-
-        {/* Replay cue — arrives near the last frame, plays the sequence back
-            to frame 1 on click. Mirrors the auto-scroll run above. */}
-        <HeroScrollCueManualScroll sectionRef={sectionRef} isStatic={isStatic} />
 
         {/* Loading state — anchored top-left over the frame. */}
         {showLoader && (

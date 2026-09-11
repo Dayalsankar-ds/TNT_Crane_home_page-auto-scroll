@@ -3,15 +3,25 @@
 /**
  * HERO SCROLL EXPERIENCE — R3F PORT (Phase 4 of the Three.js migration).
  *
- * Behavior-identical port of HeroScrollExperience.tsx: same frame sequence,
- * same mode heuristics (scrub / reduced / poster / pending, with the
- * `?scrub=1` override), same preloader UI, same sticky 500vh pin. The only
- * change is the frame surface — a WebGL textured plane (HeroFrameGL) instead
- * of 2D-canvas drawImage — which opens the door to true 3D moments in the
- * hero (camera drift, depth layers) later.
+ * Port of HeroScrollExperience.tsx: same frame sequence, same mode
+ * heuristics (scrub / reduced / poster / pending, with the `?scrub=1`
+ * override), same preloader UI. The frame surface is a WebGL textured plane
+ * (HeroFrameGL) instead of 2D-canvas drawImage, which opens the door to true
+ * 3D moments in the hero (camera drift, depth layers) later.
  *
- * The original component is kept untouched as the rollback path: swap the
- * import in app/page.tsx back to "@/components/HeroScrollExperience".
+ * NO MANUAL SCRUBBING (2026-09-10, on request): the pin still exists (the
+ * sticky child is still 100vh over a taller parent) and useHeroAutoScroll
+ * still drives it by animating real scroll position via Lenis — that
+ * plumbing didn't change, and HeroFrameGL/HeroHeadline still read scroll
+ * position exactly as before. What changed is that the hook now starts
+ * itself unconditionally the moment frames are ready, instead of waiting
+ * for a wheel gesture at either end, and nothing can interrupt it once
+ * started — see that hook's own docblock. There is no more manual
+ * scroll-driven scrubbing through the middle of the sequence: by the time a
+ * visitor could scroll here at all, the hook has already claimed the scroll
+ * and is playing it for them. The former "Scroll Up to replay" cue
+ * (HeroScrollCue.tsx) is gone with it — there is no manual replay in this
+ * model, only the one autoplay per visit.
  *
  * The WebGL layer is mounted only in scrub mode via `dynamic(ssr: false)` —
  * static modes (mobile/reduced/pending) never download Three.js, and SSR
@@ -25,7 +35,6 @@ import {
   framePath as seqFramePath,
 } from "@/components/heroSequence";
 import HeroHeadline from "@/components/HeroHeadline";
-import HeroScrollCue from "@/components/HeroScrollCue";
 import useHeroAutoScroll from "@/components/useHeroAutoScroll";
 
 const HeroFrameGL = dynamic(
@@ -144,11 +153,16 @@ export default function HeroScrollExperienceR3F() {
   const staticSrc = mode === "reduced" ? LAST_FRAME_SRC : FIRST_FRAME_SRC;
   const showLoader = mode === "scrub" && !framesReady;
 
-  // One wheel gesture at either end of the pin plays the whole sequence to the
-  // other end — down from frame 1, back up from the last frame. Gated on
-  // framesReady as well as the mode: without the decoded sequence this would
-  // scroll 500vh past a frozen frame 1. See the hook for the arm/cancel rules.
-  useHeroAutoScroll({ sectionRef, enabled: mode === "scrub" && framesReady });
+  // Plays the whole sequence itself, once, the moment frames are ready — no
+  // manual scrubbing, no gesture to start it. Gated on framesReady as well as
+  // the mode: without the decoded sequence this would scroll past a frozen
+  // frame 1. See the hook for the full mechanism (Lenis lock, keyboard
+  // blocking, the becomes-unreachable wall afterward).
+  useHeroAutoScroll({
+    sectionRef,
+    frameCount: FRAME_COUNT,
+    enabled: mode === "scrub" && framesReady,
+  });
 
   return (
     <section
@@ -201,13 +215,6 @@ export default function HeroScrollExperienceR3F() {
         {/* Opening statement — the page's only <h1>. Rides the same scroll
             progress as the frame surface and clears before the logo reveal. */}
         <HeroHeadline sectionRef={sectionRef} isStatic={isStatic} />
-
-        {/* Closing beat, and the mirror of the headline: fades IN over the last
-            tenth of the pin to advertise the backward run that useHeroAutoScroll
-            arms at the final frame. Mounted after the headline so that if the
-            two ever overlap, the cue wins the stack — but they cannot, since one
-            has cleared by 26% and the other arrives at 90%. */}
-        <HeroScrollCue sectionRef={sectionRef} isStatic={isStatic} />
 
         {/* Loading state — anchored top-left over the frame. */}
         {showLoader && (

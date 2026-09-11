@@ -1,181 +1,129 @@
 "use client";
 
 /**
- * HERO AUTO-SCROLL — MANUAL-SCROLL VARIANT.
+ * HERO AUTO-PLAY — MANUAL-SCROLL VARIANT. Plays itself, once, on load. No
+ * manual scrubbing.
  *
  * Copied 2026-09-08 from the sibling TNT_Crane_home_page-manual-scroll
  * project as a second hero version, alongside this project's own
- * useHeroAutoScroll.ts. This was originally the OLDER form of that hook —
- * it predated the one-shot-per-visit refinement (2026-09-03) the project's
- * own copy carries, so both ends re-armed every time scroll position
- * returned to them.
+ * useHeroAutoScroll.ts, and kept in step with it since (one-shot-per-visit
+ * 2026-09-10; this rewrite, same day). REWRITTEN from a wheel-triggered
+ * hijack into an unconditional autoplay — see useHeroAutoScroll.ts's own
+ * docblock for the full reasoning, mirrored here. In short:
  *
- * ONE-SHOT PER VISIT (2026-09-10, on request): brought over from
- * useHeroAutoScroll.ts so both hero versions behave identically on this
- * point — the auto-scroll hijack (either direction) fires at most once per
- * visit, and only a page reload resets it. Kept as a second, independent
- * module-level flag rather than importing the sibling hook's — the two
- * hero versions are still meant to run side-by-side without one arming or
- * disarming the other. See HeroScrollCueManualScroll.tsx, which spends the
- * same budget for its own click-to-replay button (the same two-doors,
- * one-budget arrangement the project hero uses).
+ *  - STARTS ITSELF the moment frames are ready — no wheel gesture required.
+ *    `hasTriggeredOnce` guards against StrictMode's double-mount and against
+ *    ever restarting later in the same visit.
+ *  - CANNOT BE INTERRUPTED. No cancel-on-wheel escape: wheel/touch during the
+ *    run do nothing, because Lenis's own `lock` already refuses non-forced
+ *    scroll requests while a locked `scrollTo` is in flight. Keyboard is the
+ *    one gap Lenis doesn't cover (native scroll keys, not wheel/touch), so
+ *    `onKeyDown` preventDefaults them for the run's duration.
+ *  - Recovery (backgrounded tab, stalled rAF) force-completes by jumping
+ *    straight to the end, rather than freezing wherever it stalled — there
+ *    is no "resume browsing from here" in this design.
  *
- * One wheel gesture plays the whole hero, either way.
+ * Kept as fully separate module-level state from useHeroAutoScroll.ts's own
+ * (`hasTriggeredOnce`, `heroPassed` below) — the two hero versions are still
+ * meant to run side-by-side without one arming or disarming the other.
  *
- * The first downward wheel at the opening frame hands the scroll over to a
- * timed animation that carries the page to the last frame and stops there.
- * The mirror: an upward wheel at the last frame plays the sequence back to
- * frame 1 and stops.
+ * DOWN RUN, SECOND LEG (unchanged mechanism, carried over): reaching the
+ * last frame holds there (HeroFrameGL clamps progress to 1) and the SAME
+ * locked scroll continues on as an ordinary page-scroll transition, landing
+ * with the Family strip (#family) pinned just under the nav bar. Chained
+ * from the first leg's `onComplete`, not one long tween, so the extra
+ * distance doesn't speed up the hero's own frame pacing.
  *
- * This is scroll hijacking, which is worth being deliberate about — the whole
- * complaint against it is that it takes control away and doesn't give it back.
- * So:
- *
- *  - It arms only at the two ENDS of the pin, and only for the direction that
- *    leads away from that end. Mid-sequence it is inert, so it can never fight
- *    a scroll already in progress.
- *  - A deliberate wheel the OTHER way during a run cancels it instantly, as
- *    does Escape. The run holds the scroll (`lock: true`) precisely so the
- *    trailing events of the triggering gesture can't abort it a frame later —
- *    which makes an explicit way out mandatory, not a nicety.
- *  - A cancel leaves you mid-sequence with nothing armed. Reaching an end is
- *    the only thing that re-arms, so "stop" means stop.
- *  - It only ever runs in `scrub` mode with the sequence fully preloaded.
- *    Reduced-motion and poster/mobile have no pin to traverse, and running
- *    before the frames are decoded would scroll 500vh past a frozen frame 1.
- *
- * Wheel only, on purpose. Keyboard scrolling stays literal: teleporting a
- * keyboard user four viewports on a single ArrowDown is a worse trade than
- * making them hold the key, and the effect is designed around a wheel/trackpad
- * flick anyway.
- *
- * DOWN RUN, SECOND LEG: reaching the last frame no longer just stops the
- * scroll — it holds there (HeroFrameGL already clamps its own progress to 1,
- * so nothing extra is needed to freeze the frame) and the SAME locked scroll
- * continues on as an ordinary page-scroll transition, landing with the
- * Family strip (#family) pinned just under the nav bar — the same line
- * SiteNav uses to reveal itself, so the strip and the bar arrive together.
- * This is a second `lenis.scrollTo` chained from the first's `onComplete`,
- * not one long tween across both distances — stretching a single tween over
- * the added distance would have sped up the hero's own frame playback to fit
- * inside the same HERO_RUN_S. The UP run (last frame back to first) is
- * untouched by any of this.
+ * HERO BECOMES UNREACHABLE ONCE PASSED: `heroPassed` flips once scroll
+ * position clears the pin's bottom edge, and `onScroll` clamps any position
+ * that would move back above it for the rest of the visit — see
+ * useHeroAutoScroll.ts's own docblock for the full rationale (identical
+ * here, just against this file's own module state).
  */
 
 import { useEffect, type RefObject } from "react";
 import { getLenis } from "@/components/SmoothScroll";
 import { CHROME_H } from "@/components/site/chrome";
 
-/** Seconds for a full run, either direction. Long enough to read as a camera
- *  move rather than a jump cut, short enough that nobody feels held.
- *
- *  Exported because HeroScrollCue's button runs the same journey from a click.
- *  It is the same move to the viewer, so it must not be a second, differently
- *  timed animation that happens to go the same way. */
-export const HERO_RUN_S = 2.8;
+/** Source footage frame rate, assumed 24fps (not stated in
+ *  heroSequenceManualScroll.ts, unlike V5's documented 24fps) — the autoplay
+ *  duration derives from this so it plays at roughly the clip's own pace. */
+const FPS = 24;
 
-/** Seconds for the second leg of the DOWN run — the page-scroll continuation
- *  from the held last frame on to the Family strip. Deliberately shorter than
- *  HERO_RUN_S: this is a plain page transition covering a much shorter
- *  distance, not a frame sequence to read. */
+/** Seconds for the second leg — the page-scroll continuation from the held
+ *  last frame on to the Family strip. Deliberately short: a plain page
+ *  transition covering a much shorter distance, not footage to watch. */
 const FAMILY_REVEAL_S = 1;
 
-/** How close to an end counts as "at" it. Not zero — a restored scroll
- *  position or a settling lerp can leave you a pixel or two off, and that
- *  shouldn't disqualify the frame you are plainly looking at. */
+/** How close to the bottom edge counts as "past" the pin, for the
+ *  becomes-unreachable wall below. */
 const ARM_MARGIN = 0.02;
 
-/** Wheel delta against the run that counts as "let me out" rather than gesture
- *  noise. Inertial trackpads emit small opposite-sign deltas as a flick decays,
- *  so this has to clear that floor or a run would cancel itself. */
-const CANCEL_DELTA = 12;
-
-/** Wheel delta AT an end that counts as "take over" rather than a deliberate
- *  slow scrub. Without this floor, the first micro-delta of any scrub attempt
- *  right at an end — trackpad or notched wheel alike — launched the full run,
- *  leaving no way to manually scrub in from either boundary. Same order of
- *  magnitude as CANCEL_DELTA: both exist to separate "gesture noise" from "an
- *  intentional flick," just on opposite sides of a run. */
-const TRIGGER_DELTA = 12;
-
-/** How far past the nav's reveal line (CHROME_H) the DOWN run's second leg
- *  lands #family's top, in px. Landing exactly ON the threshold leaves the
- *  nav's visibility hinging on a single pixel — any rounding/clamp/settling
- *  drift between this scrollTo's target and SiteNav's own rAF-polled read can
- *  land on the wrong side of it. The margin makes "nav visible on arrival"
- *  unconditional instead of a coin flip. */
+/** How far past the nav's reveal line (CHROME_H) the second leg lands
+ *  #family's top, in px — see useHeroAutoScroll.ts's own note. */
 const NAV_REVEAL_MARGIN = 24;
 
-/** Gentle at both ends: eases in so the takeover doesn't snap out from under
- *  the triggering flick, and eases out so it settles onto the target frame
- *  instead of slamming into it. */
-export const heroRunEase = (t: number) =>
+/** Gentle at both ends: eases in so playback doesn't snap on at frame 1, and
+ *  eases out so it settles onto the last frame instead of slamming into it. */
+const heroRunEase = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-type Dir = "down" | "up";
-
-/** Whether this hero version's one-shot hijack has already fired this visit.
- *  Module-level so it survives remounts from client-side navigation, not
- *  just this hook's own lifetime — same convention as useHeroAutoScroll.ts's
- *  own flag, but a separate variable, on purpose (see the docblock above). */
+/** Whether this hero version's autoplay has already run this visit.
+ *  Module-level so it survives remounts from client-side navigation and
+ *  guards StrictMode's double mount — only a page reload resets it. A
+ *  separate flag from useHeroAutoScroll.ts's own, on purpose (see docblock). */
 let hasTriggeredOnce = false;
 
-/** Read-only check for HeroScrollCueManualScroll's replay button, which
- *  bypasses this hook's own wheel handling and so has no visibility into the
- *  budget on its own. */
-export function hasHeroRunTriggeredManualScroll() {
-  return hasTriggeredOnce;
-}
-
-/** Spends the one-shot from OUTSIDE this hook's own wheel handling — called
- *  by HeroScrollCueManualScroll's replay click, so the forward run can't
- *  re-arm after a manual replay. */
-export function markHeroRunTriggeredManualScroll() {
-  hasTriggeredOnce = true;
-}
-
 /** Whether scroll position has ever been observed past the hero's bottom
- *  edge this visit — see useHeroAutoScroll.ts's HERO BECOMES UNREACHABLE
- *  ONCE PASSED note (2026-09-10, on request; brought over here the same
- *  way the one-shot budget was). A separate module-level flag, same reason
- *  as `hasTriggeredOnce` above: the two hero versions run independently. */
+ *  edge this visit. A separate module-level flag, same reason as
+ *  `hasTriggeredOnce` above. */
 let heroPassed = false;
+
+/** Native keys that move scroll position on their own, independent of
+ *  Lenis's wheel/touch virtualization. */
+const SCROLL_KEYS = new Set([
+  " ",
+  "Spacebar",
+  "PageUp",
+  "PageDown",
+  "Home",
+  "End",
+  "ArrowUp",
+  "ArrowDown",
+]);
 
 export default function useHeroAutoScrollManualScroll({
   sectionRef,
+  frameCount,
   enabled,
 }: {
   /** The pinned <section> — the same element the frame surface measures. */
   sectionRef: RefObject<HTMLElement | null>;
+  /** Frames in the active sequence — sets how long the autoplay takes. */
+  frameCount: number;
   /** Scrub mode with frames decoded. Anything else and this does nothing. */
   enabled: boolean;
 }) {
   useEffect(() => {
     if (!enabled) return;
+    if (hasTriggeredOnce) return;
 
     const section = sectionRef.current;
     if (!section) return;
 
-    // Null under prefers-reduced-motion (Lenis is never booted there). No
-    // fallback to window.scrollTo on purpose: someone who asked for less
-    // motion should not be handed a 500vh programmatic scroll.
+    // Null under prefers-reduced-motion (Lenis is never booted there).
     const lenis = getLenis();
     if (!lenis) return;
 
-    let armed: Dir | null = null;
-    let running: Dir | null = null;
+    const HERO_RUN_S = frameCount / FPS;
+
+    let running = false;
     let watchdog = 0;
 
-    // Same math as HeroFrameGL and HeroHeadline — the sticky child is 100vh, so
-    // the parent's extra height is the scrub distance — but deliberately NOT
-    // clamped to 0–1.
-    //
-    // The clamp is what makes the backward trigger dangerous: every position
-    // below the hero reports exactly 1, so a clamped reading would arm the
-    // "play backwards" run while you were down at the footer, and an ordinary
-    // wheel-up there would rip you back to the top of the page. Unclamped, past
-    // the hero reads >1 and before it reads <0, which is precisely the
-    // information needed to tell "at the last frame" from "long gone past it".
+    // Same math as HeroFrameGL and HeroHeadline — the sticky child is 100vh,
+    // so the parent's extra height is the scrub distance — but deliberately
+    // NOT clamped to 0–1, so "long past the hero" is distinguishable from
+    // "sitting at the last frame".
     const distance = () => section.offsetHeight - window.innerHeight;
     const rawProgress = () => {
       const d = distance();
@@ -183,25 +131,15 @@ export default function useHeroAutoScrollManualScroll({
       return -section.getBoundingClientRect().top / d;
     };
 
-    /** Which run, if any, this position should arm. Refuses to arm either
-     *  direction once the one-shot has already fired this visit. */
-    const armFor = (p: number): Dir | null => {
-      if (hasTriggeredOnce) return null;
-      if (p >= -ARM_MARGIN && p <= ARM_MARGIN) return "down"; // opening frame
-      if (p >= 1 - ARM_MARGIN && p <= 1 + ARM_MARGIN) return "up"; // last frame
-      return null; // mid-sequence, or nowhere near the hero
-    };
-
     // Absolute scroll positions of the two ends. Measured at trigger time
-    // rather than cached: ScrollTrigger.refresh() and late-loading images can
-    // still move the section after mount.
+    // rather than cached: late-loading images can still move the section
+    // after mount.
     const startY = () => window.scrollY + section.getBoundingClientRect().top;
     const endY = () => startY() + distance();
 
-    // Where the DOWN run's second leg lands: the scrollY that puts #family's
-    // top NAV_REVEAL_MARGIN px past the nav's reveal line, measured live
-    // rather than cached like startY/endY. Falls back to endY() — i.e. no
-    // second leg — if the Family strip isn't on the page.
+    // Where the second leg lands: the scrollY that puts #family's top
+    // NAV_REVEAL_MARGIN px past the nav's reveal line. Falls back to endY()
+    // — i.e. no second leg — if the Family strip isn't on the page.
     const familyLandingY = () => {
       const family = document.getElementById("family");
       if (!family) return endY();
@@ -213,39 +151,19 @@ export default function useHeroAutoScrollManualScroll({
       );
     };
 
-    const cancel = () => {
-      window.clearTimeout(watchdog);
-      if (!running) return;
-      running = null;
-      // `force` is required — the run set isLocked, and Lenis drops any
-      // scrollTo made while locked unless forced. Landing on animatedScroll
-      // stops exactly where the eye already is, and `reset()` inside the
-      // immediate branch is what clears the lock.
-      lenis.scrollTo(lenis.animatedScroll, { immediate: true, force: true });
-    };
-
-    // Ends the run (either direction): releases the lock and clears the
-    // deadman switch. `running` must stay truthy — not just non-null between
-    // the two DOWN legs — for the whole duration, so a wheel-against-the-run
-    // during the family-reveal leg still cancels it exactly like it would
-    // during the frame playback.
     const finish = () => {
       window.clearTimeout(watchdog);
-      running = null;
+      running = false;
     };
 
-    // Second leg of a DOWN run: chained from the first leg's onComplete
-    // rather than folded into one long tween, so the hero's own pacing
-    // (HERO_RUN_S over the pin's `distance()`) is untouched by the extra
-    // distance. `running` is left as "down" throughout — same lock, same
-    // cancel-on-wheel-up behavior, just a second target.
+    // Second leg: chained from the first leg's onComplete rather than
+    // folded into one long tween, so the hero's own pacing (HERO_RUN_S over
+    // the pin's `distance()`) is untouched by the extra distance.
     const continueToFamily = () => {
       window.clearTimeout(watchdog); // supersede the first leg's deadman switch
       const landing = familyLandingY();
       if (landing <= endY()) {
-        // No Family strip to land on (or it's already above the fold) —
-        // stop exactly where the original run always stopped.
-        running = null;
+        running = false;
         return;
       }
       lenis.scrollTo(landing, {
@@ -257,129 +175,97 @@ export default function useHeroAutoScrollManualScroll({
       });
       watchdog = window.setTimeout(
         () => {
-          if (running) cancel();
+          if (running) forceComplete();
         },
         FAMILY_REVEAL_S * 1000 + 1200,
       );
     };
 
-    const run = (dir: Dir) => {
-      armed = null;
-      running = dir;
-      // Spends the one shot now, not on completion — an interrupted run
-      // still used its trigger. See the ONE-SHOT PER VISIT docblock note.
+    // RECOVERY, not an escape hatch — see useHeroAutoScroll.ts's own note.
+    const forceComplete = () => {
+      window.clearTimeout(watchdog);
+      if (!running) return;
+      heroPassed = true;
+      lenis.scrollTo(endY(), { immediate: true, force: true });
+      running = false;
+    };
+
+    const run = () => {
+      running = true;
       hasTriggeredOnce = true;
-      // DOWN leaves the hero behind; UP lands back at frame 1, still inside
-      // it. Set here so a fast, fully-interrupted run still seals the
-      // boundary — see useHeroAutoScroll.ts's HERO BECOMES UNREACHABLE
-      // ONCE PASSED note.
-      if (dir === "down") heroPassed = true;
-      lenis.scrollTo(dir === "down" ? endY() : startY(), {
+      // Set here, not left for onScroll to notice later, so a run that gets
+      // force-completed mid-flight still seals the boundary behind it.
+      heroPassed = true;
+      lenis.scrollTo(endY(), {
         duration: HERO_RUN_S,
         easing: heroRunEase,
         lock: true,
         force: true,
-        // UP is unchanged — stops at the first frame. DOWN holds the last
-        // frame (nothing to draw beyond clamped progress=1) and continues
-        // into the page-scroll leg above.
-        onComplete: dir === "down" ? continueToFamily : finish,
+        onComplete: continueToFamily,
       });
 
-      // DEADMAN SWITCH. `lock: true` is only ever released by the animation
-      // finishing (or by cancel()), and the animation only advances on rAF —
-      // which the browser suspends outright in a background tab. Observed for
-      // real: a run started, the tab was backgrounded, and <html> was left with
-      // `lenis-locked` and a page that could not be scrolled at all, with
-      // nothing on a timer to recover it.
-      //
-      // visibilitychange below covers the common case immediately; this covers
-      // everything else (a stalled ticker, a dropped onComplete). Background
-      // timers are clamped to ~1s but they do still fire, so the lock always
-      // gets released eventually.
+      // DEADMAN SWITCH — see useHeroAutoScroll.ts's own note for why this
+      // exists (observed for real: a backgrounded tab left the page
+      // permanently unscrollable with nothing to recover it).
       watchdog = window.setTimeout(
         () => {
-          if (running) cancel();
+          if (running) forceComplete();
         },
         HERO_RUN_S * 1000 + 1200,
       );
     };
 
-    const onWheel = (e: WheelEvent) => {
-      if (running) {
-        // Only a wheel AGAINST the run is an escape. With the run's own
-        // direction we'd cancel on the triggering flick's own inertia.
-        const against =
-          running === "down" ? e.deltaY < -CANCEL_DELTA : e.deltaY > CANCEL_DELTA;
-        if (against) cancel();
-        return;
-      }
-      if (!armed) return;
-      if (Math.abs(e.deltaY) < TRIGGER_DELTA) return; // slow scrub, not a flick
-      const dir: Dir = e.deltaY > 0 ? "down" : "up";
-      if (dir !== armed) return; // wrong way for the end we're sitting at
-      if (armFor(rawProgress()) !== armed) return; // moved since we armed
-      run(dir);
-    };
-
+    // Blocks native keyboard scrolling for the run's duration — the one
+    // input class Lenis doesn't virtualize on its own. No wheel/touch
+    // listener is needed here at all: Lenis's own `lock` already refuses to
+    // act on them while a locked scrollTo is in flight.
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") cancel();
+      if (running && SCROLL_KEYS.has(e.key)) e.preventDefault();
     };
 
-    // Arming is recomputed per scroll rather than latched, so leaving an end
-    // disarms as reliably as arriving at one arms. Cheap next to what the hero
-    // is already doing every frame.
+    // Position-tracking only — no arming, since nothing needs a gesture to
+    // start it anymore. Still runs every scroll tick to catch and seal the
+    // wall below.
     const onScroll = () => {
       if (running) return;
 
-      // Catches "never hijacked, just scrolled past slowly" — run()'s DOWN
-      // branch already sets this for the hijacked case, but a manual scroll
-      // straight past the pin never calls run() at all.
       if (!heroPassed && rawProgress() > 1 + ARM_MARGIN) heroPassed = true;
 
-      // THE WALL — see useHeroAutoScroll.ts's HERO BECOMES UNREACHABLE ONCE
-      // PASSED note. Immediate, not animated: an eased correction would
-      // still show the hero for a moment mid-tween, the one thing this
-      // exists to prevent.
+      // THE WALL — see useHeroAutoScroll.ts's own note. Immediate, not
+      // animated: an eased correction would still show the hero for a
+      // moment mid-tween, the one thing this exists to prevent.
       if (heroPassed) {
         const boundary = endY();
         if (window.scrollY < boundary - 1) {
-          armed = null;
           lenis.scrollTo(boundary, { immediate: true, force: true });
-          return;
         }
       }
-
-      armed = armFor(rawProgress());
     };
 
-    // The target is captured when a run starts, so a resize mid-run leaves it
-    // aiming at a stale position. Bail rather than land somewhere wrong.
-    const onResize = () => cancel();
-
-    // Leaving the tab suspends rAF, which freezes the run mid-flight with the
-    // scroll still locked. End it now rather than let the deadman switch find
-    // it a few seconds later — this is the path that actually happens.
+    // Leaving the tab suspends rAF, which freezes the run mid-flight with
+    // the scroll still locked. Recover now rather than let the deadman
+    // switch find it a few seconds later.
     const onVisibility = () => {
-      if (document.hidden) cancel();
+      if (document.hidden) forceComplete();
     };
 
-    onScroll(); // arm from the position we mount at, not the first scroll
-
-    window.addEventListener("wheel", onWheel, { passive: true });
-    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", onKeyDown, { passive: false });
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
 
+    // The autoplay itself — no gesture, no delay.
+    run();
+
     return () => {
-      window.removeEventListener("wheel", onWheel);
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
       // Unmounting mid-run would otherwise leave Lenis locked with nothing
       // left to unlock it — i.e. a page that cannot be scrolled at all.
-      cancel();
+      if (running) {
+        window.clearTimeout(watchdog);
+        lenis.scrollTo(lenis.animatedScroll, { immediate: true, force: true });
+      }
     };
-  }, [sectionRef, enabled]);
+  }, [sectionRef, frameCount, enabled]);
 }
