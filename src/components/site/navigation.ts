@@ -140,15 +140,20 @@ export const NAV_GROUPS: NavGroup[] = [
         heading: "Capabilities",
         items: [
           // JOURNEY order, matching the lifecycle in CoreServices — plan, lift,
-          // rig, move, transport, store, renewable. The panel and the section
-          // are one numbering system or neither number means anything.
+          // rig, move, store, renewable. The panel and the section are one
+          // numbering system or neither number means anything.
+          //
+          // Heavy Haul & Transport (was 05, "Transport") removed 2026-09-11,
+          // on request — CoreServices.tsx renumbered to match, and the
+          // "heavy-haul-transport" slug was dropped from every region's list
+          // below rather than left pointing at a capability that no longer
+          // renders.
           { index: "01", label: "Crane Rental", icon: "rental", href: `/#${slugify("Crane Rental")}` },
           { index: "02", label: "Lift Planning & Engineering", icon: "engineering", href: `/#${slugify("Lift Planning & Engineering")}` },
           { index: "03", label: "Specialized Rigging", icon: "rigging", href: `/#${slugify("Specialized Rigging")}` },
           { index: "04", label: "Machinery Moving", icon: "heavylift", href: `/#${slugify("Machinery Moving")}` },
-          { index: "05", label: "Heavy Haul & Transport", icon: "transport", href: `/#${slugify("Heavy Haul & Transport")}` },
-          { index: "06", label: "Industrial Storage", icon: "storage", href: `/#${slugify("Industrial Storage")}` },
-          { index: "07", label: "Wind Energy", icon: "wind", href: `/#${slugify("Wind Energy")}` },
+          { index: "05", label: "Industrial Storage", icon: "storage", href: `/#${slugify("Industrial Storage")}` },
+          { index: "06", label: "Wind Energy", icon: "wind", href: `/#${slugify("Wind Energy")}` },
         ],
       },
       // The "Industries" column (Commercial / Industrial & Energy /
@@ -591,7 +596,6 @@ const LOCATION_CONTENT: Record<RegionId, LocationContent> = {
       "machinery-moving",
       "lift-planning-engineering",
       "industrial-storage",
-      "heavy-haul-transport",
       "wind-energy",
     ],
     industries: ["industrial-energy", "infrastructure", "commercial"],
@@ -610,7 +614,6 @@ const LOCATION_CONTENT: Record<RegionId, LocationContent> = {
       "specialized-rigging",
       "machinery-moving",
       "lift-planning-engineering",
-      "heavy-haul-transport",
       "wind-energy",
     ],
     industries: ["industrial-energy", "infrastructure"],
@@ -629,7 +632,6 @@ const LOCATION_CONTENT: Record<RegionId, LocationContent> = {
       "specialized-rigging",
       "machinery-moving",
       "lift-planning-engineering",
-      "heavy-haul-transport",
     ],
     industries: ["commercial", "infrastructure"],
     feature: {
@@ -648,7 +650,6 @@ const LOCATION_CONTENT: Record<RegionId, LocationContent> = {
       "machinery-moving",
       "lift-planning-engineering",
       "industrial-storage",
-      "heavy-haul-transport",
     ],
     industries: ["industrial-energy", "commercial"],
     feature: {
@@ -665,7 +666,6 @@ const LOCATION_CONTENT: Record<RegionId, LocationContent> = {
       "crane-rental",
       "specialized-rigging",
       "lift-planning-engineering",
-      "heavy-haul-transport",
       "wind-energy",
     ],
     industries: ["industrial-energy", "infrastructure"],
@@ -684,7 +684,6 @@ const LOCATION_CONTENT: Record<RegionId, LocationContent> = {
       "specialized-rigging",
       "machinery-moving",
       "lift-planning-engineering",
-      "heavy-haul-transport",
       "wind-energy",
     ],
     industries: ["commercial", "infrastructure", "industrial-energy"],

@@ -6,10 +6,10 @@
  * shared grid ROWS, so the nav's per-service deep links resolved to only three
  * scroll positions and four of seven landed under a different service's name.
  *
- * The lifecycle — PLAN → LIFT → RIG → MOVE → TRANSPORT → STORE → RENEWABLE —
- * is carried by the STAGE labels and the numbering, not by a drawn spine. It
- * was a connected vertical chain until 2026-07-29; it is now a 3×2 grid so all
- * six follow-on capabilities are visible at a glance.
+ * The lifecycle — PLAN → LIFT → RIG → MOVE → STORE → RENEWABLE — is carried
+ * by the STAGE labels and the numbering, not by a drawn spine. It was a
+ * connected vertical chain until 2026-07-29; it is now a grid (3 columns at
+ * `lg`) so the follow-on capabilities are visible at a glance.
  *
  * Consequences worth knowing:
  *  - Stage numbering is JOURNEY order, and navigation.ts was renumbered to
@@ -20,12 +20,19 @@
  *    resolve to the same scroll position. <TargetHighlight> is what keeps the
  *    click legible — it outlines the requested card even when the page cannot
  *    move. Do not remove it while this layout stands.
+ *  - Heavy Haul & Transport (was stage 05, "Transport") was removed entirely
+ *    2026-09-11, on request — five follow-on cards now, not six, so the
+ *    `lg:grid-cols-3` grid ends on an uneven last row (3 + 2) rather than a
+ *    clean 3×2. Left as-is rather than forced even; navigation.ts's
+ *    Capabilities column and every region's service-availability list in
+ *    LOCATION_CONTENT were renumbered/pruned to match.
  *
  * NO SHADOWS anywhere in this section, by request: depth is a hairline border
  * that goes gold, a 4%-opacity gold wash, and a 2px lift.
  *
- * Server component. The only client parts are <RevealText> (heading) and
- * <ParallaxFrame> (hero photo); every hover state is pure CSS.
+ * Server component. The only client part is <ParallaxFrame> (hero photo);
+ * every hover state is pure CSS. (The heading's own <RevealText> went with
+ * the "One Partner, End to End" copy it animated, removed 2026-09-11.)
  *
  * Palette: black / white / gold. NOT navy — the brand book has no navy, and the
  * retired #071034 was removed site-wide on 2026-07-28.
@@ -42,7 +49,6 @@
 import Image from "next/image";
 import { Eyebrow, Icon, type IconName } from "./primitives";
 import Button from "./Button";
-import RevealText from "./RevealText";
 import ParallaxFrame from "./ParallaxFrame";
 import { SERVICE_PHOTOS } from "./photos";
 import { slugify } from "./navigation";
@@ -87,7 +93,6 @@ const LEAD = {
 const STAGE_ICONS: Record<string, string> = {
   "Specialized Rigging": "/icons/hook.svg",
   "Machinery Moving": "/icons/forklift.svg",
-  "Heavy Haul & Transport": "/icons/truck.svg",
   "Industrial Storage": "/icons/cart.svg",
   "Wind Energy": "/icons/tower-crane.svg",
   // "Lift Planning & Engineering" has no dedicated icon asset yet — falls
@@ -98,9 +103,8 @@ const STAGES: Stage[] = [
   { index: "02", stage: "Plan", title: "Lift Planning & Engineering", blurb: "Stamped lift plans, ground-bearing analysis, and crane selection — signed by in-house engineers before a single machine mobilizes.", icon: "engineering" },
   { index: "03", stage: "Rig", title: "Specialized Rigging", blurb: "Hydraulic gantries, jack-and-slide, and precision skidding where a crane can't reach.", icon: "rigging" },
   { index: "04", stage: "Move", title: "Machinery Moving", blurb: "SPMTs and skates for turnkey plant relocation — set, aligned, and levelled in place.", icon: "heavylift" },
-  { index: "05", stage: "Transport", title: "Heavy Haul & Transport", blurb: "Permitted heavy-haul and modular transporters, routed and escorted end to end.", icon: "transport" },
-  { index: "06", stage: "Store", title: "Industrial Storage", blurb: "Secure indoor and outdoor yards with crane access between phases of work.", icon: "storage" },
-  { index: "07", stage: "Renewable", title: "Wind Energy", blurb: "Turbine erection, blade and component exchange across the wind corridor.", icon: "wind" },
+  { index: "05", stage: "Store", title: "Industrial Storage", blurb: "Secure indoor and outdoor yards with crane access between phases of work.", icon: "storage" },
+  { index: "06", stage: "Renewable", title: "Wind Energy", blurb: "Turbine erection, blade and component exchange across the wind corridor.", icon: "wind" },
 ];
 
 export default function CoreServices() {
@@ -113,20 +117,11 @@ export default function CoreServices() {
 
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         {/* ── Section header ───────────────────────────────────────────── */}
+        {/* The "One Partner, End to End" headline + intro paragraph were
+            removed 2026-09-11, on request — Eyebrow alone now carries the
+            section label. */}
         <div className="max-w-3xl">
           <Eyebrow>Full-Scope Capability</Eyebrow>
-          <RevealText
-            as="h2"
-            text="One Partner, End to End"
-            className="mt-3 font-display text-4xl tracking-wide text-white uppercase sm:text-5xl lg:text-6xl"
-          />
-          <p className="mt-5 font-body text-base leading-relaxed text-white/70 sm:text-lg">
-            Most lifts pass through four contractors before the load is set. Ours
-            pass through one. Engineering, rigging, transport, and storage run on
-            a single scope of work, a single schedule, and a single point of
-            accountability — from the first ground-bearing calculation to the
-            final set.
-          </p>
         </div>
 
         {/* ── Stage 01 — the lead capability ───────────────────────────── */}
@@ -187,9 +182,9 @@ export default function CoreServices() {
           </ParallaxFrame>
         </article>
 
-        {/* ── Stages 02–07 — the grid ──────────────────────────────────── */}
-        {/* Still an <ol>: the six read 02→07 across rows, so the order is real
-            and assistive tech should hear "2 of 6" rather than a pile of cards.
+        {/* ── Stages 02–06 — the grid ──────────────────────────────────── */}
+        {/* Still an <ol>: the five read 02→06 across rows, so the order is real
+            and assistive tech should hear "2 of 5" rather than a pile of cards.
             The lifecycle now lives in the STAGE labels and numbering rather than
             in a drawn spine — a 3-across grid has no single path to trace.
             Equal heights come from the grid + `h-full` + column flex, not from

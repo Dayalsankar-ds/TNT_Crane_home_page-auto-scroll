@@ -32,7 +32,6 @@ const BLOCKS: { no: string; heading: string; links: FooterLink[] }[] = [
       { label: "Specialty Rigging", href: "/#specialized-rigging" },
       { label: "Lift Planning & Engineering", href: "/#lift-planning-engineering" },
       { label: "Wind Energy", href: "/#wind-energy" },
-      { label: "Heavy Haul & Transport", href: "/#heavy-haul-transport" },
     ],
   },
   {
