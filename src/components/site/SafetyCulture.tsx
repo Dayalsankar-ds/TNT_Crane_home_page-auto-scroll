@@ -16,10 +16,16 @@
  * Badge is a self-contained shield (works on any background), so the
  * tagline is set here as real text instead, in the site's own type.
  *
- * 2026-09-07: Theme 2 (see former themeVersionStore.ts / ThemeToggle.tsx)
- * swapped this band from maroon to dark slate, as a same-session comparison
- * of the red used here specifically. 2026-09-10: theme one (maroon) was
- * removed project-wide — the slate fill below is now permanent, no toggle.
+ * 2026-09-07: Theme 2 (see themeVersionStore.ts / ThemeToggle.tsx) swaps
+ * this band from maroon to dark slate, on request — a same-session
+ * comparison of the red used here specifically. Theme 1 is unchanged.
+ * Removed 2026-09-10 (theme one dropped project-wide, slate made permanent),
+ * RESTORED 2026-09-14 on request ("one more theme to show to my manager") —
+ * back to the original conditional below, EXCEPT theme one's own fill:
+ * "change red to dark color" (2026-09-14, same day) swapped it from
+ * `bg-tnt-maroon` to `bg-tnt-navy` (pure black — a different dark from
+ * theme two's slate, so the two toggle states still read as distinct). No
+ * other color changed as part of that request.
  *
  * 2026-07-30: the certification-chip row briefly moved to a new strip right
  * after the hero (CertificationsStrip), to avoid the same five badges
@@ -33,6 +39,7 @@
 
 import { Icon, type IconName } from "./primitives";
 import Reveal from "./Reveal";
+import { useThemeVersion } from "./themeVersionStore";
 
 const BADGES = ["ISO 9001", "NCCCO Certified", "OSHA VPP", "ISNetworld", "Avetta"];
 
@@ -55,8 +62,13 @@ const PILLARS: { icon: IconName; title: string; body: string }[] = [
 ];
 
 export default function SafetyCulture() {
+  const [themeVersion] = useThemeVersion();
+
   return (
-    <section id="safety" className="scroll-mt-32 bg-tnt-slate">
+    <section
+      id="safety"
+      className={`scroll-mt-32 ${themeVersion === "two" ? "bg-tnt-slate" : "bg-tnt-navy"}`}
+    >
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div className="grid items-center gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
           {/* Badge — self-contained shield mark, reads on the maroon fill

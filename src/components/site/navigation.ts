@@ -21,6 +21,11 @@
  *    About, which is now the only panel that reaches them. Nothing on the
  *    homepage became unreachable in the reshuffle.
  *
+ * 2026-09-11: "Contact us" removed as its own top-level item, on request —
+ * back to seven flat/paneled items across the bar. It moved into the About
+ * panel's items instead of disappearing from the nav outright (see that
+ * column below).
+ *
  * Data only — no "use client" — so the mobile accordion, the desktop panels,
  * and any future sitemap render from the same list and cannot drift.
  *
@@ -98,8 +103,10 @@ export const NAV_GROUPS: NavGroup[] = [
         no: "01",
         // Coverage Map and Family of Companies moved in here on 2026-09-10,
         // when the eight-item bar removed the Coverage group they used to sit
-        // under. "Contact Us" left in the other direction — it is a top-level
-        // item now, so repeating it here would be the same link twice.
+        // under. "Contact Us" briefly left in the other direction (it was a
+        // top-level flat item, so repeating it here would have been the same
+        // link twice) but came back 2026-09-11 when that top-level item was
+        // removed — this panel is its only way into the nav now.
         heading: "About TNT",
         items: [
           // An /our-story route briefly lived here on 2026-08-06 and was
@@ -110,6 +117,7 @@ export const NAV_GROUPS: NavGroup[] = [
           { label: "Family of Companies", href: "/#family", icon: "commercial" },
           { label: "Safety & Record", href: "/#safety", icon: "engineering" },
           { label: "Case Studies", href: "/#projects", icon: "heavylift" },
+          { label: "Contact Us", href: "/#contact", icon: "mail" },
         ],
       },
       // Dropped with their routes on 2026-08-04, none having a homepage
@@ -171,41 +179,36 @@ export const NAV_GROUPS: NavGroup[] = [
     },
   },
   {
-    // Renamed from "Equipment" on 2026-09-10 to the client's "Fleet". NOTE the
-    // label now over-promises slightly: on the sister sites "Fleet"/"CHARTS"
-    // means crane classes with capacities and load-chart PDFs, and this panel
-    // holds the rigging/attachments catalog instead — the crane-class chart
-    // data (craneChartData.ts) was removed with EquipmentFinder the same day.
+    // Renamed from "Equipment" on 2026-09-10 to the client's "Fleet".
     label: "Fleet",
     href: "/#fleet-guide",
     columns: [
       {
         no: "01",
-        // Was "Fleet Classes" (7 crane classes, e.g. Crawler Cranes 80–750 T)
-        // until EquipmentGuide.tsx was replaced with a rigging/attachments
-        // catalog on 2026-08-26 — see that file's docblock. Went 7 → 3 → 6
-        // the same day, as more real photos turned up on cross-check. These
-        // 6 items and their hrefs match its RIGGING array exactly; `meta` is
-        // dropped since there's no honest capacity-range equivalent for
-        // rigging categories the way there was for crane classes.
-        heading: "Rigging & Attachments",
+        // Rigging & Attachments (6 categories, its own compare-modal card
+        // grid) replaced 2026-09-13, on request, with "About the Fleet" —
+        // matching tntcrane.com's own homepage section of that name. These 6
+        // items are its exact crane-type list; hrefs match EquipmentGuide.tsx's
+        // FLEET_TYPES array exactly. `meta` stays dropped — the source section
+        // is a plain list, no capacity ranges to show per item.
+        heading: "About the Fleet",
         items: [
-          { index: "01", label: "Hydraulic Gantry Systems", icon: "heavylift", href: `/#${slugify("Hydraulic Gantry Systems")}` },
-          { index: "02", label: "Cantilever & Spreader Bar Rigging", icon: "rigging", href: `/#${slugify("Cantilever & Spreader Bar Rigging")}` },
-          { index: "03", label: "In-Plant Overhead Rigging", icon: "engineering", href: `/#${slugify("In-Plant Overhead Rigging")}` },
-          { index: "04", label: "SPMT & Modular Transport", icon: "transport", href: `/#${slugify("SPMT & Modular Transport")}` },
-          { index: "05", label: "Jack-and-Slide Systems", icon: "heavylift", href: `/#${slugify("Jack-and-Slide Systems")}` },
-          { index: "06", label: "Versa-Lift Machinery Moving", icon: "rental", href: `/#${slugify("Versa-Lift Machinery Moving")}` },
+          { index: "01", label: "All-Terrain Cranes", icon: "allterrain", href: `/#${slugify("All-Terrain Cranes")}` },
+          { index: "02", label: "Crawler Cranes", icon: "crawler", href: `/#${slugify("Crawler Cranes")}` },
+          { index: "03", label: "Hydraulic Truck Cranes", icon: "boom", href: `/#${slugify("Hydraulic Truck Cranes")}` },
+          { index: "04", label: "Rough-Terrain Cranes", icon: "transport", href: `/#${slugify("Rough-Terrain Cranes")}` },
+          { index: "05", label: "Carry Deck Cranes", icon: "carrydeck", href: `/#${slugify("Carry Deck Cranes")}` },
+          { index: "06", label: "Tower Cranes", icon: "tower", href: `/#${slugify("Tower Cranes")}` },
         ],
       },
     ],
     feature: {
-      eyebrow: "Rigging & Attachments",
-      title: "The gear behind every lift",
+      eyebrow: "About the Fleet",
+      title: "700+ cranes, six classes",
       blurb:
-        "Gantries, below-the-hook fixtures, and in-plant rigging — the equipment that makes a lift possible, not just the crane.",
+        "All-terrain to tower cranes, plus the specialized rigging equipment that moves what a crane alone can't.",
       href: "/#fleet-guide",
-      cta: "Open the guide",
+      cta: "See the fleet",
     },
   },
   // The three inert items. Each was a real route until 2026-08-04 and has no
@@ -214,7 +217,10 @@ export const NAV_GROUPS: NavGroup[] = [
   { label: "Careers", href: null, columns: [] },
   { label: "News", href: null, columns: [] },
   { label: "For Sale", href: null, columns: [] },
-  { label: "Contact us", href: "/#contact", columns: [] },
+  // "Contact us" removed as a top-level item 2026-09-11, on request. It
+  // moved back into the About panel's items (see that column above) rather
+  // than disappearing from the nav entirely — it had only left there in the
+  // first place because this flat item duplicated it.
 ];
 
 /* ==========================================================================

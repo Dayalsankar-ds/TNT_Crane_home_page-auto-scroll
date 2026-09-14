@@ -3,10 +3,17 @@
 // in git history if a rollback is ever needed:
 //   git show 5d89d04:src/components/HeroScrollExperience.tsx
 //
-// HeroVersioned (2026-09-08) wraps this hero alongside a second, manual-scroll
-// variant behind a floating "Hero 1 / 2" toggle — see heroVersionStore.ts.
+// HeroVersioned (2026-09-08) used to wrap this hero alongside a second,
+// manual-scroll variant behind a floating "Hero 1 / 2" toggle. Hero one
+// (this R3F version) is hidden as of 2026-09-11, on request — see
+// HeroVersioned.tsx for what's still on disk vs. what's actually rendered.
 import HeroVersioned from "@/components/site/HeroVersioned";
-import FamilyStrip from "@/components/site/FamilyStrip";
+// FamilyStripV2 rendered directly as of 2026-09-13, on request — Nav
+// version 1's FamilyStrip.tsx (the diagonal-panel + 2x2 grid design) is
+// hidden, unrendered on disk; see that file's own docblock for what's still
+// there vs. what's live. FamilyStripV2 no longer depends on navVersion at
+// all here — it renders regardless of which Nav version is active.
+import FamilyStripV2 from "@/components/site/FamilyStripV2";
 import StatementSection from "@/components/site/StatementSection";
 import EquipmentGuide from "@/components/site/EquipmentGuide";
 import CoreServices from "@/components/site/CoreServices";
@@ -65,11 +72,14 @@ export default function Home() {
     <div id="top" className="-mt-[var(--chrome-h)] bg-black text-white">
         {/* HERO — mechanism (scrub, pin, modes) is locked; do not restyle.
             Carries the page's <h1> as an opening overlay (HeroHeadline).
-            HeroVersioned also renders the floating Hero 1/2 toggle. */}
+            HeroVersioned renders hero two only as of 2026-09-11 — no
+            toggle, see that file's docblock. */}
         <HeroVersioned />
 
-        {/* Trust, fast — TNT's own family-of-companies logos right off the hero */}
-        <FamilyStrip />
+        {/* Trust, fast — TNT's own family-of-companies logos right off the
+            hero. FamilyStripV2 only as of 2026-09-13 — see the import
+            comment above. */}
+        <FamilyStripV2 />
 
         {/* Manifesto + scale — Technical Paper opening statement (About Us) */}
         <StatementSection />

@@ -62,29 +62,14 @@ export default function FamilyStripV2() {
 
   return (
     <section ref={sectionRef} id="family" className="relative overflow-hidden bg-black">
-      {/* Headline band — left-aligned (2026-09-02, on request; was centered
-          mid-page). Everything, description included, now sits flush left
-          against the section's own padding instead of floating in the
-          middle. */}
-      <div className="mx-auto max-w-6xl px-6 py-24 sm:px-10 lg:px-16 lg:py-28">
-        <div
-          className={`max-w-2xl text-left transition-all duration-700 ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-          }`}
-        >
-          <p className="font-body text-[13px] font-bold tracking-[0.3em] text-tnt-amber uppercase">
-            TNT Group
-          </p>
-          <h2 className="mt-4 font-display text-5xl leading-[0.95] tracking-tight text-white uppercase sm:text-6xl">
-            Family of Companies
-          </h2>
-          <div className="mt-8 h-px w-16 bg-tnt-amber" />
-          <p className="mt-8 max-w-lg font-body text-base leading-relaxed text-white/50">
-            Four regional brands, one standard of work — each built its name
-            long before joining the group, and keeps it today.
-          </p>
-        </div>
-      </div>
+      {/* Headline band (eyebrow, "Family of Companies" heading, and the
+          "Four regional brands..." description) removed 2026-09-13, on
+          request — this section now goes straight to the brand shelf below.
+          `bg-black` on the <section> itself is kept: without the headline
+          band's own py-24 padding, that black would otherwise collapse to
+          zero height, but a thin black seam still frames the shelf above the
+          hero and below whatever follows, matching how the rest of the site
+          treats section boundaries. */}
 
       {/* Brand shelf — full-bleed light strip so the lockups render exactly
           as authored (see docblock). Hairline dividers, no card/shadow. */}

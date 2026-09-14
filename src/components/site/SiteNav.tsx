@@ -89,6 +89,14 @@ export default function SiteNav() {
   // Shared with FamilyStrip/FamilyStripV2 via a module-level store — see
   // navVersionStore.ts for why this isn't local useState anymore.
   const [navVersion, setNavVersion] = useNavVersion();
+  // Nav version 1 drops the About group entirely (2026-09-12, on request,
+  // for design comparison) — version 2 keeps the full nav unchanged. Both
+  // versions still share every other group; this is the one deliberate
+  // difference between them at the top level.
+  const visibleNavGroups =
+    navVersion === "one"
+      ? NAV_GROUPS.filter((g) => g.label !== "About")
+      : NAV_GROUPS;
   // Shared with StorySlideshow (toggles its own desktop-style vs.
   // mobile-style description layout) via the same kind of module-level
   // store — see aboutVersionStore.ts.
@@ -301,7 +309,7 @@ export default function SiteNav() {
               plain link; a flat item with `href: null` has no destination yet
               and renders as inert text rather than a link to nowhere. */}
           <ul className="hidden items-center gap-0.5 lg:flex">
-            {NAV_GROUPS.map((g) => {
+            {visibleNavGroups.map((g) => {
               const isOpen = shownGroup === g.label;
               const isCurrent = current === g.label;
               const hasPanel = g.columns.length > 0;
@@ -434,7 +442,7 @@ export default function SiteNav() {
             text over a translucent panel would sit on whatever section
             happened to be scrolling underneath. */}
         {shownGroup &&
-          NAV_GROUPS.filter(
+          visibleNavGroups.filter(
             // The columns check is what keeps a flat item from ever rendering
             // an empty panel. Flat items don't call scheduleOpen either, so
             // this is belt-and-braces — but it's also what lets `feature` be
@@ -566,7 +574,7 @@ export default function SiteNav() {
         } transition-[max-height] duration-300`}
       >
         <ul className="flex flex-col gap-1 px-4 pt-2 pb-6">
-          {NAV_GROUPS.map((g) => {
+          {visibleNavGroups.map((g) => {
             const expanded = mobileSection === g.label;
             const localized = g.label === "Services";
             const cols = localized

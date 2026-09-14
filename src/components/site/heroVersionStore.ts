@@ -6,9 +6,16 @@
  * themeVersionStore.ts once existed for a "Theme 1 / 2" toggle; removed
  * 2026-09-10 when theme one — brand maroon — was dropped project-wide.)
  *
- * Hero "one" is HeroScrollExperienceR3F — the shipped hero, untouched.
+ * Hero "one" is HeroScrollExperienceR3F — the originally-shipped hero.
  * Hero "two" is HeroScrollExperienceManualScroll — the manual-scroll variant
  * copied in 2026-09-08 for side-by-side comparison (see that file's docblock).
+ *
+ * DEFAULT SWITCHED TO "two" (2026-09-11, on request): hero one is hidden for
+ * now, not removed — "we can use it later if needed" was the explicit ask,
+ * so nothing about HeroScrollExperienceR3F.tsx, useHeroAutoScroll.ts, or
+ * this store's "one" branch was touched. Flipping the default here is the
+ * whole change; flip it back (or reach for the floating "Hero 1/2" toggle,
+ * HeroToggle.tsx, which still offers both) to bring it back.
  *
  * A plain module-level store read via `useSyncExternalStore` rather than
  * React Context, for the same reason as the other version stores: the
@@ -23,7 +30,7 @@ import { useSyncExternalStore } from "react";
 
 export type HeroVersion = "one" | "two";
 
-let version: HeroVersion = "one";
+let version: HeroVersion = "two";
 const listeners = new Set<() => void>();
 
 function subscribe(cb: () => void) {
@@ -35,10 +42,11 @@ function getSnapshot(): HeroVersion {
   return version;
 }
 
-// Server-rendered markup always starts on hero one; the client picks up
-// whatever's live in the module after hydration via the subscription above.
+// Server-rendered markup always starts on hero two (see the DEFAULT SWITCHED
+// note above); the client picks up whatever's live in the module after
+// hydration via the subscription above.
 function getServerSnapshot(): HeroVersion {
-  return "one";
+  return "two";
 }
 
 export function setHeroVersion(next: HeroVersion) {

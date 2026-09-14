@@ -28,6 +28,21 @@ export const PHOTOS = {
   hookBlockReal: "photo-1718738002405-b149aac720bf",
   gantryCraneReal: "photo-1781156215091-4133052708d0",
   overheadBridgeCraneReal: "photo-1784916313628-d6525ab2199f",
+  // ABOUT THE FLEET — Unsplash fallback for the 3 crane types FLEET_PHOTOS
+  // has no real TNT photo for (2026-09-13). Checked each returns HTTP 200 /
+  // image/jpeg, and viewed each before picking it:
+  //   - roughTerrainCrane: a SANY mobile crane's boom/hook/cab close-up —
+  //     genuinely a rough-terrain-class crane, not a generic stand-in.
+  //   - carryDeckCrane: the closest available match, NOT a precise one —
+  //     Unsplash has no real carry-deck-crane coverage (the class is a
+  //     low-profile 4-wheel yard crane with no truck cab). This is a
+  //     truck-mounted boom crane at a residential job site instead; picked
+  //     for being a small, compact mobile crane rather than claiming to be
+  //     an exact match.
+  //   - towerCrane: a straightforward tower-crane boom against open sky.
+  roughTerrainCrane: "photo-1597089038854-6be9a836a40d",
+  carryDeckCrane: "photo-1583246820648-e06ee5e2c267",
+  towerCrane: "photo-1539269071019-8bc6d57b0205",
 } as const;
 
 /**
@@ -66,6 +81,44 @@ export const RIGGING_PHOTOS = {
   spmtModularTransport: "/photos/rigging/spmt-modular-transport.jpg",
   jackAndSlide: "/photos/rigging/jack-and-slide.jpg",
   versaLiftMachineryMoving: "/photos/rigging/versa-lift-machinery-moving.jpg",
+} as const;
+
+/**
+ * ABOUT THE FLEET — real TNT photography (2026-09-13), for the 6-item
+ * crane-type gallery in EquipmentGuide.tsx. Sourced directly from
+ * tntcrane.com's own homepage/uploads, downloaded and inspected before use,
+ * same rigor as RIGGING_PHOTOS above:
+ *   - allTerrainCrane: a red TNT-branded all-terrain crane picking in
+ *     downtown Houston traffic (tntcrane.com, AT-Crane_TNT-Crane-2)
+ *   - crawlerCrane: a TNT crawler crane setting bridge girders over a creek
+ *     (tntcrane.com, TNT_Crawler_Union-Pacific)
+ *   - hydraulicTruckCrane: a line of TNT hydraulic truck cranes lifting a
+ *     large pipeline section into place (tntcrane.com,
+ *     Water-Pipeline-Project-Hydraulic-Truck-Cranes_1)
+ *
+ * NOT included: Rough-Terrain, Carry Deck, and Tower Cranes have no found
+ * real TNT photo yet — their service subpages didn't surface one on
+ * inspection. They use Unsplash fallback instead (PHOTOS.roughTerrainCrane /
+ * carryDeckCrane / towerCrane above), same as this project's other catalogs
+ * do for categories without real photography — not left bare.
+ *
+ * A set of same-named PNGs already existed on disk in public/photos/fleet/
+ * (all-terrain-cranes.png, crawler-cranes.png, boom-trucks.png,
+ * carry-deck-industrial.png, rough-terrain-cranes.png, tower-cranes.png,
+ * heavy-lift-gantry.png) from an earlier pass — opened and inspected,
+ * they're synthetic/AI-generated (uniform 1254×1254 output size, an
+ * impossible wet-mirror-floor-at-sunset composition repeated across every
+ * one, and a "TNT" logo rendered onto the equipment rather than
+ * photographed). Left on disk but NOT referenced by name here — using them
+ * would be exactly the kind of fabricated-as-real photo this project's
+ * sourcing rule exists to prevent. Flagged for the user; consider deleting
+ * them separately since a same-named file sitting unused is an easy trap for
+ * a future edit to reach for by mistake.
+ */
+export const FLEET_PHOTOS = {
+  allTerrainCrane: "/photos/fleet/all-terrain-crane.jpg",
+  crawlerCrane: "/photos/fleet/crawler-crane.jpg",
+  hydraulicTruckCrane: "/photos/fleet/hydraulic-truck-crane.jpg",
 } as const;
 
 /**

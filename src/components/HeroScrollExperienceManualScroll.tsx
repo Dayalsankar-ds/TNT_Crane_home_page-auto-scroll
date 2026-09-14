@@ -140,10 +140,19 @@ export default function HeroScrollExperienceManualScroll() {
 
     return () => {
       cancelled = true;
-      // Drop references so the decoded surfaces become collectable.
+      // Drop references so the decoded surfaces become collectable, AND
+      // actually cancel any still-in-flight request (2026-09-11) — nulling
+      // just the handlers left the browser's request running to completion
+      // anyway, so React 19 dev StrictMode's mount→cleanup→remount was
+      // measured fetching every frame TWICE (confirmed via network capture:
+      // the exact 00000→00285 sequence, back to back). Assigning `img.src`
+      // to the current URL again to abort it doesn't work reliably across
+      // browsers; setting it to "" does. Harmless in production, where this
+      // effect only ever runs once.
       for (const img of images) {
         img.onload = null;
         img.onerror = null;
+        img.src = "";
       }
       imagesRef.current = [];
       // Must accompany clearing imagesRef: leaving framesReady true would let

@@ -19,6 +19,22 @@
  *  - touch (coarse pointer) → smoothing is left to the native momentum scroll,
  *    which already feels right on mobile and avoids fighting the OS. Wheel/
  *    trackpad on pointer devices is where Lenis earns its keep.
+ *
+ * ALWAYS RELOADS TO THE TOP (2026-09-11, on request: "if I reloaded the
+ * website it needs to start from hero section"). The browser's own scroll
+ * restoration was the culprit — nothing here had ever touched
+ * `history.scrollRestoration`, so a reload could land wherever the tab was
+ * last scrolled, same as any ordinary page. That interacted badly with the
+ * hero's own one-shot autoplay + "becomes unreachable" wall (see
+ * useHeroAutoScroll.ts): the restored position could already read as
+ * "past the hero" the instant the wall's flag checked it, so it looked like
+ * reloading skipped the hero entirely rather than replaying it. Setting
+ * `scrollRestoration = "manual"` and forcing `window.scrollTo(0, 0)` up
+ * front — before Lenis boots, and unconditionally, even under
+ * prefers-reduced-motion — makes every load (reload included) start at
+ * scrollY 0, which is what lets `useHeroAutoScroll`'s own one-shot state
+ * (reset by the reload itself, since it's just a module variable) and the
+ * actual scroll position agree on "this is a fresh visit".
  */
 
 import { useEffect } from "react";
@@ -41,6 +57,12 @@ export const getLenis = () => instance;
 
 export default function SmoothScroll() {
   useEffect(() => {
+    // Unconditional and first — a reload should start at the top regardless
+    // of motion preference, so this runs before the reduced-motion branch
+    // below, not after it.
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    window.scrollTo(0, 0);
+
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;

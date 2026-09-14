@@ -5,7 +5,7 @@ import "./globals.css";
 import SiteNav from "@/components/site/SiteNav";
 import SiteFooter from "@/components/site/SiteFooter";
 import SmoothScroll from "@/components/SmoothScroll";
-import HeroToggle from "@/components/site/HeroToggle";
+import ThemeToggle from "@/components/site/ThemeToggle";
 
 // Geist stays the body default so the existing hero's inherited font is unchanged.
 const geistSans = Geist({
@@ -60,13 +60,13 @@ export default function RootLayout({
         <SmoothScroll />
         {/* Fixed nav + shared footer wrap every route */}
         <SiteNav />
-        {/* Hero 1/2 floating toggle, bottom-left — separate from the
-            Nav/About pickers in SiteNav (bottom-right). The Theme 1/2
-            toggle that used to sit alongside it was removed 2026-09-10:
-            theme one (maroon) is gone, theme two (dark slate) is now the
-            only, permanent look. */}
+        {/* Theme 1/2 floating toggle, bottom-left — restored 2026-09-14, on
+            request ("one more theme to show to my manager"). Hero 1/2 used
+            to sit beside it in this row; that toggle stays unrendered since
+            hero one is still hidden (see HeroVersioned.tsx) — re-add
+            `<HeroToggle />` here if hero one comes back too. */}
         <div className="fixed bottom-4 left-4 z-[60] flex items-end gap-2 sm:bottom-6 sm:left-6">
-          <HeroToggle />
+          <ThemeToggle />
         </div>
         {/* The nav is fixed, so it overlays page content. Inner routes used to
             clear it only by accident — their first section's `py-20` happened

@@ -56,22 +56,28 @@ export const SEQUENCE_V3: HeroSequence = {
 /** The sequence the hero renders. */
 export const ACTIVE_SEQUENCE = SEQUENCE_V3;
 
-/** Zero-padded public URL for a frame index. */
+/** Zero-padded public URL for a frame index, in the original JPEGs — kept
+ *  around because `frames-v3/` is the source `scripts/encode-v3-webp.mjs`
+ *  reads from, not because anything still serves it to a browser. */
 export const framePath = (seq: HeroSequence, n: number) =>
   `${seq.dir}/${String(n).padStart(5, "0")}.jpg`;
 
-// Must match an entry in next.config.ts's images.deviceSizes / images.qualities
-// — the optimizer 400s on a w=/q= it wasn't configured to allow. 1280 is the
-// frames' native width, so this is a format re-encode, not a resize.
-const OPT_WIDTH = 1280;
-const OPT_QUALITY = 60;
-
 /**
- * Same frame, routed through Next's built-in image optimizer (`sharp`,
- * already a transitive dep of `next`) instead of served raw from `public/`.
- * Re-encodes the JPEG to WebP/AVIF on the fly, which is what actually shrinks
- * the preload — no ffmpeg or master footage required to get this win, unlike
- * re-encoding the source frames themselves.
+ * PRE-ENCODED, SERVED STATIC (2026-09-11, replacing a live `/_next/image`
+ * re-encode) — on request, after "the local host link loading time [is]
+ * taking too long": every frame used to route through Next's image
+ * optimizer to get re-encoded from JPEG to WebP on the fly per request.
+ * That's real, measured work (median ~273ms, some over 500ms) that a dev
+ * server repeats on every cold load, times 286 frames — nothing was ever
+ * cached ahead of time. `scripts/encode-v3-webp.mjs` now does that exact
+ * same JPEG→WebP re-encode (quality 60, no resize — 1280 is already the
+ * frames' native width) once, offline, with `sharp` directly (the same
+ * library the optimizer itself uses under the hood), writing the output to
+ * `public/video/frames-v3-webp/`. This just serves that output as a static
+ * file — same approach V5 already uses for its own frames (see
+ * heroSequence.ts), and the same output the optimizer used to produce, just
+ * computed ahead of time instead of on every request. Re-run the script if
+ * `frames-v3/`'s source JPEGs or `SEQUENCE_V3.count` ever change.
  */
 export const optimizedFramePath = (seq: HeroSequence, n: number) =>
-  `/_next/image?url=${encodeURIComponent(framePath(seq, n))}&w=${OPT_WIDTH}&q=${OPT_QUALITY}`;
+  `${seq.dir}-webp/${String(n).padStart(5, "0")}.webp`;

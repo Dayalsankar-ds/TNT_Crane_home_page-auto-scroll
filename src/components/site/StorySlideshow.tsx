@@ -12,29 +12,38 @@
  * crossfade). Each stat card is paired 1:1 with a slide and is itself the
  * navigation control — no separate arrows/progress bar (removed 2026-07-30;
  * the cards being clickable made them redundant). Clicking a card highlights
- * it in a dark-slate fill (not dimmed; the fill reads as "selected", dimming
- * reads as "disabled") and swaps in that stat's description. Originally
- * brand maroon — swapped to slate 2026-09-10 when theme one (maroon) was
- * removed project-wide; see SafetyCulture.tsx's docblock for the same swap.
+ * it in a dark fill, depending on themeVersionStore.ts's "Theme 1/2" toggle
+ * (not dimmed; a fill reads as "selected", dimming reads as "disabled") and
+ * swaps in that stat's description. Swapped to a permanent slate fill
+ * 2026-09-10 when theme one (maroon) was dropped project-wide; RESTORED to
+ * the theme-conditional fill 2026-09-14, on request ("one more theme to
+ * show to my manager") — see SafetyCulture.tsx's docblock for the matching
+ * restoration there. Theme one's own fill is `bg-tnt-navy` now, not maroon
+ * — "change red to dark color," same day — so it stays visually distinct
+ * from theme two's `bg-tnt-slate`.
  *
- * DESCRIPTION PLACEMENT — ABOUT VERSION GATE (2026-09-02): originally this
- * was purely responsive (left-of-photo on wide screens, a bar underneath on
- * narrow ones). On request, it's now gated on aboutVersionStore.ts instead —
- * the same store backing the "About /01 /02" picker in SiteNav.tsx — so
- * either composition can be previewed at any viewport width:
- *   - version "one": left side of the photo itself, over a left-to-right
- *               black scrim, with the 7-card panel still anchored on the
- *               right — a true two-column composition (the old lg+ layout).
- *   - version "two": a full-width black bar under the photo (the old
- *               below-lg layout). A second overlay doesn't fit beside the
- *               card panel at narrow widths (it already wants ~92% of the
- *               row), which is why this layout existed in the first place —
- *               now it's a deliberate choice rather than a width fallback.
+ * DESCRIPTION PLACEMENT (2026-09-13, on request — "remove the bottom
+ * description"): the full-width black bar that used to sit below the photo
+ * (repeating the same description a second time) is gone. What's left is
+ * the description beside the photo itself — over a left-to-right scrim,
+ * with the 7-card panel anchored on the right — which had been stacked
+ * above that bottom bar since a slightly earlier request the same day. See
+ * git history for the bottom bar's own markup if it's ever wanted back; the
+ * "About /01 /02" picker in SiteNav.tsx still exists but does nothing to
+ * this section either way, since nothing here is conditional on it anymore.
  *
  * Auto-advances every 4s (2026-07-30) while the section is in view, unless
  * the user prefers reduced motion. Any manual navigation (card click, arrow
- * key, swipe) resets the timer rather than fighting it. Description copy is
- * set in Impact (`font-display`), matching the stat numerals above it.
+ * key, swipe) resets the timer rather than fighting it.
+ *
+ * DESCRIPTION FONT (2026-09-14, on request): the description paragraph is
+ * `font-body` (Open Sans) now, not `font-display` (Impact) — it reads as a
+ * sentence a visitor is meant to read, not another oversized display
+ * numeral. `tracking-wide` came off with it; that letter-spacing was tuned
+ * for Impact's condensed letterforms; Open Sans doesn't need it. The stat
+ * VALUES in the card grid below stay in Impact — unaffected, and correct as
+ * a display face for a big standalone figure like "700+". Color went
+ * `text-tnt-amber` → `text-white` the same day, on request.
  */
 
 import {
@@ -45,7 +54,8 @@ import {
   type TouchEvent,
 } from "react";
 import { Icon, type IconName } from "./primitives";
-import { useAboutVersion } from "./aboutVersionStore";
+import Button from "./Button";
+import { useThemeVersion } from "./themeVersionStore";
 
 type Slide = {
   icon: IconName;
@@ -123,7 +133,7 @@ const SLIDES: Slide[] = [
 const TOTAL = SLIDES.length;
 
 export default function StorySlideshow() {
-  const [aboutVersion] = useAboutVersion();
+  const [themeVersion] = useThemeVersion();
   const [index, setIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const touchStartX = useRef<number | null>(null);
@@ -234,19 +244,13 @@ export default function StorySlideshow() {
           className="absolute inset-0 h-full w-full object-cover"
         />
 
-        {/* Left-side scrim (2026-09-02, on request: description moved from
-           the bottom bar to the left side of the photo for version "one") —
-           the photo has no dark region of its own on the left, so the amber
-           description text needs a wash to stay legible sitting on top of
-           it. Gated on the same About-version check as the description
-           block below, not a breakpoint (see the docblock's ABOUT VERSION
-           GATE note). */}
-        {aboutVersion === "one" && (
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent"
-          />
-        )}
+        {/* Left-side scrim — the photo has no dark region of its own on the
+           left, so the amber description text below needs a wash to stay
+           legible sitting on top of it. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent"
+        />
 
         {/* Gutter wrapper — same mx-auto max-w-7xl frame every other section
            uses, so the panel stays centered within it on ultra-wide screens.
@@ -256,23 +260,34 @@ export default function StorySlideshow() {
            gutter is applied directly on the panel below, at the same px-4
            sm:px-6 lg:px-8 scale every other section's margin uses. */}
         <div className="pointer-events-none absolute inset-y-4 inset-x-0 mx-auto max-w-7xl sm:inset-y-6 lg:inset-y-8">
-          {/* Left-side description (version "one" only) — mirrors the
-             description that used to sit in the full-width bar below the
-             photo. There isn't enough spare width beside the card panel
-             (which itself needs ~92% of the row) for a second overlay to
-             sit next to it without the two colliding, which is why version
-             "two" keeps the bottom-bar layout instead — see its own comment
-             further down. */}
-          {aboutVersion === "one" && (
-            <div className="pointer-events-none absolute inset-y-0 left-8 flex w-[36%] max-w-md items-center">
-              <p
-                key={index}
-                className="story-fade-up font-display text-xl leading-relaxed tracking-wide text-tnt-amber lg:text-2xl"
-              >
+          {/* Left-side description — mirrors the description in the
+             full-width bar below the photo (further down). There isn't
+             enough spare width beside the card panel (which itself needs
+             ~92% of the row) for this to sit next to it without the two
+             colliding at narrower widths; that's fine here since the bar
+             below repeats the same copy for those widths anyway. */}
+          <div className="pointer-events-none absolute inset-y-0 left-8 flex w-[36%] max-w-md items-center">
+            {/* Wrapping div (not just the <p>) carries the key/fade now,
+                so "Learn more" re-plays the same per-slide fade instead of
+                sitting static beneath an animating paragraph. */}
+            <div key={index} className="story-fade-up">
+              <p className="font-body text-xl leading-relaxed text-white lg:text-2xl">
                 {current.description}
               </p>
+              {/* pointer-events-auto: the wrapper above is pointer-events-none
+                  (it overlays the photo without blocking clicks through to
+                  it), so the button has to opt back in to be clickable —
+                  same pattern HeroHeadline used for its own overlaid CTA. */}
+              <Button
+                href="#quote"
+                variant="primary"
+                onDark
+                className="pointer-events-auto mt-6"
+              >
+                Learn more
+              </Button>
             </div>
-          )}
+          </div>
 
           <div className="pointer-events-auto absolute inset-y-0 right-4 w-[92%] max-w-md overflow-hidden bg-white shadow-2xl sm:right-6 lg:right-8 lg:max-w-xl">
             <dl className="grid h-full grid-cols-2">
@@ -295,7 +310,7 @@ export default function StorySlideshow() {
                     aria-current={isActive ? "true" : undefined}
                     aria-label={`${s.label}: ${s.value}`}
                     className={`flex flex-col items-center justify-center gap-1.5 px-4 py-3 text-center transition-colors duration-300 sm:gap-2 sm:py-4 ${
-                      isActive ? "bg-tnt-slate" : ""
+                      isActive ? (themeVersion === "two" ? "bg-tnt-slate" : "bg-tnt-navy") : ""
                     } ${isFirst ? "col-span-2" : ""} ${
                       !isFirst && i % 2 === 1 ? "border-r border-black/10" : ""
                     } ${i < SLIDES.length - 2 ? "border-b border-black/10" : ""}`}
@@ -344,34 +359,6 @@ export default function StorySlideshow() {
           </div>
         </div>
       </div>
-
-      {/* Content panel — the slide's description, version "two" only
-         (2026-09-02, on request: gated on aboutVersionStore.ts rather than
-         `lg:hidden` now, so this bar can be previewed at any viewport width
-         — see the docblock's ABOUT VERSION GATE note; version "one" puts
-         the description beside the photo instead, above).
-         bg-black restored (2026-08-19, on request) — briefly bg-tnt-maroon
-         to match SafetyCulture/iCARE, reverted back.
-         min-h fixed (2026-08-20, on request) — was purely content-driven, so
-         the panel visibly grew/shrank as the carousel auto-advanced between a
-         2-line description and iCARE's 3-line one. Heights below are the
-         EXACT measured worst case (iCARE, the longest copy) at each of the
-         text size's three breakpoints — text + padding, zero slack, same
-         methodology as the card grid's own min-h above — not rounded up,
-         because the extra headroom pushed the total section past 800px
-         viewport heights and broke the "fits without scrolling" requirement
-         that sizing was tuned for. `items-center` still centers whichever
-         text is shorter within the fixed box. */}
-      {aboutVersion === "two" && (
-        <div className="flex min-h-[170px] items-center justify-center bg-black px-8 py-3 text-center sm:min-h-[97px] sm:px-12 sm:py-4">
-          <p
-            key={index}
-            className="story-fade-up max-w-3xl font-display text-lg leading-relaxed tracking-wide text-tnt-amber sm:text-xl lg:text-2xl"
-          >
-            {current.description}
-          </p>
-        </div>
-      )}
     </section>
   );
 }

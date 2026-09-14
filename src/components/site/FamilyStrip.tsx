@@ -20,11 +20,15 @@
  *   requests) sitting above the "Family of / Companies" headline, not the
  *   small tracked <Eyebrow> primitive used elsewhere on the site
  *
- * NAV VERSION GATE (2026-09-02, on request): this is Nav version ONE's
- * Family-of-Companies section. Version two renders FamilyStripV2.tsx instead
- * — a deliberately different composition, not a variant of this file. Which
- * one shows is read from navVersionStore.ts, the same store backing the
- * "Nav / 01" / "Nav / 02" picker in SiteNav.tsx.
+ * HIDDEN AS OF 2026-09-13, on request ("I like this UI [FamilyStripV2],
+ * remove the other one") — this file is no longer imported anywhere;
+ * page.tsx renders FamilyStripV2 directly and unconditionally now, same
+ * treatment as HeroScrollExperienceR3F.tsx when hero one was hidden. Left on
+ * disk in case this composition is wanted back later.
+ *
+ * NAV VERSION GATE (2026-09-02, superseded by the above): this used to be
+ * Nav version ONE's Family-of-Companies section, switched with FamilyStripV2
+ * via navVersionStore.ts's "Nav / 01" / "Nav / 02" picker in SiteNav.tsx.
  */
 
 import { useEffect, useRef, useState } from "react";
