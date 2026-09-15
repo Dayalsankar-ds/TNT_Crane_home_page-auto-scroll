@@ -485,7 +485,7 @@ export default function SiteNav() {
                       }}
                     />
                   )}
-                  <div className="flex gap-6">
+                  <div className="flex justify-center gap-6">
                   {/* Location picker leads the panel from a rail of its own.
                       It's a filter, and a filter belongs upstream of what it
                       filters — left of the columns, read before them. */}
@@ -507,14 +507,13 @@ export default function SiteNav() {
                     key={swapKey}
                     className={`nav-swap grid gap-x-8 gap-y-8 ${
                       // Two columns still stretch to fill the row — that's a
-                      // real two-up layout. A lone column (Services) used to
-                      // stretch the same way, which left the short item list
-                      // stranded in a track as wide as the whole row, with a
-                      // dead gap before the feature card. Capping it to its
-                      // own content width instead closes that gap; any
-                      // leftover row width falls after the feature card,
-                      // against the panel's own edge, which reads as normal
-                      // breathing room rather than a hole in the middle.
+                      // real two-up layout. A lone column (Services) is capped
+                      // to its own content width instead so it doesn't strand
+                      // itself in a track as wide as the whole row. The panel
+                      // row is centered (justify-center above) with an equal
+                      // gap-6 + 6-unit rail padding on each side, so any
+                      // leftover row width splits evenly left and right
+                      // instead of collecting after the feature card.
                       columns.length > 1
                         ? "flex-1 grid-cols-2"
                         : "w-[22rem] shrink-0 grid-cols-1"
@@ -525,7 +524,7 @@ export default function SiteNav() {
                     ))}
                   </div>
 
-                  <div className="w-[17rem] shrink-0 border-l border-black/10 pl-8">
+                  <div className="w-[17rem] shrink-0 border-l border-black/10 pl-6">
                     {/* Closing card — one destination per panel that carries
                         the group's argument, so the panel makes a point
                         instead of only listing. */}
