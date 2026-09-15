@@ -27,6 +27,14 @@
  * theme two's slate, so the two toggle states still read as distinct). No
  * other color changed as part of that request.
  *
+ * THEME 1 IS LIGHT NOW (2026-09-15, on request — "iCARE needs to be in
+ * light theme," confirmed as Theme 1 only, Theme 2 stays dark slate): the
+ * section shell is `bg-white` on Theme 1, every white/N text/border utility
+ * that existed to read against a dark fill is now the equivalent black/N,
+ * and the pillar/badge chip fills flip from `bg-white/5` to `bg-black/5`.
+ * The iCARE badge PNG and the amber accents are unchanged — both already
+ * read fine on white. Theme 2 keeps its original dark styling untouched.
+ *
  * 2026-07-30: the certification-chip row briefly moved to a new strip right
  * after the hero (CertificationsStrip), to avoid the same five badges
  * appearing twice on one page. That strip couldn't get real, rights-cleared
@@ -63,16 +71,16 @@ const PILLARS: { icon: IconName; title: string; body: string }[] = [
 
 export default function SafetyCulture() {
   const [themeVersion] = useThemeVersion();
+  const dark = themeVersion === "two";
 
   return (
     <section
       id="safety"
-      className={`scroll-mt-32 ${themeVersion === "two" ? "bg-tnt-slate" : "bg-tnt-navy"}`}
+      className={`scroll-mt-32 ${dark ? "bg-tnt-slate" : "bg-white"}`}
     >
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div className="grid items-center gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
-          {/* Badge — self-contained shield mark, reads on the maroon fill
-             without any text-contrast issue. */}
+          {/* Badge — self-contained shield mark, reads fine on either fill. */}
           <Reveal className="flex justify-center lg:justify-start">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -86,10 +94,14 @@ export default function SafetyCulture() {
             <p className="font-body text-[13px] font-bold tracking-[0.18em] text-tnt-amber uppercase">
               iCARE
             </p>
-            <h2 className="mt-3 font-display text-4xl tracking-wide text-white uppercase sm:text-5xl">
+            <h2
+              className={`mt-3 font-display text-4xl tracking-wide uppercase sm:text-5xl ${dark ? "text-white" : "text-black"}`}
+            >
               Safety Culture Starts With Me
             </h2>
-            <p className="mt-4 font-body text-base text-white/80 sm:text-lg">
+            <p
+              className={`mt-4 font-body text-base sm:text-lg ${dark ? "text-white/80" : "text-black/70"}`}
+            >
               iCARE is TNT&rsquo;s safety program — every operator, rigger, and
               crew member is personally accountable for the job running
               safely, on every lift, at every branch.
@@ -101,14 +113,22 @@ export default function SafetyCulture() {
           {PILLARS.map((p, i) => (
             <li key={p.title}>
               <Reveal delay={i * 100} className="h-full">
-                <div className="flex h-full flex-col rounded-xl border border-white/15 bg-white/5 p-6">
+                <div
+                  className={`flex h-full flex-col rounded-xl border p-6 ${
+                    dark ? "border-white/15 bg-white/5" : "border-black/12 bg-black/[0.03]"
+                  }`}
+                >
                   <span className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-tnt-amber text-white">
                     <Icon name={p.icon} className="h-6 w-6" />
                   </span>
-                  <h3 className="mt-5 font-display text-xl tracking-wide text-white uppercase">
+                  <h3
+                    className={`mt-5 font-display text-xl tracking-wide uppercase ${dark ? "text-white" : "text-black"}`}
+                  >
                     {p.title}
                   </h3>
-                  <p className="mt-2 flex-1 font-body text-sm leading-relaxed text-white/75">
+                  <p
+                    className={`mt-2 flex-1 font-body text-sm leading-relaxed ${dark ? "text-white/75" : "text-black/60"}`}
+                  >
                     {p.body}
                   </p>
                 </div>
@@ -117,7 +137,7 @@ export default function SafetyCulture() {
           ))}
         </ul>
 
-        <div className="mt-14 border-t border-white/10 pt-8">
+        <div className={`mt-14 border-t pt-8 ${dark ? "border-white/10" : "border-black/10"}`}>
           <p className="text-center font-body text-[13px] font-bold tracking-[0.18em] text-tnt-amber uppercase lg:text-left">
             Certifications &amp; Compliance
           </p>
@@ -125,7 +145,11 @@ export default function SafetyCulture() {
             {BADGES.map((b) => (
               <li
                 key={b}
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 font-body text-sm font-semibold text-white/85"
+                className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 font-body text-sm font-semibold ${
+                  dark
+                    ? "border-white/15 bg-white/5 text-white/85"
+                    : "border-black/12 bg-black/[0.03] text-black/75"
+                }`}
               >
                 <Icon name="engineering" className="h-4 w-4 text-tnt-amber" />
                 {b}

@@ -3,7 +3,9 @@
  *
  * Fixes the biggest user gap: no phone/email/contact anywhere. Navy band,
  * primary contact rail + region-aware dispatch numbers (each acquired brand
- * kept its own 1-800). 24/7/365 cue up top. Numbers in mono (CAD motif).
+ * kept its own 1-800). Numbers in mono (CAD motif). The "24/7/365 dispatch"
+ * pill that used to sit above the headline was removed 2026-09-15, on
+ * request.
  *
  * NOTE: phone numbers are the real per-brand lines from the site audit but
  * should be confirmed against TNT's current routing before launch.
@@ -31,16 +33,15 @@ export default function ContactSection() {
     <section id="contact" className="scroll-mt-32 bg-tnt-navy">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Left — headline + 24/7 + primary contact */}
+          {/* Left — headline + primary contact. The "24/7/365 dispatch" pill
+              that used to sit above the headline was removed 2026-09-15,
+              on request. */}
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-tnt-amber/40 bg-tnt-amber/10 px-3 py-1 font-mono text-[11px] font-semibold tracking-[0.16em] text-tnt-amber uppercase">
-              24 / 7 / 365 dispatch
-            </span>
             <RevealText
               as="h2"
               barClassName="bg-tnt-amber"
               text="Reach the Nearest Team"
-              className="mt-5 font-display text-4xl tracking-wide text-white uppercase sm:text-5xl"
+              className="font-display text-4xl tracking-wide text-white uppercase sm:text-5xl"
             />
             <p className="mt-4 max-w-md font-body text-base text-white/70 sm:text-lg">
               Cranes move fast — so do we. Call the branch nearest your site, day

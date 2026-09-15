@@ -18,7 +18,6 @@ import StatementSection from "@/components/site/StatementSection";
 import EquipmentGuide from "@/components/site/EquipmentGuide";
 import CoreServices from "@/components/site/CoreServices";
 import CoverageMap from "@/components/site/CoverageMap";
-import CaseStudies from "@/components/site/CaseStudies";
 import SafetyCulture from "@/components/site/SafetyCulture";
 import ContactSection from "@/components/site/ContactSection";
 import RequestQuote from "@/components/site/RequestQuote";
@@ -93,9 +92,15 @@ export default function Home() {
         {/* Where we are */}
         <CoverageMap /> {/* nearest branch — dark band #2 (glass) */}
 
-        {/* Proof — sticky-stack case studies, moved ahead of Safety
-            (2026-09-02, on request). */}
-        <CaseStudies />
+        {/* Case Studies hidden 2026-09-15, on request ("just hide, don't
+            delete") — CaseStudies.tsx is untouched on disk, just unrendered;
+            re-add `<CaseStudies />` here (between CoverageMap and
+            SafetyCulture, same spot) if it comes back. The nav's About
+            panel and the footer both still link to `/#projects` — that
+            anchor (`id="projects"` in CaseStudies.tsx) no longer exists on
+            the page while this is hidden, so those two links are inert
+            until it's restored; left as-is since only the section itself
+            was asked to hide. */}
 
         {/* Trust — iCARE safety program */}
         <SafetyCulture />
