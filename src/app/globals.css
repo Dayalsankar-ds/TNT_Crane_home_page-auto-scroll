@@ -102,7 +102,9 @@ body {
 
 /* Frosted nav chrome — DARK-tinted glass (distinct from the map's white glass).
    The slate tint is held at 0.7 so white nav text stays legible even where the
-   bar blurs a light section behind it. Degrades to solid slate. */
+   bar blurs a light section behind it. Degrades to solid slate. The mega panel
+   and mobile sheet that drop from this bar are their OWN light surface (see
+   the panel's bg-white in SiteNav.tsx) — only the bar itself is dark. */
 .glass-nav {
   background: rgba(18, 18, 18, 0.7);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);

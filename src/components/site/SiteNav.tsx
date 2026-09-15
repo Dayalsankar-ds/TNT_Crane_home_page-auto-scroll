@@ -465,7 +465,7 @@ export default function SiteNav() {
             return (
               <div
                 key={g.label}
-                className="absolute inset-x-0 top-full hidden border-t border-tnt-amber/40 bg-tnt-navy shadow-2xl shadow-black/40 lg:block"
+                className="absolute inset-x-0 top-full hidden border-t border-tnt-amber/40 bg-white shadow-2xl shadow-black/20 lg:block"
                 onMouseEnter={clearHover}
               >
                 {/* Gaps and rails were tightened on 2026-08-04 to buy width
@@ -490,7 +490,7 @@ export default function SiteNav() {
                       It's a filter, and a filter belongs upstream of what it
                       filters — left of the columns, read before them. */}
                   {localized && (
-                    <div className="w-[12.5rem] shrink-0 border-r border-white/10 pr-6">
+                    <div className="w-[12.5rem] shrink-0 border-r border-black/10 pr-6">
                       <LocationSelect
                         value={location}
                         onChange={(next) => {
@@ -505,8 +505,19 @@ export default function SiteNav() {
 
                   <div
                     key={swapKey}
-                    className={`nav-swap grid flex-1 gap-x-8 gap-y-8 ${
-                      columns.length > 1 ? "grid-cols-2" : "grid-cols-1"
+                    className={`nav-swap grid gap-x-8 gap-y-8 ${
+                      // Two columns still stretch to fill the row — that's a
+                      // real two-up layout. A lone column (Services) used to
+                      // stretch the same way, which left the short item list
+                      // stranded in a track as wide as the whole row, with a
+                      // dead gap before the feature card. Capping it to its
+                      // own content width instead closes that gap; any
+                      // leftover row width falls after the feature card,
+                      // against the panel's own edge, which reads as normal
+                      // breathing room rather than a hole in the middle.
+                      columns.length > 1
+                        ? "flex-1 grid-cols-2"
+                        : "w-[22rem] shrink-0 grid-cols-1"
                     }`}
                   >
                     {columns.map((col) => (
@@ -514,7 +525,7 @@ export default function SiteNav() {
                     ))}
                   </div>
 
-                  <div className="w-[17rem] shrink-0 border-l border-white/10 pl-8">
+                  <div className="w-[17rem] shrink-0 border-l border-black/10 pl-8">
                     {/* Closing card — one destination per panel that carries
                         the group's argument, so the panel makes a point
                         instead of only listing. */}
@@ -525,16 +536,16 @@ export default function SiteNav() {
                       <p className="font-body text-[13px] font-bold tracking-[0.18em] text-tnt-amber uppercase">
                         {feature.eyebrow}
                       </p>
-                      <p className="mt-3 font-display text-3xl leading-tight tracking-wide text-white uppercase">
+                      <p className="mt-3 font-display text-3xl leading-tight tracking-wide text-black uppercase">
                         {feature.title}
                       </p>
-                      <p className="mt-3 font-body text-base leading-relaxed text-white/60">
+                      <p className="mt-3 font-body text-base leading-relaxed text-black/60">
                         {feature.blurb}
                       </p>
                       <Link
                         href={feature.href}
                         onClick={() => setOpenGroup(null)}
-                        className="mt-5 inline-flex items-center gap-2 font-body text-base font-semibold text-tnt-amber hover:text-white"
+                        className="mt-5 inline-flex items-center gap-2 font-body text-base font-semibold text-tnt-amber hover:text-black"
                       >
                         {feature.cta}
                         <Icon name="arrow" className="h-5 w-5" />
@@ -569,7 +580,7 @@ export default function SiteNav() {
         // trackpad at a narrow window — but the sheet should scroll itself in
         // every input mode, not just the one it was designed for.
         data-lenis-prevent
-        className={`overflow-y-auto overscroll-contain bg-tnt-slate lg:hidden ${
+        className={`overflow-y-auto overscroll-contain border-t border-black/10 bg-white lg:hidden ${
           mobileOpen ? "max-h-[calc(100vh-5rem)]" : "max-h-0 overflow-hidden"
         } transition-[max-height] duration-300`}
       >
@@ -585,12 +596,12 @@ export default function SiteNav() {
             // something under it to reveal.
             const hasPanel = cols.length > 0;
             return (
-              <li key={g.label} className="border-b border-white/10 last:border-0">
+              <li key={g.label} className="border-b border-black/10 last:border-0">
                 <div className="flex items-center">
                   {g.href === null ? (
                     <span
                       aria-disabled="true"
-                      className="flex-1 rounded-md px-3 py-3.5 font-display text-base tracking-wide text-white/40 uppercase"
+                      className="flex-1 rounded-md px-3 py-3.5 font-display text-base tracking-wide text-black/30 uppercase"
                     >
                       {g.label}
                     </span>
@@ -600,7 +611,7 @@ export default function SiteNav() {
                       onClick={() => setMobileOpen(false)}
                       aria-current={current === g.label ? "page" : undefined}
                       className={`flex-1 rounded-md px-3 py-3.5 font-display text-base tracking-wide uppercase ${
-                        current === g.label ? "text-tnt-amber" : "text-white"
+                        current === g.label ? "text-tnt-amber" : "text-black"
                       }`}
                     >
                       {g.label}
@@ -614,7 +625,7 @@ export default function SiteNav() {
                       }
                       aria-expanded={expanded}
                       aria-label={`${expanded ? "Collapse" : "Expand"} ${g.label}`}
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-md text-white/70"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-md text-black/60"
                     >
                       <svg
                         viewBox="0 0 12 12"
@@ -645,7 +656,7 @@ export default function SiteNav() {
                       <div className="mt-2 px-3">
                         <label
                           htmlFor="mobile-location"
-                          className="font-mono text-[11px] tracking-[0.14em] text-white/45 uppercase"
+                          className="font-mono text-[11px] tracking-[0.14em] text-black/45 uppercase"
                         >
                           Choose Location
                         </label>
@@ -655,13 +666,13 @@ export default function SiteNav() {
                           onChange={(e) =>
                             setLocation(e.target.value as LocationId)
                           }
-                          className="mt-2 w-full rounded-md border border-white/20 bg-white/5 px-3 py-2.5 font-body text-sm font-semibold text-white focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
+                          className="mt-2 w-full rounded-md border border-black/15 bg-black/5 px-3 py-2.5 font-body text-sm font-semibold text-black focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
                         >
                           {SERVICE_LOCATIONS.map((loc) => (
                             <option
                               key={loc.id}
                               value={loc.id}
-                              className="bg-tnt-slate text-white"
+                              className="bg-white text-black"
                             >
                               {loc.label} — {loc.brand}
                             </option>
@@ -680,16 +691,16 @@ export default function SiteNav() {
                               <Link
                                 href={item.href}
                                 onClick={() => setMobileOpen(false)}
-                                className="flex items-center gap-3 rounded-md px-3 py-2.5 font-body text-[15px] text-white/80 hover:bg-white/10 hover:text-tnt-amber"
+                                className="flex items-center gap-3 rounded-md px-3 py-2.5 font-body text-[15px] text-black/75 hover:bg-black/5 hover:text-tnt-amber"
                               >
                                 {item.index && (
-                                  <span className="font-mono text-[11px] text-white/30 tabular-nums">
+                                  <span className="font-mono text-[11px] text-black/30 tabular-nums">
                                     {item.index}
                                   </span>
                                 )}
                                 <span className="flex-1">{item.label}</span>
                                 {item.meta && (
-                                  <span className="font-mono text-[11px] text-white/40 tabular-nums">
+                                  <span className="font-mono text-[11px] text-black/40 tabular-nums">
                                     {item.meta}
                                   </span>
                                 )}
@@ -709,7 +720,7 @@ export default function SiteNav() {
             <a
               href="tel:+18007992505"
               onClick={() => setMobileOpen(false)}
-              className="block rounded-md px-3 py-3 font-mono text-base font-semibold text-tnt-amber hover:bg-white/10"
+              className="block rounded-md px-3 py-3 font-mono text-base font-semibold text-tnt-amber hover:bg-black/5"
             >
               1-800-799-2505
             </a>
@@ -718,7 +729,6 @@ export default function SiteNav() {
             <Button
               href="/#quote"
               variant="primary"
-              onDark
               arrow={false}
               onClick={() => setMobileOpen(false)}
               className="w-full justify-center py-3"
@@ -827,8 +837,8 @@ function FamilyMarks({ location }: { location: LocationId }) {
   const marks = one ? (one.logo ? [{ brand: one.brand, logo: one.logo }] : []) : FAMILY_BRANDS;
 
   return (
-    <div className="mt-7 border-t border-white/10 pt-5">
-      <p className="font-mono text-[10px] tracking-[0.14em] text-white/40 uppercase">
+    <div className="mt-7 border-t border-black/10 pt-5">
+      <p className="font-mono text-[10px] tracking-[0.14em] text-black/40 uppercase">
         {one ? "Operated by" : "Operating companies"}
       </p>
       {marks.length > 0 ? (
@@ -846,14 +856,13 @@ function FamilyMarks({ location }: { location: LocationId }) {
                 fill
                 sizes="108px"
                 unoptimized
-                style={{ filter: "drop-shadow(0 0 1px rgba(255,255,255,0.75))" }}
                 className="object-contain"
               />
             </li>
           ))}
         </ul>
       ) : (
-        <p className="mt-2 font-body text-sm font-semibold text-white/80">
+        <p className="mt-2 font-body text-sm font-semibold text-black/80">
           {one?.brand}
         </p>
       )}
@@ -869,7 +878,7 @@ function FamilyFilters({
   onChange: (next: LocationId) => void;
 }) {
   return (
-    <div className="mb-8 flex justify-center border-b border-white/10 pb-6">
+    <div className="mb-8 flex justify-center border-b border-black/10 pb-6">
       <ul className="flex w-full max-w-3xl flex-wrap items-center justify-center gap-3">
         <li>
           <button
@@ -879,7 +888,7 @@ function FamilyFilters({
             className={`flex h-12 min-w-20 items-center justify-center rounded-sm border px-3 font-mono text-[10px] tracking-[0.08em] uppercase transition-colors ${
               value === "all"
                 ? "border-tnt-amber bg-tnt-amber text-black"
-                : "border-white/15 text-white/65 hover:border-tnt-amber/60 hover:text-white"
+                : "border-black/15 text-black/65 hover:border-tnt-amber/60 hover:text-tnt-amber"
             }`}
           >
             All
@@ -897,7 +906,7 @@ function FamilyFilters({
                 className={`relative block h-12 w-28 rounded-sm border p-1 transition-colors ${
                   selected
                     ? "border-tnt-amber ring-1 ring-tnt-amber"
-                    : "border-transparent hover:border-white/30"
+                    : "border-transparent hover:border-black/20"
                 }`}
               >
                 <Image
@@ -906,7 +915,6 @@ function FamilyFilters({
                   fill
                   sizes="84px"
                   unoptimized
-                  style={{ filter: "drop-shadow(0 0 1px rgba(255,255,255,0.75))" }}
                   className="object-contain"
                 />
               </button>
@@ -939,17 +947,17 @@ function PanelColumn({ col }: { col: NavColumn }) {
           <li key={item.label + item.href}>
             <Link
               href={item.href}
-              className="group flex items-center gap-3 rounded-md px-3 py-3 transition-colors hover:bg-white/5"
+              className="group flex items-center gap-3 rounded-md px-3 py-3 transition-colors hover:bg-black/5"
             >
               {item.index && (
-                <span className="font-mono text-[12px] text-white/30 tabular-nums transition-colors group-hover:text-tnt-amber">
+                <span className="font-mono text-[12px] text-black/30 tabular-nums transition-colors group-hover:text-tnt-amber">
                   {item.index}
                 </span>
               )}
               {item.icon && (
                 <Icon
                   name={item.icon}
-                  className="h-5 w-5 shrink-0 text-white/40 transition-colors group-hover:text-tnt-amber"
+                  className="h-5 w-5 shrink-0 text-black/40 transition-colors group-hover:text-tnt-amber"
                   strokeWidth={1.6}
                 />
               )}
@@ -957,11 +965,11 @@ function PanelColumn({ col }: { col: NavColumn }) {
                   the room: a label reads as one line or not at all, so a
                   future item longer than the column overflows visibly here
                   rather than silently reflowing to two lines. */}
-              <span className="font-body text-base font-semibold whitespace-nowrap text-white/85 transition-colors group-hover:text-white">
+              <span className="font-body text-base font-semibold whitespace-nowrap text-black/80 transition-colors group-hover:text-black">
                 {item.label}
               </span>
               {item.meta && (
-                <span className="ml-auto font-mono text-[12px] whitespace-nowrap text-white/35 tabular-nums">
+                <span className="ml-auto font-mono text-[12px] whitespace-nowrap text-black/40 tabular-nums">
                   {item.meta}
                 </span>
               )}

@@ -60,7 +60,7 @@ export function wasEscapeHandled(e: KeyboardEvent) {
 
 function BrandMark({ brand }: { brand: string }) {
   return (
-    <span className="flex h-8 w-[88px] shrink-0 items-center justify-end text-right font-mono text-[9px] leading-tight tracking-[0.06em] text-white/55 uppercase">
+    <span className="flex h-8 w-[88px] shrink-0 items-center justify-end text-right font-mono text-[9px] leading-tight tracking-[0.06em] text-black/50 uppercase">
       {brand}
     </span>
   );
@@ -189,7 +189,7 @@ export default function LocationSelect({
     <div className="relative">
       <p
         id="nav-location-label"
-        className="font-mono text-[11px] tracking-[0.14em] text-white/45 uppercase"
+        className="font-mono text-[11px] tracking-[0.14em] text-black/45 uppercase"
       >
         Choose Location
       </p>
@@ -208,15 +208,15 @@ export default function LocationSelect({
             onOpenChange(true);
           }
         }}
-        className="mt-2 flex w-full items-center justify-between gap-3 rounded-md border border-white/20 bg-white/5 px-3 py-2.5 text-left transition-colors hover:border-tnt-amber/60 focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
+        className="mt-2 flex w-full items-center justify-between gap-3 rounded-md border border-black/15 bg-black/5 px-3 py-2.5 text-left transition-colors hover:border-tnt-amber/60 focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
       >
         {/* Selected state keeps the CITY as the headline and the company mark
             beneath it, so the association survives after the list closes. */}
         <span id="nav-location-value" className="min-w-0">
-          <span className="block truncate font-body text-sm font-semibold text-white">
+          <span className="block truncate font-body text-sm font-semibold text-black">
             {selected.label}
           </span>
-          <span className="block truncate font-mono text-[11px] text-white/45">
+          <span className="block truncate font-mono text-[11px] text-black/45">
             {selected.brand}
           </span>
         </span>
@@ -238,10 +238,10 @@ export default function LocationSelect({
         /* Wider than the trigger: the rail is narrow, but "Colorado Springs, CO"
            over "Eagle West Crane & Rigging" needs room to read without
            truncating. Anchored left so it opens into the panel. */
-        <div className="absolute left-0 z-10 mt-1 w-[21rem] overflow-hidden rounded-md border border-white/20 bg-tnt-slate shadow-2xl shadow-black/50">
-          <div className="border-b border-white/10 p-2">
-            <div className="flex items-center gap-2 rounded-md bg-white/10 px-2.5 py-2 ring-1 ring-white/15 focus-within:ring-tnt-amber">
-              <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-white/60" />
+        <div className="absolute left-0 z-10 mt-1 w-[21rem] overflow-hidden rounded-md border border-black/15 bg-white shadow-2xl shadow-black/20">
+          <div className="border-b border-black/10 p-2">
+            <div className="flex items-center gap-2 rounded-md bg-black/5 px-2.5 py-2 ring-1 ring-black/10 focus-within:ring-tnt-amber">
+              <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-black/50" />
               <input
                 ref={inputRef}
                 // combobox + listbox: the input owns focus and drives the list
@@ -261,7 +261,7 @@ export default function LocationSelect({
                 onKeyDown={onInputKeyDown}
                 onBlur={() => onOpenChange(false)}
                 placeholder="Search city or company…"
-                className="w-full bg-transparent font-body text-sm text-white placeholder:text-white/45 focus:outline-none"
+                className="w-full bg-transparent font-body text-sm text-black placeholder:text-black/40 focus:outline-none"
               />
             </div>
           </div>
@@ -280,8 +280,8 @@ export default function LocationSelect({
             className="max-h-[22rem] overflow-y-auto py-1"
           >
             {filtered.length === 0 && (
-              <li className="px-3 py-3 font-body text-sm text-white/55">
-                No locations match “{query}”.
+              <li className="px-3 py-3 font-body text-sm text-black/50">
+                No locations match &quot;{query}&quot;.
               </li>
             )}
             {filtered.map((loc, i) => {
@@ -304,12 +304,12 @@ export default function LocationSelect({
                   commit(i);
                 }}
                 className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 ${
-                  isActive ? "bg-white/10" : ""
+                  isActive ? "bg-black/5" : ""
                 }`}
               >
                 <span
                   className={`min-w-0 flex-1 truncate font-body text-sm font-semibold ${
-                    isSelected ? "text-tnt-amber" : "text-white/90"
+                    isSelected ? "text-tnt-amber" : "text-black/85"
                   }`}
                 >
                   {loc.label}

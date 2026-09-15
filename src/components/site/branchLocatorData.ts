@@ -47,24 +47,63 @@ const BRAND_REGION: Record<string, RegionId | null> = {
   "Eagle West Cranes": "western-canada",
 };
 
-// The 16 TNT branches with complete location details
+// All 44 branches across the TNT family of brands
 const SEEDS: Seed[] = [
-  { id: "aus", city: "Austin, TX", state: "Texas", region: "Central Texas", brand: "TNT Crane & Rigging", country: "US", lat: 30.2672, lng: -97.7431 },
-  { id: "bea", city: "Beaumont, TX", state: "Texas", region: "Southeast Texas", brand: "TNT Crane & Rigging", country: "US", lat: 30.0656, lng: -94.1277 },
-  { id: "bud", city: "Buda, TX", state: "Texas", region: "Central Texas", brand: "TNT Crane & Rigging", country: "US", lat: 30.2499, lng: -97.8604 },
-  { id: "cor", city: "Corpus Christi, TX", state: "Texas", region: "Gulf Coast", brand: "TNT Crane & Rigging", country: "US", lat: 27.8006, lng: -97.3964 },
-  { id: "dal", city: "Dallas, TX", state: "Texas", region: "North Texas", brand: "TNT Crane & Rigging", country: "US", lat: 32.7767, lng: -96.797 },
-  { id: "edi", city: "Edinburg, TX", state: "Texas", region: "Rio Grande Valley", brand: "TNT Crane & Rigging", country: "US", lat: 26.3064, lng: -97.8377 },
-  { id: "ftw", city: "Fort Worth, TX", state: "Texas", region: "North Texas", brand: "TNT Crane & Rigging", country: "US", lat: 32.7555, lng: -97.3308 },
-  { id: "fre", city: "Freeport, TX", state: "Texas", region: "Brazoria", brand: "TNT Crane & Rigging", country: "US", lat: 28.9532, lng: -95.3368 },
-  { id: "hou", city: "Houston, TX", state: "Texas", region: "Gulf Coast", brand: "TNT Crane & Rigging", country: "US", lat: 29.7604, lng: -95.3698 },
-  { id: "mid", city: "Midland, TX", state: "Texas", region: "Permian Basin", brand: "TNT Crane & Rigging", country: "US", lat: 31.9973, lng: -102.0779 },
-  { id: "nor", city: "Norco, LA", state: "Louisiana", region: "Gulf Coast", brand: "TNT Crane & Rigging", country: "US", lat: 30.2202, lng: -90.7506 },
-  { id: "okc", city: "Oklahoma City, OK", state: "Oklahoma", region: "Central Oklahoma", brand: "TNT Crane & Rigging", country: "US", lat: 35.4676, lng: -97.5164 },
-  { id: "pam", city: "Pampa, TX", state: "Texas", region: "Texas Panhandle", brand: "TNT Crane & Rigging", country: "US", lat: 35.5427, lng: -100.9896 },
-  { id: "sat", city: "San Antonio, TX", state: "Texas", region: "South Central", brand: "TNT Crane & Rigging", country: "US", lat: 29.4241, lng: -98.4936 },
-  { id: "stj", city: "St James, LA", state: "Louisiana", region: "Gulf Coast", brand: "TNT Crane & Rigging", country: "US", lat: 30.2072, lng: -90.8486 },
-  { id: "tul", city: "Tulsa, OK", state: "Oklahoma", region: "Northeast Oklahoma", brand: "TNT Crane & Rigging", country: "US", lat: 36.1539, lng: -95.9928 },
+  // TNT Crane & Rigging (16)
+  { id: "aus", city: "Austin, TX", state: "Texas", region: "Central Texas", brand: "TNT Crane & Rigging", country: "US", lat: 30.1935, lng: -97.665 },
+  { id: "bea", city: "Beaumont, TX", state: "Texas", region: "Southeast Texas", brand: "TNT Crane & Rigging", country: "US", lat: 29.9803, lng: -93.9946 },
+  { id: "bud", city: "Buda, TX", state: "Texas", region: "Central Texas", brand: "TNT Crane & Rigging", country: "US", lat: 30.0825, lng: -97.8417 },
+  { id: "cor", city: "Corpus Christi, TX", state: "Texas", region: "Gulf Coast", brand: "TNT Crane & Rigging", country: "US", lat: 27.8449, lng: -97.5672 },
+  { id: "dal", city: "Dallas, TX", state: "Texas", region: "North Texas", brand: "TNT Crane & Rigging", country: "US", lat: 32.877, lng: -96.9139 },
+  { id: "edi", city: "Edinburg, TX", state: "Texas", region: "Rio Grande Valley", brand: "TNT Crane & Rigging", country: "US", lat: 26.281, lng: -98.1487 },
+  { id: "ftw", city: "Fort Worth, TX", state: "Texas", region: "North Texas", brand: "TNT Crane & Rigging", country: "US", lat: 32.7536, lng: -97.3028 },
+  { id: "fre", city: "Freeport, TX", state: "Texas", region: "Brazoria", brand: "TNT Crane & Rigging", country: "US", lat: 28.9497, lng: -95.3461 },
+  { id: "hou", city: "Houston, TX", state: "Texas", region: "Gulf Coast", brand: "TNT Crane & Rigging", country: "US", lat: 29.6796, lng: -95.4008 },
+  { id: "mid", city: "Midland, TX", state: "Texas", region: "Permian Basin", brand: "TNT Crane & Rigging", country: "US", lat: 31.9974, lng: -102.0779 },
+  { id: "nor", city: "Norco, LA", state: "Louisiana", region: "Gulf Coast", brand: "TNT Crane & Rigging", country: "US", lat: 30.0093, lng: -90.4076 },
+  { id: "okc", city: "Oklahoma City, OK", state: "Oklahoma", region: "Central Oklahoma", brand: "TNT Crane & Rigging", country: "US", lat: 35.3903, lng: -97.6544 },
+  { id: "pam", city: "Pampa, TX", state: "Texas", region: "Texas Panhandle", brand: "TNT Crane & Rigging", country: "US", lat: 35.5258, lng: -100.977 },
+  { id: "sat", city: "San Antonio, TX", state: "Texas", region: "South Central", brand: "TNT Crane & Rigging", country: "US", lat: 29.5713, lng: -98.1403 },
+  { id: "stj", city: "St James, LA", state: "Louisiana", region: "Gulf Coast", brand: "TNT Crane & Rigging", country: "US", lat: 30.0097, lng: -90.799 },
+  { id: "tul", city: "Tulsa, OK", state: "Oklahoma", region: "Northeast Oklahoma", brand: "TNT Crane & Rigging", country: "US", lat: 36.1563, lng: -95.9928 },
+
+  // RMS Cranes (6)
+  { id: "abq", city: "Albuquerque, NM", state: "New Mexico", region: "New Mexico", brand: "RMS Cranes", country: "US", lat: 35.005, lng: -106.6614 },
+  { id: "cas", city: "Casper, WY", state: "Wyoming", region: "Wyoming", brand: "RMS Cranes", country: "US", lat: 42.8501, lng: -106.3251 },
+  { id: "cos", city: "Colorado Springs, CO", state: "Colorado", region: "Southern Colorado", brand: "RMS Cranes", country: "US", lat: 38.8838, lng: -104.8095 },
+  { id: "den", city: "Denver, CO", state: "Colorado", region: "Front Range", brand: "RMS Cranes", country: "US", lat: 39.8129, lng: -104.7733 },
+  { id: "win", city: "Windsor, CO", state: "Colorado", region: "Northern Colorado", brand: "RMS Cranes", country: "US", lat: 40.4743, lng: -104.8812 },
+  { id: "hen", city: "Denver, CO", state: "Colorado", region: "Front Range", brand: "RMS Cranes", country: "US", lat: 39.9205, lng: -104.8658 },
+
+  // Southway Crane & Rigging (12)
+  { id: "alb", city: "Albany, GA", state: "Georgia", region: "Southwest Georgia", brand: "Southway Crane & Rigging", country: "US", lat: 31.5913, lng: -84.1328 },
+  { id: "atl", city: "Atlanta, GA", state: "Georgia", region: "Metro Atlanta", brand: "Southway Crane & Rigging", country: "US", lat: 33.7545, lng: -84.3898 },
+  { id: "bhm", city: "Birmingham, AL", state: "Alabama", region: "Central Alabama", brand: "Southway Crane & Rigging", country: "US", lat: 33.5453, lng: -86.8184 },
+  { id: "rgg", city: "Ringgold, GA", state: "Georgia", region: "Northwest Georgia", brand: "Southway Crane & Rigging", country: "US", lat: 34.9127, lng: -85.1319 },
+  { id: "lex", city: "Lexington, SC", state: "South Carolina", region: "Midlands SC", brand: "Southway Crane & Rigging", country: "US", lat: 33.9472, lng: -81.2466 },
+  { id: "con", city: "Conyers, GA", state: "Georgia", region: "Metro Atlanta", brand: "Southway Crane & Rigging", country: "US", lat: 33.6679, lng: -83.9855 },
+  { id: "byr", city: "Byron, GA", state: "Georgia", region: "Middle Georgia", brand: "Southway Crane & Rigging", country: "US", lat: 32.6515, lng: -83.7451 },
+  { id: "mgm", city: "Montgomery, AL", state: "Alabama", region: "Central Alabama", brand: "Southway Crane & Rigging", country: "US", lat: 32.3927, lng: -86.309 },
+  { id: "nau", city: "North Augusta, SC", state: "South Carolina", region: "CSRA", brand: "Southway Crane & Rigging", country: "US", lat: 33.4943, lng: -81.9706 },
+  { id: "pwt", city: "Port Wentworth, GA", state: "Georgia", region: "Coastal Georgia", brand: "Southway Crane & Rigging", country: "US", lat: 32.1953, lng: -81.1904 },
+  { id: "mdw", city: "Midway, FL", state: "Florida", region: "Big Bend Florida", brand: "Southway Crane & Rigging", country: "US", lat: 30.4938, lng: -84.4263 },
+  { id: "val", city: "Valdosta, GA", state: "Georgia", region: "South Georgia", brand: "Southway Crane & Rigging", country: "US", lat: 30.8096, lng: -83.2712 },
+
+  // JMS Crane & Rigging (1)
+  { id: "bil", city: "Billings, MT", state: "Montana", region: "Southern Montana", brand: "JMS Crane & Rigging", country: "US", lat: 45.7436, lng: -108.5624 },
+
+  // TNT Canada (6)
+  { id: "brk", city: "Brooks, AB", state: "Alberta", region: "Southern Alberta", brand: "TNT Canada", country: "CA", lat: 50.5589, lng: -111.8928 },
+  { id: "cal", city: "Calgary, AB", state: "Alberta", region: "Southern Alberta", brand: "TNT Canada", country: "CA", lat: 51.3699, lng: -114.0142 },
+  { id: "edm", city: "Edmonton, AB", state: "Alberta", region: "Central Alberta", brand: "TNT Canada", country: "CA", lat: 53.2608, lng: -113.5512 },
+  { id: "fmm", city: "Fort McMurray, AB", state: "Alberta", region: "Northern Alberta", brand: "TNT Canada", country: "CA", lat: 56.6761, lng: -111.353 },
+  { id: "let", city: "Lethbridge, AB", state: "Alberta", region: "Southern Alberta", brand: "TNT Canada", country: "CA", lat: 49.7373, lng: -112.789 },
+  { id: "mh", city: "Medicine Hat, AB", state: "Alberta", region: "Southern Alberta", brand: "TNT Canada", country: "CA", lat: 50.0803, lng: -110.7618 },
+
+  // Eagle West Cranes (3)
+  { id: "abb", city: "Abbotsford, BC", state: "British Columbia", region: "Fraser Valley", brand: "Eagle West Cranes", country: "CA", lat: 49.0399, lng: -122.3575 },
+  { id: "chi", city: "Chilliwack, BC", state: "British Columbia", region: "Fraser Valley", brand: "Eagle West Cranes", country: "CA", lat: 49.0645, lng: -122.0376 },
+  { id: "kam", city: "Kamloops, BC", state: "British Columbia", region: "Southern Interior BC", brand: "Eagle West Cranes", country: "CA", lat: 50.6575, lng: -120.1097 },
 ];
 
 export type BranchLocatorData = {
