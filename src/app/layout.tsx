@@ -60,11 +60,14 @@ export default function RootLayout({
         <SmoothScroll />
         {/* Fixed nav + shared footer wrap every route */}
         <SiteNav />
-        {/* Theme 1/2 floating toggle, bottom-left — restored 2026-09-14, on
-            request ("one more theme to show to my manager"). Hero 1/2 used
-            to sit beside it in this row; that toggle stays unrendered since
-            hero one is still hidden (see HeroVersioned.tsx) — re-add
-            `<HeroToggle />` here if hero one comes back too. */}
+        {/* Theme 1/2 + Light/Dark floating toggle, bottom-left — restored
+            2026-09-14, on request ("one more theme to show to my manager").
+            Hero 1/2 used to sit beside it in this row (HeroToggle.tsx) —
+            deleted 2026-09-17 along with the manual-scroll hero it toggled
+            to, since there's only one hero now. Light/Dark
+            (colorSchemeStore.ts) was added 2026-09-17 as its own floating
+            pill, then merged into this one same day, on request — see
+            ThemeToggle.tsx's own docblock. */}
         <div className="fixed bottom-4 left-4 z-[60] flex items-end gap-2 sm:bottom-6 sm:left-6">
           <ThemeToggle />
         </div>

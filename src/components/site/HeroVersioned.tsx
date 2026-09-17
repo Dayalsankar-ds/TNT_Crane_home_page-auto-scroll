@@ -1,33 +1,21 @@
 /**
- * HERO VERSIONED — used to swap between the two hero implementations based
- * on heroVersionStore + the floating "Hero 1/2" toggle (HeroToggle.tsx,
- * previously rendered by layout.tsx).
+ * HERO VERSIONED — thin wrapper kept so `page.tsx` doesn't need to change
+ * if the hero implementation changes again; not a real "versioned" switch
+ * any more.
  *
- * HERO ONE HIDDEN (2026-09-11, on request: "hide the hero version 1, keep
- * only hero version 2"). This now renders HeroScrollExperienceManualScroll
- * unconditionally — no version store, no toggle, no choice. Nothing was
- * deleted, per the explicit ask to keep hero one available for later:
- *
- *  - HeroScrollExperienceR3F.tsx, useHeroAutoScroll.ts, HeroToggle.tsx, and
- *    heroVersionStore.ts are all untouched and still on disk — just not
- *    imported by anything right now, so they carry no runtime cost.
- *  - layout.tsx no longer renders <HeroToggle /> (see that file for the
- *    removed block) — there is nothing left to toggle.
- *
- * TO BRING HERO ONE BACK: restore this file's previous body (`git log` this
- * file, or the commit around 2026-09-11's "hide hero one" change) — the
- * short version is re-import HeroScrollExperienceR3F and useHeroVersion from
- * "./heroVersionStore", branch on `heroVersion === "one"` again, and re-add
- * `<HeroToggle />` to layout.tsx.
- *
- * Was previously keyed by version (`key="hero-one"` / `key="hero-two"`) so
- * switching remounted the hero fresh rather than reusing state across two
- * components with different internals — moot with only one hero rendered,
- * but worth restoring alongside the toggle if hero one comes back.
+ * MANUAL-SCROLL HERO REMOVED, AUTO-SCROLL HERO IS NOW THE ONLY ONE
+ * (2026-09-17, on request — "remove the existing manual-scroll hero and
+ * replace it with the auto-scroll hero only"): this used to render
+ * HeroScrollExperienceManualScroll (with HeroScrollExperienceR3F sitting
+ * unused on disk behind a since-removed "Hero 1/2" toggle, see prior
+ * history via `git log` on this file). HeroScrollExperienceManualScroll.tsx,
+ * heroSequenceManualScroll.ts, useHeroAutoScrollManualScroll.ts,
+ * heroVersionStore.ts, and HeroToggle.tsx were all deleted outright in the
+ * same request — there is only one hero now, no toggle, no version store.
  */
 
-import HeroScrollExperienceManualScroll from "@/components/HeroScrollExperienceManualScroll";
+import HeroScrollExperienceR3F from "@/components/HeroScrollExperienceR3F";
 
 export default function HeroVersioned() {
-  return <HeroScrollExperienceManualScroll />;
+  return <HeroScrollExperienceR3F />;
 }

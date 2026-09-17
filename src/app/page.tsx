@@ -4,9 +4,10 @@
 //   git show 5d89d04:src/components/HeroScrollExperience.tsx
 //
 // HeroVersioned (2026-09-08) used to wrap this hero alongside a second,
-// manual-scroll variant behind a floating "Hero 1 / 2" toggle. Hero one
-// (this R3F version) is hidden as of 2026-09-11, on request — see
-// HeroVersioned.tsx for what's still on disk vs. what's actually rendered.
+// manual-scroll variant behind a floating "Hero 1 / 2" toggle. The
+// manual-scroll variant, the toggle, and the version store were all deleted
+// outright 2026-09-17, on request, when new footage (heroSequence.ts's V6)
+// replaced the old scene — this R3F hero is now the only one, unconditional.
 import HeroVersioned from "@/components/site/HeroVersioned";
 // FamilyStripV2 rendered directly as of 2026-09-13, on request — Nav
 // version 1's FamilyStrip.tsx (the diagonal-panel + 2x2 grid design) is
@@ -71,8 +72,8 @@ export default function Home() {
     <div id="top" className="-mt-[var(--chrome-h)] bg-black text-white">
         {/* HERO — mechanism (scrub, pin, modes) is locked; do not restyle.
             Carries the page's <h1> as an opening overlay (HeroHeadline).
-            HeroVersioned renders hero two only as of 2026-09-11 — no
-            toggle, see that file's docblock. */}
+            HeroVersioned renders the R3F auto-scroll hero unconditionally
+            as of 2026-09-17 — no toggle, see that file's docblock. */}
         <HeroVersioned />
 
         {/* Trust, fast — TNT's own family-of-companies logos right off the
