@@ -15,6 +15,17 @@
  * trigger + dialog in EquipmentFinder.tsx. No top margin here as a result;
  * that spacing is the page layout's job, not this component's, and a modal
  * sheet shouldn't carry it.
+ *
+ * DARK MODE = SOLID AMBER (2026-09-18, on request: "on dark mode full
+ * capacity chart pop up need to be in yellow color"): every `dark:` pair
+ * below flips this card from navy/white to amber/black — not just the
+ * outer shell, since a navy card sitting inside an amber-filled section
+ * elsewhere reads as an oversight, not a choice. Text/border/fill
+ * opacities keep the same numeric scale (white/40 ↔ black/40, etc.) so
+ * relative contrast is unchanged, just inverted. The two filter pills'
+ * "active" state is the one exception: on a navy card an amber-filled pill
+ * pops; on an amber card that same fill would vanish into the background,
+ * so `dark:` swaps it to a black-filled pill instead (see below).
  */
 
 import { useMemo, useState } from "react";
@@ -58,23 +69,23 @@ export default function CraneCapacityChart() {
   }, [activeType, query, sortDir]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-black/10 bg-tnt-navy text-white">
+    <div className="overflow-hidden rounded-2xl border border-black/10 bg-tnt-navy text-white dark:bg-tnt-amber dark:text-black">
       {/* Header — title, count, and controls */}
-      <div className="flex flex-col gap-4 border-b border-white/10 p-4 sm:gap-5 sm:p-8">
+      <div className="flex flex-col gap-4 border-b border-white/10 p-4 sm:gap-5 sm:p-8 dark:border-black/10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h3
               id="capacity-chart-heading"
-              className="font-display text-2xl tracking-wide text-white uppercase sm:text-3xl"
+              className="font-display text-2xl tracking-wide text-white uppercase sm:text-3xl dark:text-black"
             >
               Full Capacity Chart
             </h3>
-            <p className="mt-1 font-body text-xs text-white/60 sm:text-sm">
+            <p className="mt-1 font-body text-xs text-white/60 sm:text-sm dark:text-black/60">
               {CRANE_MODELS.length} machines, every rated capacity and
               manufacturer load chart on file.
             </p>
           </div>
-          <p className="font-mono text-[10px] tracking-[0.12em] text-tnt-amber tabular-nums uppercase sm:text-xs sm:tracking-[0.14em]">
+          <p className="font-mono text-[10px] tracking-[0.12em] text-tnt-amber tabular-nums uppercase sm:text-xs sm:tracking-[0.14em] dark:text-black">
             Showing {rows.length} of {CRANE_MODELS.length}
           </p>
         </div>
@@ -88,8 +99,8 @@ export default function CraneCapacityChart() {
                 onClick={() => setActiveType("all")}
                 className={`rounded-full border px-3.5 py-1.5 font-body text-[10px] font-semibold tracking-wide uppercase transition-colors sm:text-xs ${
                   activeType === "all"
-                    ? "border-tnt-amber bg-tnt-amber text-black"
-                    : "border-white/20 text-white/70 hover:border-white/50 hover:text-white"
+                    ? "border-tnt-amber bg-tnt-amber text-black dark:border-black dark:bg-black dark:text-tnt-amber"
+                    : "border-white/20 text-white/70 hover:border-white/50 hover:text-white dark:border-black/20 dark:text-black/70 dark:hover:border-black/50 dark:hover:text-black"
                 }`}
               >
                 All Classes
@@ -101,8 +112,8 @@ export default function CraneCapacityChart() {
                   onClick={() => setActiveType(t)}
                   className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 font-body text-[10px] font-semibold tracking-wide uppercase transition-colors sm:text-xs ${
                     activeType === t
-                      ? "border-tnt-amber bg-tnt-amber text-black"
-                      : "border-white/20 text-white/70 hover:border-white/50 hover:text-white"
+                      ? "border-tnt-amber bg-tnt-amber text-black dark:border-black dark:bg-black dark:text-tnt-amber"
+                      : "border-white/20 text-white/70 hover:border-white/50 hover:text-white dark:border-black/20 dark:text-black/70 dark:hover:border-black/50 dark:hover:text-black"
                   }`}
                 >
                   <Icon name={TYPE_ICON[t]} className="h-3.5 w-3.5" strokeWidth={2} />
@@ -116,7 +127,7 @@ export default function CraneCapacityChart() {
             <span className="sr-only">Search by make or model</span>
             <Icon
               name="search"
-              className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/40"
+              className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-white/40 dark:text-black/40"
               strokeWidth={2}
             />
             <input
@@ -124,7 +135,7 @@ export default function CraneCapacityChart() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search make or model…"
-              className="w-full rounded-md border border-white/20 bg-white/5 py-2 pr-3 pl-9 font-body text-sm text-white placeholder:text-white/40 focus-visible:border-tnt-amber focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
+              className="w-full rounded-md border border-white/20 bg-white/5 py-2 pr-3 pl-9 font-body text-sm text-white placeholder:text-white/40 focus-visible:border-tnt-amber focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none dark:border-black/20 dark:bg-black/5 dark:text-black dark:placeholder:text-black/40 dark:focus-visible:border-black dark:focus-visible:ring-black"
             />
           </label>
         </div>
@@ -133,7 +144,7 @@ export default function CraneCapacityChart() {
       {/* Table / card list — mobile gets stacked cards, desktop keeps the table */}
       <div className="sm:hidden">
         {rows.length > 0 ? (
-          <div className="divide-y divide-white/10">
+          <div className="divide-y divide-white/10 dark:divide-black/10">
             {rows.map((m) => (
               <article
                 key={`${m.make}-${m.model}-${m.chartHref}`}
@@ -141,39 +152,39 @@ export default function CraneCapacityChart() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5 grid h-10 w-10 place-items-center rounded-full bg-white/5 ring-1 ring-white/10">
+                    <div className="mt-0.5 grid h-10 w-10 place-items-center rounded-full bg-white/5 ring-1 ring-white/10 dark:bg-black/5 dark:ring-black/10">
                       <Icon
                         name={TYPE_ICON[m.type]}
-                        className="h-4 w-4 text-tnt-amber"
+                        className="h-4 w-4 text-tnt-amber dark:text-black"
                         strokeWidth={1.8}
                       />
                     </div>
                     <div>
-                      <p className="font-body text-[10px] tracking-[0.14em] text-white/50 uppercase">
+                      <p className="font-body text-[10px] tracking-[0.14em] text-white/50 uppercase dark:text-black/50">
                         {CRANE_TYPE_LABELS[m.type]}
                       </p>
-                      <h4 className="mt-1 font-display text-xl tracking-wide text-white uppercase">
+                      <h4 className="mt-1 font-display text-xl tracking-wide text-white uppercase dark:text-black">
                         {m.model}
                       </h4>
                     </div>
                   </div>
-                  <div className="font-mono text-xs tracking-[0.12em] text-tnt-amber tabular-nums uppercase">
+                  <div className="font-mono text-xs tracking-[0.12em] text-tnt-amber tabular-nums uppercase dark:text-black">
                     {m.capacityTons}T
                   </div>
                 </div>
 
-                <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-white/75">
+                <div className="mt-3 grid grid-cols-2 gap-3 text-xs text-white/75 dark:text-black/75">
                   <div>
-                    <p className="font-body text-[10px] tracking-[0.12em] text-white/45 uppercase">
+                    <p className="font-body text-[10px] tracking-[0.12em] text-white/45 uppercase dark:text-black/45">
                       Make
                     </p>
-                    <p className="mt-1 text-sm text-white/90">{m.make}</p>
+                    <p className="mt-1 text-sm text-white/90 dark:text-black/90">{m.make}</p>
                   </div>
                   <div>
-                    <p className="font-body text-[10px] tracking-[0.12em] text-white/45 uppercase">
+                    <p className="font-body text-[10px] tracking-[0.12em] text-white/45 uppercase dark:text-black/45">
                       Capacity
                     </p>
-                    <p className="mt-1 text-sm text-white/90">{m.capacityTons} Ton</p>
+                    <p className="mt-1 text-sm text-white/90 dark:text-black/90">{m.capacityTons} Ton</p>
                   </div>
                 </div>
 
@@ -181,7 +192,7 @@ export default function CraneCapacityChart() {
                   href={m.chartHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-1.5 font-body text-[10px] font-semibold tracking-[0.12em] text-tnt-amber uppercase"
+                  className="mt-4 inline-flex items-center gap-1.5 font-body text-[10px] font-semibold tracking-[0.12em] text-tnt-amber uppercase dark:text-black"
                 >
                   View PDF
                   <Icon name="arrow" className="h-3 w-3" strokeWidth={2.5} />
@@ -190,7 +201,7 @@ export default function CraneCapacityChart() {
             ))}
           </div>
         ) : (
-          <div className="px-4 py-12 text-center text-sm text-white/50">
+          <div className="px-4 py-12 text-center text-sm text-white/50 dark:text-black/50">
             No machines match that search.
           </div>
         )}
@@ -198,8 +209,8 @@ export default function CraneCapacityChart() {
 
       <div data-lenis-prevent className="hidden max-h-[60vh] overflow-auto overscroll-contain sm:block sm:max-h-[32rem]">
         <table className="w-full border-collapse font-body text-sm">
-          <thead className="sticky top-0 z-10 bg-tnt-navy">
-            <tr className="border-b border-white/10 text-left text-[10px] tracking-[0.12em] text-white/50 uppercase sm:text-[11px] sm:tracking-[0.14em]">
+          <thead className="sticky top-0 z-10 bg-tnt-navy dark:bg-tnt-amber">
+            <tr className="border-b border-white/10 text-left text-[10px] tracking-[0.12em] text-white/50 uppercase sm:text-[11px] sm:tracking-[0.14em] dark:border-black/10 dark:text-black/50">
               <th className="px-4 py-3 font-semibold sm:px-8">Class</th>
               <th className="px-2 py-3 font-semibold sm:px-3">Make</th>
               <th className="px-2 py-3 font-semibold sm:px-3">Model</th>
@@ -209,7 +220,7 @@ export default function CraneCapacityChart() {
                   onClick={() =>
                     setSortDir((d) => (d === "asc" ? "desc" : "asc"))
                   }
-                  className="inline-flex items-center gap-1 hover:text-white"
+                  className="inline-flex items-center gap-1 hover:text-white dark:hover:text-black"
                 >
                   Capacity
                   <Icon
@@ -230,21 +241,21 @@ export default function CraneCapacityChart() {
             {rows.map((m) => (
               <tr
                 key={`${m.make}-${m.model}-${m.chartHref}`}
-                className="border-b border-white/5 hover:bg-white/[0.04]"
+                className="border-b border-white/5 hover:bg-white/[0.04] dark:border-black/5 dark:hover:bg-black/[0.04]"
               >
-                <td className="px-4 py-2.5 text-white/70 sm:px-8">
+                <td className="px-4 py-2.5 text-white/70 sm:px-8 dark:text-black/70">
                   <Icon
                     name={TYPE_ICON[m.type]}
-                    className="h-4 w-4 text-tnt-amber"
+                    className="h-4 w-4 text-tnt-amber dark:text-black"
                     strokeWidth={1.8}
                   />
                   <span className="sr-only">{CRANE_TYPE_LABELS[m.type]}</span>
                 </td>
-                <td className="px-2 py-2.5 text-xs text-white/80 sm:px-3 sm:text-sm">{m.make}</td>
-                <td className="px-2 py-2.5 font-semibold text-xs text-white sm:px-3 sm:text-sm">
+                <td className="px-2 py-2.5 text-xs text-white/80 sm:px-3 sm:text-sm dark:text-black/80">{m.make}</td>
+                <td className="px-2 py-2.5 font-semibold text-xs text-white sm:px-3 sm:text-sm dark:text-black">
                   {m.model}
                 </td>
-                <td className="px-2 py-2.5 tabular-nums text-xs text-white/80 sm:px-3 sm:text-sm">
+                <td className="px-2 py-2.5 tabular-nums text-xs text-white/80 sm:px-3 sm:text-sm dark:text-black/80">
                   {m.capacityTons} Ton
                 </td>
                 <td className="px-2 py-2.5 pr-4 sm:px-3 sm:pr-8">
@@ -252,7 +263,7 @@ export default function CraneCapacityChart() {
                     href={m.chartHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 font-body text-[10px] font-semibold tracking-wide text-tnt-amber uppercase hover:text-tnt-amber-vivid sm:text-xs"
+                    className="inline-flex items-center gap-1.5 font-body text-[10px] font-semibold tracking-wide text-tnt-amber uppercase hover:text-tnt-amber-vivid sm:text-xs dark:text-black dark:hover:text-black/70"
                   >
                     View PDF
                     <Icon name="arrow" className="h-3 w-3" strokeWidth={2.5} />
@@ -264,7 +275,7 @@ export default function CraneCapacityChart() {
               <tr>
                 <td
                   colSpan={5}
-                  className="px-8 py-12 text-center text-white/50"
+                  className="px-8 py-12 text-center text-white/50 dark:text-black/50"
                 >
                   No machines match that search.
                 </td>
@@ -275,7 +286,7 @@ export default function CraneCapacityChart() {
       </div>
 
       {/* Disclaimer — matches TNT's own load-chart disclaimer language */}
-      <p className="border-t border-white/10 px-6 py-4 font-body text-xs text-white/40 sm:px-8">
+      <p className="border-t border-white/10 px-6 py-4 font-body text-xs text-white/40 sm:px-8 dark:border-black/10 dark:text-black/40">
         Weights and measurements shown in load charts are a guide provided by
         the manufacturer for preliminary calculations only, and may vary due
         to site-specific conditions.

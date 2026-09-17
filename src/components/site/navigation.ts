@@ -72,6 +72,12 @@ export type NavFeature = {
   blurb: string;
   href: string;
   cta: string;
+  /** When true, the cta opens the shared capacity-chart modal
+   *  (capacityChartStore.ts) instead of following `href` — added
+   *  2026-09-18, on request, for Fleet's "View Full Capacity Chart" so it
+   *  opens the SAME popup as the button on About the Fleet, not just a
+   *  scroll to the section. */
+  ctaOpensCapacityChart?: boolean;
 };
 
 export type NavGroup = {
@@ -208,7 +214,8 @@ export const NAV_GROUPS: NavGroup[] = [
       blurb:
         "All-terrain to tower cranes, plus the specialized rigging equipment that moves what a crane alone can't.",
       href: "/#fleet-guide",
-      cta: "See the fleet",
+      cta: "View Full Capacity Chart",
+      ctaOpensCapacityChart: true,
     },
   },
   // The three inert items. Each was a real route until 2026-08-04 and has no

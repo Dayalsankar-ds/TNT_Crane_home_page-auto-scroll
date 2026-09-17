@@ -79,6 +79,8 @@ import Button from "./Button";
 import CraneCapacityChart from "./CraneCapacityChart";
 import { slugify } from "./navigation";
 import { FLEET_PHOTOS, PHOTOS, IMG, GRADIENTS } from "./photos";
+import { useColorScheme } from "./colorSchemeStore";
+import { useCapacityChartOpen } from "./capacityChartStore";
 
 type FleetType = {
   name: string;
@@ -108,9 +110,21 @@ export default function EquipmentGuide() {
   // modal wiring here are that same mechanism, just triggered from About
   // the Fleet instead) in a modal rather than inline, same reasoning as
   // before: keep the full filterable table off the page by default.
-  const [chartOpen, setChartOpen] = useState(false);
+  //
+  // Backed by capacityChartStore.ts (2026-09-18, on request), not local
+  // state: the Fleet nav dropdown's "View Full Capacity Chart" CTA
+  // (SiteNav.tsx) needs to open this exact same modal, and that's a
+  // completely separate component tree — a shared store is what lets a
+  // click there flip the same boolean this component reads.
+  const [chartOpen, setChartOpen] = useCapacityChartOpen();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  // Drives the button's own dark-mode skin below (2026-09-18, on request:
+  // "change the button color in dark mode") — Button.tsx's colors are
+  // controlled by its `onDark` prop, not a Tailwind `dark:` class, so this
+  // section (which otherwise flips color purely via `dark:` utilities) has
+  // to read the toggle directly for just this one component.
+  const [colorScheme] = useColorScheme();
 
   useEffect(() => {
     if (!chartOpen) return;
@@ -171,63 +185,130 @@ export default function EquipmentGuide() {
   return (
     <section id="fleet-guide" className="bg-tnt-gray text-black dark:bg-tnt-slate dark:text-white">
       <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
-        <div className="max-w-3xl">
-          <Eyebrow>About the Fleet</Eyebrow>
-          <h2 className="mt-4 font-display text-5xl leading-[0.95] tracking-tight text-black uppercase sm:text-6xl dark:text-white">
-            A modern fleet of
-            <br />
-            more than 700 cranes
-          </h2>
+        {/* TWO-SIDE LAYOUT (2026-09-18, on request: "divide that section in
+            two, A side and B side — A side is left side which needs to
+            have content, B side needs to have image"): the whole section
+            is now one lg:grid-cols-2 row — side A (heading, paragraphs,
+            the label list, and the capacity-chart button) on the left,
+            side B (just the photo) on the right. Replaces the previous
+            stacked layout (full-width text block, then a separate
+            list+photo row below it). DOM order is content-then-photo, so
+            mobile stacks the same way (content first, image below) rather
+            than needing `order-*` utilities to reorder anything. */}
+        <div ref={galleryRef} className="grid gap-10 lg:grid-cols-2 lg:items-stretch lg:gap-16">
+          {/* ── SIDE A — content ─────────────────────────────────────── */}
+          <div className="flex flex-col">
+            <Eyebrow>About the Fleet</Eyebrow>
+            <h2 className="mt-4 font-display text-5xl leading-[0.95] tracking-tight text-black uppercase sm:text-6xl dark:text-white">
+              A modern fleet of
+              <br />
+              more than 700 cranes
+            </h2>
 
-          {/* The two closing paragraphs from the live site. Its own copy
-              links "Specialized Rigging"/"Machinery Moving"/"Industrial
-              Storage" out to those service pages — reproduced here as
-              same-page anchors to CoreServices.tsx's own stage cards
-              (identical slugs: `slugify("Specialized Rigging")` etc.), since
-              those are the real equivalent sections on THIS site. */}
-          <p className="mt-6 font-body text-base leading-relaxed text-tnt-body">
-            TNT Crane &amp; Rigging is also proud to provide an extended
-            fleet of{" "}
-            <a
-              href="#specialized-rigging"
-              className="font-semibold text-tnt-amber underline-offset-2 hover:underline"
-            >
-              Specialized Rigging
-            </a>{" "}
-            equipment including Hydraulic Gantry Lift Systems, Jack &amp;
-            Slide Systems, Machinery Skates, Specialized Forklifts,
-            Cantilever Bars, Self-Propelled Modular Transporters, and other
-            Specialized Rigging Equipment.
-          </p>
-          <p className="mt-4 font-body text-base leading-relaxed text-tnt-body">
-            Need expert{" "}
-            <a
-              href="#machinery-moving"
-              className="font-semibold text-tnt-amber underline-offset-2 hover:underline"
-            >
-              Machinery Moving
-            </a>{" "}
-            or secure{" "}
-            <a
-              href="#industrial-storage"
-              className="font-semibold text-tnt-amber underline-offset-2 hover:underline"
-            >
-              Industrial Storage
-            </a>
-            ? TNT Crane &amp; Rigging has you covered — from precision
-            equipment relocation to complex rigging in tight spaces and safe
-            storage solutions, we handle it all with efficiency and care.
-          </p>
-        </div>
+            {/* The two closing paragraphs from the live site. Its own copy
+                links "Specialized Rigging"/"Machinery Moving"/"Industrial
+                Storage" out to those service pages — reproduced here as
+                same-page anchors to CoreServices.tsx's own stage cards
+                (identical slugs: `slugify("Specialized Rigging")` etc.),
+                since those are the real equivalent sections on THIS site. */}
+            <p className="mt-6 font-body text-base leading-relaxed text-tnt-body">
+              TNT Crane &amp; Rigging is also proud to provide an extended
+              fleet of{" "}
+              <a
+                href="#specialized-rigging"
+                className="font-semibold text-tnt-amber underline-offset-2 hover:underline"
+              >
+                Specialized Rigging
+              </a>{" "}
+              equipment including Hydraulic Gantry Lift Systems, Jack &amp;
+              Slide Systems, Machinery Skates, Specialized Forklifts,
+              Cantilever Bars, Self-Propelled Modular Transporters, and other
+              Specialized Rigging Equipment.
+            </p>
+            <p className="mt-4 font-body text-base leading-relaxed text-tnt-body">
+              Need expert{" "}
+              <a
+                href="#machinery-moving"
+                className="font-semibold text-tnt-amber underline-offset-2 hover:underline"
+              >
+                Machinery Moving
+              </a>{" "}
+              or secure{" "}
+              <a
+                href="#industrial-storage"
+                className="font-semibold text-tnt-amber underline-offset-2 hover:underline"
+              >
+                Industrial Storage
+              </a>
+              ? TNT Crane &amp; Rigging has you covered — from precision
+              equipment relocation to complex rigging in tight spaces and
+              safe storage solutions, we handle it all with efficiency and
+              care.
+            </p>
 
-        {/* Single-photo slideshow — one photo crossfades between all 6
-            types (auto-advancing + click-to-jump, see the state above)
-            beside a plain clickable list, replacing the old 6-card
-            scroll-snap gallery. */}
-        <div ref={galleryRef} className="mt-14 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-stretch">
-          {/* Photo — every type's <img> stacked in the same box, crossfading
-              via opacity so there's no layout shift between them. */}
-          <div className="relative aspect-4/3 overflow-hidden rounded-2xl border border-black/10 bg-white sm:aspect-16/10 dark:border-white/10 dark:bg-black">
+            {/* Label list — click to jump, active state also driven by the
+                4s autoplay above. Keeps each type's slugified `id` so
+                navigation.ts's Fleet panel deep links still land on
+                something real. */}
+            <ul className="mt-8 flex flex-col gap-1">
+              {FLEET_TYPES.map((t, i) => (
+                <li key={t.name} id={slugify(t.name)} className="scroll-mt-32">
+                  <button
+                    type="button"
+                    onClick={() => selectType(i)}
+                    aria-current={i === activeType ? "true" : undefined}
+                    className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-colors ${
+                      i === activeType
+                        ? "border-tnt-amber bg-tnt-amber/10"
+                        : "border-transparent hover:border-black/10 dark:hover:border-white/10"
+                    }`}
+                  >
+                    <Icon
+                      name={t.icon}
+                      className={`h-6 w-6 shrink-0 ${
+                        i === activeType ? "text-tnt-amber" : "text-black/40 dark:text-white/40"
+                      }`}
+                      strokeWidth={1.5}
+                    />
+                    <span
+                      className={`font-body text-sm font-semibold ${
+                        i === activeType ? "text-black dark:text-white" : "text-black/60 dark:text-white/60"
+                      }`}
+                    >
+                      {t.name}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {/* Opens the full capacity chart — every model TNT operates,
+                filterable by class and searchable by make/model, each
+                linking its real manufacturer load-chart PDF — in a modal. */}
+            <Button
+              ref={triggerRef}
+              type="button"
+              variant="primary"
+              onDark={colorScheme === "dark"}
+              onClick={() => setChartOpen(true)}
+              className="mt-8"
+            >
+              View Full Capacity Chart
+            </Button>
+          </div>
+
+          {/* ── SIDE B — photo ───────────────────────────────────────── */}
+          {/* Every type's <img> stacked in the same box, crossfading via
+              opacity so there's no layout shift between them.
+              `lg:aspect-3/4`: a real portrait aspect ratio (on request,
+              "a true tall/portrait shape"), not a height borrowed from
+              `items-stretch`. `object-cover` on the <img>s below crops
+              each (landscape-sourced) photo to fill it. Below `lg` (where
+              side A stacks above this instead of sitting beside it) it
+              keeps the original 4:3 / 16:10 landscape aspect ratios —
+              portrait only reads as intentional next to a column beside
+              it, not stacked full-width under one. */}
+          <div className="relative aspect-4/3 overflow-hidden rounded-2xl border border-black/10 bg-white sm:aspect-16/10 lg:aspect-3/4 lg:self-start dark:border-white/10 dark:bg-black">
             {FLEET_TYPES.map((t, i) => (
               <div
                 key={t.name}
@@ -256,56 +337,7 @@ export default function EquipmentGuide() {
               </div>
             ))}
           </div>
-
-          {/* Label list — click to jump, active state also driven by the
-              4s autoplay above. Keeps each type's slugified `id` so
-              navigation.ts's Fleet panel deep links still land on
-              something real. */}
-          <ul className="flex flex-col justify-center gap-1">
-            {FLEET_TYPES.map((t, i) => (
-              <li key={t.name} id={slugify(t.name)} className="scroll-mt-32">
-                <button
-                  type="button"
-                  onClick={() => selectType(i)}
-                  aria-current={i === activeType ? "true" : undefined}
-                  className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-colors ${
-                    i === activeType
-                      ? "border-tnt-amber bg-tnt-amber/10"
-                      : "border-transparent hover:border-black/10 dark:hover:border-white/10"
-                  }`}
-                >
-                  <Icon
-                    name={t.icon}
-                    className={`h-6 w-6 shrink-0 ${
-                      i === activeType ? "text-tnt-amber" : "text-black/40 dark:text-white/40"
-                    }`}
-                    strokeWidth={1.5}
-                  />
-                  <span
-                    className={`font-body text-sm font-semibold ${
-                      i === activeType ? "text-black dark:text-white" : "text-black/60 dark:text-white/60"
-                    }`}
-                  >
-                    {t.name}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
-
-        {/* Opens the full capacity chart — every model TNT operates,
-            filterable by class and searchable by make/model, each linking
-            its real manufacturer load-chart PDF — in a modal. */}
-        <Button
-          ref={triggerRef}
-          type="button"
-          variant="primary"
-          onClick={() => setChartOpen(true)}
-          className="mt-10"
-        >
-          View Full Capacity Chart
-        </Button>
       </div>
 
       {chartOpen && (

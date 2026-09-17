@@ -45,6 +45,7 @@ import LocationSelect, { wasEscapeHandled } from "./LocationSelect";
 import { CHROME_H } from "./chrome";
 import { useNavVersion } from "./navVersionStore";
 import { useAboutVersion } from "./aboutVersionStore";
+import { setCapacityChartOpen } from "./capacityChartStore";
 import Image from "next/image";
 import {
   FAMILY_BRANDS,
@@ -543,7 +544,19 @@ export default function SiteNav() {
                       </p>
                       <Link
                         href={feature.href}
-                        onClick={() => setOpenGroup(null)}
+                        onClick={(e) => {
+                          setOpenGroup(null);
+                          // Fleet's "View Full Capacity Chart" (2026-09-18,
+                          // on request: "it need to show the same pop up
+                          // which we having on About the Fleet section") —
+                          // opens the shared modal instead of following the
+                          // link, so it's the identical popup, not a scroll
+                          // to the section plus a second click.
+                          if (feature.ctaOpensCapacityChart) {
+                            e.preventDefault();
+                            setCapacityChartOpen(true);
+                          }
+                        }}
                         className="mt-5 inline-flex items-center gap-2 font-body text-base font-semibold text-tnt-amber hover:text-black dark:hover:text-white"
                       >
                         {feature.cta}
