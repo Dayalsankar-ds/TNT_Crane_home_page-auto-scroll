@@ -1,8 +1,22 @@
 @import "tailwindcss";
 
+/* Class-based dark mode (2026-09-17, ThemeToggle's "Dark" option) — Tailwind
+   v4 has no JS config to flip the default media-query strategy, so `dark:`
+   is redefined here to match `.dark` on <html> (set by colorSchemeStore.ts,
+   independently of themeVersionStore.ts's "Theme 1/2") instead of
+   `prefers-color-scheme`. This is independent of the
+   `@media (prefers-color-scheme: dark)` block below, which only covers a
+   visitor's OS-level preference before any toggle choice is stored. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 @theme inline {

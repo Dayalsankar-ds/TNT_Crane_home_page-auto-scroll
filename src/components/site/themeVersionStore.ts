@@ -1,35 +1,23 @@
 "use client";
 
 /**
- * THEME VERSION STORE — same pattern as navVersionStore.ts / aboutVersionStore.ts,
- * for the standalone "Theme 1 / 2" floating toggle (ThemeToggle.tsx).
+ * THEME VERSION STORE — "Theme 1 / 2" toggle state, backing one of the two
+ * independent groups in ThemeToggle.tsx's popover (see appearanceStore.ts's
+ * history for how this file was briefly merged away and then split back
+ * out, 2026-09-17, on request — "each one is separate button not linked
+ * with each other").
  *
- * Theme "one" is the site exactly as shipped — untouched. Theme "two" swaps
- * every maroon (brand red) surface for the same dark-slate alternate, so the
- * two stay visually consistent with each other:
- *   - SafetyCulture (iCARE) — the section's maroon band
- *   - StorySlideshow (About Us) — the active stat card's maroon fill
- * Per request (2026-09-07): keep theme one exactly as-is, compare a
- * matching alternate everywhere maroon currently appears as a fill.
+ * Deliberately INDEPENDENT of colorSchemeStore.ts's "Light/Dark" state.
+ * Picking Theme 1/2 has no effect on Light/Dark, and vice versa — the two
+ * are separate settings that happen to share one floating pill/popover for
+ * layout convenience only.
  *
- * A plain module-level store read via `useSyncExternalStore` rather than
- * React Context, for the same reason as the other version stores: the
- * toggle and SafetyCulture are not in a shared component tree with a
- * provider between them.
+ * Session-only (no persistence): a same-session comparison of two brand
+ * looks for CoreServices/SafetyCulture/StorySlideshow, not a viewer
+ * preference that should survive a reload.
  *
- * Not persisted (no localStorage) — a same-session design-review toggle,
- * not a user preference that should survive a reload.
- *
- * REMOVED 2026-09-10, RESTORED 2026-09-14 (on request: "one more theme to
- * show to my manager") — brand maroon had been dropped project-wide in
- * between, so restoring this toggle also means SafetyCulture.tsx and
- * StorySlideshow.tsx needed their fill conditionals put back; see each
- * file's own docblock for that.
- *
- * THEME ONE IS NO LONGER MAROON (2026-09-14, same day, on request: "change
- * red to dark color") — it's `bg-tnt-navy` (pure black) now, so it stays
- * visually distinct from theme two's `bg-tnt-slate`. Nothing else about
- * either theme changed.
+ * Same plain-module + `useSyncExternalStore` pattern as the other version
+ * stores (heroVersionStore.ts, navVersionStore.ts, aboutVersionStore.ts).
  */
 
 import { useSyncExternalStore } from "react";
@@ -48,8 +36,6 @@ function getSnapshot(): ThemeVersion {
   return version;
 }
 
-// Server-rendered markup always starts on theme one; the client picks up
-// whatever's live in the module after hydration via the subscription above.
 function getServerSnapshot(): ThemeVersion {
   return "one";
 }

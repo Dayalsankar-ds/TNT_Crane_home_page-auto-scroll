@@ -23,7 +23,7 @@ const SERVICES = [
 ];
 
 const field =
-  "w-full rounded-md border border-black/15 bg-white px-4 py-3 font-body text-sm text-black placeholder:text-tnt-meta focus:border-tnt-amber focus:ring-1 focus:ring-tnt-amber focus:outline-none";
+  "w-full rounded-md border border-black/15 bg-white px-4 py-3 font-body text-sm text-black placeholder:text-tnt-meta focus:border-tnt-amber focus:ring-1 focus:ring-tnt-amber focus:outline-none dark:border-white/15 dark:bg-black dark:text-white";
 const label =
   "block font-body text-[11px] font-semibold tracking-[0.16em] text-tnt-meta uppercase";
 
@@ -43,7 +43,7 @@ export default function RequestQuote() {
   };
 
   return (
-    <section id="quote" className="scroll-mt-32 bg-white">
+    <section id="quote" className="scroll-mt-32 bg-white dark:bg-black">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
           {/* Left — statement */}
@@ -52,7 +52,7 @@ export default function RequestQuote() {
             <RevealText
               as="h2"
               text="Request a Job Quote"
-              className="mt-3 font-display text-4xl tracking-wide text-black uppercase sm:text-5xl"
+              className="mt-3 font-display text-4xl tracking-wide text-black uppercase sm:text-5xl dark:text-white"
             />
             <p className="mt-4 font-body text-base text-tnt-body sm:text-lg">
               Tell us about the lift and a TNT rep will follow up with capacity,
@@ -65,8 +65,8 @@ export default function RequestQuote() {
 
           {/* Right — form */}
           {submitted ? (
-            <div className="flex flex-col items-start justify-center rounded-2xl border border-black/10 bg-white p-8 sm:p-12">
-              <span className="font-display text-3xl tracking-wide text-tnt-navy uppercase sm:text-4xl">
+            <div className="flex flex-col items-start justify-center rounded-2xl border border-black/10 bg-white p-8 sm:p-12 dark:border-white/10 dark:bg-black">
+              <span className="font-display text-3xl tracking-wide text-tnt-navy uppercase sm:text-4xl dark:text-white">
                 Request received
               </span>
               <p className="mt-3 max-w-md font-body text-base text-tnt-body">
@@ -81,7 +81,7 @@ export default function RequestQuote() {
           ) : (
             <form
               onSubmit={onSubmit}
-              className="rounded-2xl border border-black/10 bg-white p-6 sm:p-8"
+              className="rounded-2xl border border-black/10 bg-white p-6 sm:p-8 dark:border-white/10 dark:bg-black"
             >
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
@@ -125,7 +125,7 @@ export default function RequestQuote() {
                         className={`rounded-full border px-4 py-2 font-body text-sm font-semibold transition-colors ${
                           on
                             ? "border-tnt-amber bg-tnt-amber text-black"
-                            : "border-black/15 text-tnt-body hover:border-black/40 hover:text-black"
+                            : "border-black/15 text-tnt-body hover:border-black/40 hover:text-black dark:border-white/15 dark:hover:border-white/40 dark:hover:text-white"
                         }`}
                       >
                         {s}

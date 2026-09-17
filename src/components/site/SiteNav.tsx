@@ -465,7 +465,7 @@ export default function SiteNav() {
             return (
               <div
                 key={g.label}
-                className="absolute inset-x-0 top-full hidden border-t border-tnt-amber/40 bg-white shadow-2xl shadow-black/20 lg:block"
+                className="absolute inset-x-0 top-full hidden border-t border-tnt-amber/40 bg-white shadow-2xl shadow-black/20 lg:block dark:bg-black"
                 onMouseEnter={clearHover}
               >
                 {/* Gaps and rails were tightened on 2026-08-04 to buy width
@@ -490,7 +490,7 @@ export default function SiteNav() {
                       It's a filter, and a filter belongs upstream of what it
                       filters — left of the columns, read before them. */}
                   {localized && (
-                    <div className="w-[12.5rem] shrink-0 border-r border-black/10 pr-6">
+                    <div className="w-[12.5rem] shrink-0 border-r border-black/10 pr-6 dark:border-white/10">
                       <LocationSelect
                         value={location}
                         onChange={(next) => {
@@ -524,7 +524,7 @@ export default function SiteNav() {
                     ))}
                   </div>
 
-                  <div className="w-[17rem] shrink-0 border-l border-black/10 pl-6">
+                  <div className="w-[17rem] shrink-0 border-l border-black/10 pl-6 dark:border-white/10">
                     {/* Closing card — one destination per panel that carries
                         the group's argument, so the panel makes a point
                         instead of only listing. */}
@@ -535,16 +535,16 @@ export default function SiteNav() {
                       <p className="font-body text-[13px] font-bold tracking-[0.18em] text-tnt-amber uppercase">
                         {feature.eyebrow}
                       </p>
-                      <p className="mt-3 font-display text-3xl leading-tight tracking-wide text-black uppercase">
+                      <p className="mt-3 font-display text-3xl leading-tight tracking-wide text-black uppercase dark:text-white">
                         {feature.title}
                       </p>
-                      <p className="mt-3 font-body text-base leading-relaxed text-black/60">
+                      <p className="mt-3 font-body text-base leading-relaxed text-black/60 dark:text-white/60">
                         {feature.blurb}
                       </p>
                       <Link
                         href={feature.href}
                         onClick={() => setOpenGroup(null)}
-                        className="mt-5 inline-flex items-center gap-2 font-body text-base font-semibold text-tnt-amber hover:text-black"
+                        className="mt-5 inline-flex items-center gap-2 font-body text-base font-semibold text-tnt-amber hover:text-black dark:hover:text-white"
                       >
                         {feature.cta}
                         <Icon name="arrow" className="h-5 w-5" />
@@ -579,7 +579,7 @@ export default function SiteNav() {
         // trackpad at a narrow window — but the sheet should scroll itself in
         // every input mode, not just the one it was designed for.
         data-lenis-prevent
-        className={`overflow-y-auto overscroll-contain border-t border-black/10 bg-white lg:hidden ${
+        className={`overflow-y-auto overscroll-contain border-t border-black/10 bg-white lg:hidden dark:border-white/10 dark:bg-black ${
           mobileOpen ? "max-h-[calc(100vh-5rem)]" : "max-h-0 overflow-hidden"
         } transition-[max-height] duration-300`}
       >
@@ -595,12 +595,12 @@ export default function SiteNav() {
             // something under it to reveal.
             const hasPanel = cols.length > 0;
             return (
-              <li key={g.label} className="border-b border-black/10 last:border-0">
+              <li key={g.label} className="border-b border-black/10 last:border-0 dark:border-white/10">
                 <div className="flex items-center">
                   {g.href === null ? (
                     <span
                       aria-disabled="true"
-                      className="flex-1 rounded-md px-3 py-3.5 font-display text-base tracking-wide text-black/30 uppercase"
+                      className="flex-1 rounded-md px-3 py-3.5 font-display text-base tracking-wide text-black/30 uppercase dark:text-white/30"
                     >
                       {g.label}
                     </span>
@@ -610,7 +610,7 @@ export default function SiteNav() {
                       onClick={() => setMobileOpen(false)}
                       aria-current={current === g.label ? "page" : undefined}
                       className={`flex-1 rounded-md px-3 py-3.5 font-display text-base tracking-wide uppercase ${
-                        current === g.label ? "text-tnt-amber" : "text-black"
+                        current === g.label ? "text-tnt-amber" : "text-black dark:text-white"
                       }`}
                     >
                       {g.label}
@@ -624,7 +624,7 @@ export default function SiteNav() {
                       }
                       aria-expanded={expanded}
                       aria-label={`${expanded ? "Collapse" : "Expand"} ${g.label}`}
-                      className="inline-flex h-11 w-11 items-center justify-center rounded-md text-black/60"
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-md text-black/60 dark:text-white/60"
                     >
                       <svg
                         viewBox="0 0 12 12"
@@ -655,7 +655,7 @@ export default function SiteNav() {
                       <div className="mt-2 px-3">
                         <label
                           htmlFor="mobile-location"
-                          className="font-mono text-[11px] tracking-[0.14em] text-black/45 uppercase"
+                          className="font-mono text-[11px] tracking-[0.14em] text-black/45 uppercase dark:text-white/45"
                         >
                           Choose Location
                         </label>
@@ -665,7 +665,7 @@ export default function SiteNav() {
                           onChange={(e) =>
                             setLocation(e.target.value as LocationId)
                           }
-                          className="mt-2 w-full rounded-md border border-black/15 bg-black/5 px-3 py-2.5 font-body text-sm font-semibold text-black focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
+                          className="mt-2 w-full rounded-md border border-black/15 bg-black/5 px-3 py-2.5 font-body text-sm font-semibold text-black focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none dark:border-white/15 dark:bg-white/5 dark:text-white"
                         >
                           {SERVICE_LOCATIONS.map((loc) => (
                             <option
@@ -690,16 +690,16 @@ export default function SiteNav() {
                               <Link
                                 href={item.href}
                                 onClick={() => setMobileOpen(false)}
-                                className="flex items-center gap-3 rounded-md px-3 py-2.5 font-body text-[15px] text-black/75 hover:bg-black/5 hover:text-tnt-amber"
+                                className="flex items-center gap-3 rounded-md px-3 py-2.5 font-body text-[15px] text-black/75 hover:bg-black/5 hover:text-tnt-amber dark:text-white/75 dark:hover:bg-white/5"
                               >
                                 {item.index && (
-                                  <span className="font-mono text-[11px] text-black/30 tabular-nums">
+                                  <span className="font-mono text-[11px] text-black/30 tabular-nums dark:text-white/30">
                                     {item.index}
                                   </span>
                                 )}
                                 <span className="flex-1">{item.label}</span>
                                 {item.meta && (
-                                  <span className="font-mono text-[11px] text-black/40 tabular-nums">
+                                  <span className="font-mono text-[11px] text-black/40 tabular-nums dark:text-white/40">
                                     {item.meta}
                                   </span>
                                 )}
@@ -719,7 +719,7 @@ export default function SiteNav() {
             <a
               href="tel:+18007992505"
               onClick={() => setMobileOpen(false)}
-              className="block rounded-md px-3 py-3 font-mono text-base font-semibold text-tnt-amber hover:bg-black/5"
+              className="block rounded-md px-3 py-3 font-mono text-base font-semibold text-tnt-amber hover:bg-black/5 dark:hover:bg-white/5"
             >
               1-800-799-2505
             </a>
@@ -836,8 +836,8 @@ function FamilyMarks({ location }: { location: LocationId }) {
   const marks = one ? (one.logo ? [{ brand: one.brand, logo: one.logo }] : []) : FAMILY_BRANDS;
 
   return (
-    <div className="mt-7 border-t border-black/10 pt-5">
-      <p className="font-mono text-[10px] tracking-[0.14em] text-black/40 uppercase">
+    <div className="mt-7 border-t border-black/10 pt-5 dark:border-white/10">
+      <p className="font-mono text-[10px] tracking-[0.14em] text-black/40 uppercase dark:text-white/40">
         {one ? "Operated by" : "Operating companies"}
       </p>
       {marks.length > 0 ? (
@@ -861,7 +861,7 @@ function FamilyMarks({ location }: { location: LocationId }) {
           ))}
         </ul>
       ) : (
-        <p className="mt-2 font-body text-sm font-semibold text-black/80">
+        <p className="mt-2 font-body text-sm font-semibold text-black/80 dark:text-white/80">
           {one?.brand}
         </p>
       )}
@@ -877,7 +877,7 @@ function FamilyFilters({
   onChange: (next: LocationId) => void;
 }) {
   return (
-    <div className="mb-8 flex justify-center border-b border-black/10 pb-6">
+    <div className="mb-8 flex justify-center border-b border-black/10 pb-6 dark:border-white/10">
       <ul className="flex w-full max-w-3xl flex-wrap items-center justify-center gap-3">
         <li>
           <button
@@ -887,7 +887,7 @@ function FamilyFilters({
             className={`flex h-12 min-w-20 items-center justify-center rounded-sm border px-3 font-mono text-[10px] tracking-[0.08em] uppercase transition-colors ${
               value === "all"
                 ? "border-tnt-amber bg-tnt-amber text-black"
-                : "border-black/15 text-black/65 hover:border-tnt-amber/60 hover:text-tnt-amber"
+                : "border-black/15 text-black/65 hover:border-tnt-amber/60 hover:text-tnt-amber dark:border-white/15 dark:text-white/65"
             }`}
           >
             All
@@ -905,7 +905,7 @@ function FamilyFilters({
                 className={`relative block h-12 w-28 rounded-sm border p-1 transition-colors ${
                   selected
                     ? "border-tnt-amber ring-1 ring-tnt-amber"
-                    : "border-transparent hover:border-black/20"
+                    : "border-transparent hover:border-black/20 dark:hover:border-white/20"
                 }`}
               >
                 <Image
@@ -946,17 +946,17 @@ function PanelColumn({ col }: { col: NavColumn }) {
           <li key={item.label + item.href}>
             <Link
               href={item.href}
-              className="group flex items-center gap-3 rounded-md px-3 py-3 transition-colors hover:bg-black/5"
+              className="group flex items-center gap-3 rounded-md px-3 py-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
             >
               {item.index && (
-                <span className="font-mono text-[12px] text-black/30 tabular-nums transition-colors group-hover:text-tnt-amber">
+                <span className="font-mono text-[12px] text-black/30 tabular-nums transition-colors group-hover:text-tnt-amber dark:text-white/30">
                   {item.index}
                 </span>
               )}
               {item.icon && (
                 <Icon
                   name={item.icon}
-                  className="h-5 w-5 shrink-0 text-black/40 transition-colors group-hover:text-tnt-amber"
+                  className="h-5 w-5 shrink-0 text-black/40 transition-colors group-hover:text-tnt-amber dark:text-white/40"
                   strokeWidth={1.6}
                 />
               )}
@@ -964,11 +964,11 @@ function PanelColumn({ col }: { col: NavColumn }) {
                   the room: a label reads as one line or not at all, so a
                   future item longer than the column overflows visibly here
                   rather than silently reflowing to two lines. */}
-              <span className="font-body text-base font-semibold whitespace-nowrap text-black/80 transition-colors group-hover:text-black">
+              <span className="font-body text-base font-semibold whitespace-nowrap text-black/80 transition-colors group-hover:text-black dark:text-white/80 dark:group-hover:text-white">
                 {item.label}
               </span>
               {item.meta && (
-                <span className="ml-auto font-mono text-[12px] whitespace-nowrap text-black/40 tabular-nums">
+                <span className="ml-auto font-mono text-[12px] whitespace-nowrap text-black/40 tabular-nums dark:text-white/40">
                   {item.meta}
                 </span>
               )}

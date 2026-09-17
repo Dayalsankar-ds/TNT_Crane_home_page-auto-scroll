@@ -70,6 +70,7 @@ import Button from "./Button";
 import { slugify } from "./navigation";
 import TargetHighlight from "./TargetHighlight";
 import { useThemeVersion } from "./themeVersionStore";
+import { useColorScheme } from "./colorSchemeStore";
 
 type Stage = {
   /** Journey position. Mirrors navigation.ts. */
@@ -103,7 +104,11 @@ const STAGES: Stage[] = [
 
 export default function CoreServices() {
   const [themeVersion] = useThemeVersion();
-  const dark = themeVersion === "two";
+  // The Light/Dark toggle (colorSchemeStore) can also force this section
+  // dark, independently of Theme 1/2 — the two never affect each other's
+  // own state, but either one alone is enough to make this section dark.
+  const [colorScheme] = useColorScheme();
+  const dark = themeVersion === "two" || colorScheme === "dark";
 
   return (
     <section
@@ -118,10 +123,19 @@ export default function CoreServices() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         {/* ── Section header ───────────────────────────────────────────── */}
         {/* The "One Partner, End to End" headline + intro paragraph were
-            removed 2026-09-11, on request — Eyebrow alone now carries the
-            section label. */}
+            removed 2026-09-11, on request — Eyebrow alone carried the
+            section label for a while. RESTORED 2026-09-17, on request
+            ("add this text below the heading, similar way like we have on
+            other sections") — same Eyebrow + h2 pattern SafetyCulture.tsx
+            uses right below its own Eyebrow (dark-conditional text color,
+            no separate intro paragraph this time — just the headline). */}
         <div className="max-w-3xl">
           <Eyebrow>Full-Scope Capability</Eyebrow>
+          <h2
+            className={`mt-3 font-display text-4xl tracking-wide uppercase sm:text-5xl ${dark ? "text-white" : "text-black"}`}
+          >
+            One Partner, End to End
+          </h2>
         </div>
 
         {/* ── Stages 01–06 — the grid ──────────────────────────────────── */}

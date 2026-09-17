@@ -48,6 +48,7 @@
 import { Icon, type IconName } from "./primitives";
 import Reveal from "./Reveal";
 import { useThemeVersion } from "./themeVersionStore";
+import { useColorScheme } from "./colorSchemeStore";
 
 const BADGES = ["ISO 9001", "NCCCO Certified", "OSHA VPP", "ISNetworld", "Avetta"];
 
@@ -71,7 +72,10 @@ const PILLARS: { icon: IconName; title: string; body: string }[] = [
 
 export default function SafetyCulture() {
   const [themeVersion] = useThemeVersion();
-  const dark = themeVersion === "two";
+  // Same rule as CoreServices.tsx: Light/Dark and Theme 1/2 never affect
+  // each other's state, but either one alone forces this section dark.
+  const [colorScheme] = useColorScheme();
+  const dark = themeVersion === "two" || colorScheme === "dark";
 
   return (
     <section
