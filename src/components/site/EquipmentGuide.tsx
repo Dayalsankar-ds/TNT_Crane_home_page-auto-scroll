@@ -28,6 +28,19 @@
  * don't coexist — the copy now reads as an intro, the gallery as what it's
  * introducing.
  *
+ * SINGLE-PHOTO SLIDESHOW (2026-09-17, on request: "one single image
+ * placeholder need to change one by one" — didn't like the 6-card scroll
+ * gallery's image placement): replaced the horizontal gallery with one
+ * large photo beside a clickable list of the same 6 crane types. The photo
+ * crossfades to match whichever type is active; active state both
+ * auto-advances (every 4s, on request — "auto-rotate + labels") and can be
+ * jumped to directly by clicking a label, same interaction shape as
+ * StorySlideshow.tsx's own autoplaying card grid (4s cadence,
+ * reduced-motion opt-out, gated on the section being in view — copied
+ * rather than reinvented, so the two autoplay features on this page behave
+ * identically). Each label keeps the slugified `id` the old cards carried,
+ * so navigation.ts's Fleet panel deep links still land on something real.
+ *
  * 3 REAL + 3 STOCK, ALL 6 WITH A PHOTO (2026-09-13, same day — a bare
  * gradient tile for 3 of 6 cards read as "missing photos" sitting next to
  * ones that had them, in a gallery where all 6 are visible side by side —
@@ -58,7 +71,12 @@
  * follows, rather than blending into either.
  */
 
+"use client";
+
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Eyebrow, Icon, type IconName } from "./primitives";
+import Button from "./Button";
+import CraneCapacityChart from "./CraneCapacityChart";
 import { slugify } from "./navigation";
 import { FLEET_PHOTOS, PHOTOS, IMG, GRADIENTS } from "./photos";
 
@@ -84,12 +102,78 @@ const FLEET_TYPES: FleetType[] = [
 ];
 
 export default function EquipmentGuide() {
+  // Opens the full capacity chart (restored 2026-09-17, on request — it
+  // previously lived on the now-removed EquipmentFinder section, deleted
+  // 2026-09-10 along with its "Find Your Machine" section; the button and
+  // modal wiring here are that same mechanism, just triggered from About
+  // the Fleet instead) in a modal rather than inline, same reasoning as
+  // before: keep the full filterable table off the page by default.
+  const [chartOpen, setChartOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!chartOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setChartOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+      triggerRef.current?.focus();
+    };
+  }, [chartOpen]);
+
+  // Single-photo slideshow — same shape as StorySlideshow.tsx's autoplay:
+  // 4s cadence, off while the section is out of view or reduced-motion is
+  // on, and any manual pick (clicking a label) restarts the 4s window
+  // rather than getting immediately overridden by an in-flight timer.
+  const [activeType, setActiveType] = useState(0);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const inViewRef = useRef(false);
+  const reducedMotionRef = useRef(false);
+
+  useEffect(() => {
+    reducedMotionRef.current = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+  }, []);
+
+  useEffect(() => {
+    const el = galleryRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inViewRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotionRef.current) return;
+    const id = setInterval(() => {
+      if (inViewRef.current) {
+        setActiveType((i) => (i + 1) % FLEET_TYPES.length);
+      }
+    }, 4000);
+    return () => clearInterval(id);
+  }, [activeType]);
+
+  const selectType = useCallback((i: number) => setActiveType(i), []);
+
   return (
-    <section id="fleet-guide" className="bg-tnt-gray text-black">
+    <section id="fleet-guide" className="bg-tnt-gray text-black dark:bg-tnt-slate dark:text-white">
       <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
         <div className="max-w-3xl">
           <Eyebrow>About the Fleet</Eyebrow>
-          <h2 className="mt-4 font-display text-5xl leading-[0.95] tracking-tight text-black uppercase sm:text-6xl">
+          <h2 className="mt-4 font-display text-5xl leading-[0.95] tracking-tight text-black uppercase sm:text-6xl dark:text-white">
             A modern fleet of
             <br />
             more than 700 cranes
@@ -136,27 +220,29 @@ export default function EquipmentGuide() {
           </p>
         </div>
 
-        {/* Gallery — native scroll-snap, no library. `-mx-4 px-4` (etc.)
-            bleeds the scroll track to the viewport edge on mobile so the
-            first/last card isn't flush against the gutter, while the cards
-            themselves still align to the same max-w-7xl grid on desktop. */}
-        <div className="mt-14 -mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-          {FLEET_TYPES.map((t) => (
-            <div
-              key={t.name}
-              id={slugify(t.name)}
-              className="group w-64 shrink-0 scroll-mt-32 snap-start overflow-hidden rounded-2xl border border-black/10 bg-white sm:w-72"
-            >
+        {/* Single-photo slideshow — one photo crossfades between all 6
+            types (auto-advancing + click-to-jump, see the state above)
+            beside a plain clickable list, replacing the old 6-card
+            scroll-snap gallery. */}
+        <div ref={galleryRef} className="mt-14 grid gap-8 lg:grid-cols-[1.3fr_1fr] lg:items-stretch">
+          {/* Photo — every type's <img> stacked in the same box, crossfading
+              via opacity so there's no layout shift between them. */}
+          <div className="relative aspect-4/3 overflow-hidden rounded-2xl border border-black/10 bg-white sm:aspect-16/10 dark:border-white/10 dark:bg-black">
+            {FLEET_TYPES.map((t, i) => (
               <div
-                className="relative aspect-4/3"
+                key={t.name}
+                aria-hidden={i !== activeType}
+                className={`absolute inset-0 transition-opacity duration-700 ease-out ${
+                  i === activeType ? "opacity-100" : "opacity-0"
+                }`}
                 style={{ backgroundImage: t.gradient }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={t.photo}
                   alt={t.name}
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  loading={i === 0 ? "eager" : "lazy"}
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
                 {/* Honesty tag, not a design flourish — see the docblock's
                     "3 REAL + 3 STOCK" note. A generic Unsplash photo and an
@@ -168,20 +254,98 @@ export default function EquipmentGuide() {
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-3 px-4 py-4">
-                <Icon
-                  name={t.icon}
-                  className="h-6 w-6 shrink-0 text-tnt-amber"
-                  strokeWidth={1.5}
-                />
-                <span className="font-body text-sm font-semibold text-black">
-                  {t.name}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Label list — click to jump, active state also driven by the
+              4s autoplay above. Keeps each type's slugified `id` so
+              navigation.ts's Fleet panel deep links still land on
+              something real. */}
+          <ul className="flex flex-col justify-center gap-1">
+            {FLEET_TYPES.map((t, i) => (
+              <li key={t.name} id={slugify(t.name)} className="scroll-mt-32">
+                <button
+                  type="button"
+                  onClick={() => selectType(i)}
+                  aria-current={i === activeType ? "true" : undefined}
+                  className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-colors ${
+                    i === activeType
+                      ? "border-tnt-amber bg-tnt-amber/10"
+                      : "border-transparent hover:border-black/10 dark:hover:border-white/10"
+                  }`}
+                >
+                  <Icon
+                    name={t.icon}
+                    className={`h-6 w-6 shrink-0 ${
+                      i === activeType ? "text-tnt-amber" : "text-black/40 dark:text-white/40"
+                    }`}
+                    strokeWidth={1.5}
+                  />
+                  <span
+                    className={`font-body text-sm font-semibold ${
+                      i === activeType ? "text-black dark:text-white" : "text-black/60 dark:text-white/60"
+                    }`}
+                  >
+                    {t.name}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
+
+        {/* Opens the full capacity chart — every model TNT operates,
+            filterable by class and searchable by make/model, each linking
+            its real manufacturer load-chart PDF — in a modal. */}
+        <Button
+          ref={triggerRef}
+          type="button"
+          variant="primary"
+          onClick={() => setChartOpen(true)}
+          className="mt-10"
+        >
+          View Full Capacity Chart
+        </Button>
       </div>
+
+      {chartOpen && (
+        // `data-lenis-prevent`: Lenis owns the wheel globally, so without it
+        // a wheel over this overlay smooth-scrolls the (locked, overflow:
+        // hidden) page behind it instead of this dialog's own content.
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="capacity-chart-heading"
+          data-lenis-prevent
+          className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-black/70 p-4 py-10 sm:p-8"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) setChartOpen(false);
+          }}
+        >
+          <div className="relative mx-auto w-full max-w-5xl">
+            <button
+              ref={closeRef}
+              type="button"
+              onClick={() => setChartOpen(false)}
+              aria-label="Close capacity chart"
+              className="absolute -top-3 -right-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-tnt-navy text-white hover:border-tnt-amber hover:text-tnt-amber focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
+            >
+              <svg
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+              >
+                <path d="m5 5 10 10M15 5 5 15" />
+              </svg>
+            </button>
+            <CraneCapacityChart />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
