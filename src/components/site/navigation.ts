@@ -122,7 +122,10 @@ export const NAV_GROUPS: NavGroup[] = [
           { label: "Coverage Map", href: "/#coverage", icon: "pin" },
           { label: "Family of Companies", href: "/#family", icon: "commercial" },
           { label: "Safety & Record", href: "/#safety", icon: "engineering" },
-          { label: "Case Studies", href: "/#projects", icon: "heavylift" },
+          // "Case Studies" (/#projects) removed 2026-09-18, on request —
+          // it was a dead link: CaseStudies.tsx is unrendered on the
+          // homepage (see page.tsx), so #projects doesn't exist. See
+          // page.tsx's own note — the footer still links there too.
           { label: "Contact Us", href: "/#contact", icon: "mail" },
         ],
       },
