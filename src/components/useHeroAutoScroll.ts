@@ -75,9 +75,14 @@ import { CHROME_H } from "@/components/site/chrome";
  *  smaller window for whatever interrupted it to land mid-flight. Reverted
  *  back to 24 the same day once the actual mechanism was fixed instead (see
  *  the CAPPED, SELF-DRIVEN PLAYBACK note on `run()` below, and
- *  `forceLenisLock`): a stall can no longer skip footage regardless of FPS,
- *  so there's no reason left to run the footage faster than its own pace. */
-const FPS = 24;
+ *  `forceLenisLock`): a stall can no longer skip footage regardless of FPS.
+ *
+ *  RAISED 24 → 36 (2026-09-18, on request: "increase the speed of the
+ *  video") — 1.5x playback speed. With the V6 footage's 386 frames this
+ *  drops the main leg from ~16.1s to ~10.7s. Pure speed knob: raise for
+ *  faster playback, lower for slower — nothing else in this file depends
+ *  on the exact value. */
+const FPS = 36;
 
 /** Seconds for the second leg — the page-scroll continuation from the held
  *  last frame on to the Family strip. Deliberately short: a plain page
@@ -120,9 +125,55 @@ const ARM_MARGIN = 0.02;
 const NAV_REVEAL_MARGIN = 24;
 
 /** Gentle at both ends: eases in so playback doesn't snap on at frame 1, and
- *  eases out so it settles onto the last frame instead of slamming into it. */
+ *  eases out so it settles onto the last frame instead of slamming into it.
+ *  Used for the short second leg (continueToFamily, FAMILY_REVEAL_S — a 1s
+ *  page-scroll transition) where a plain cubic's flat opening is too brief
+ *  to notice. NOT used for the main hero leg any more — see
+ *  makeTrapezoidEase below for why. */
 const heroRunEase = (t: number) =>
   t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+/** Fixed real-world length of the main hero leg's ease-in/ease-out ramp, in
+ *  seconds — independent of HERO_RUN_S. (2026-09-18, on request: "lag while
+ *  it started to play ease in.") A plain cubic ease-in-out's flat opening is
+ *  a FIXED FRACTION of the total duration (~15-20%), so when the hero's
+ *  footage got longer (193 → 386 frames, doubling HERO_RUN_S), that flat
+ *  opening doubled too, from a barely-there ~1.2s to a plainly noticeable
+ *  ~2.4s of apparent stillness before motion started. This decouples the
+ *  ramp from the run's length: however long the footage runs, the startup
+ *  (and matching wind-down) always takes the same real ~0.45s, with
+ *  constant-speed playback filling whatever's left. */
+const EASE_RAMP_S = 0.45;
+
+/**
+ * Builds a trapezoidal ease-in/ease-out for a run lasting `durationS`
+ * seconds: a raised-cosine ramp up to full speed over EASE_RAMP_S (clamped
+ * so the two ramps can never overlap on a short run), a constant-speed
+ * middle, and a mirrored raised-cosine ramp down at the end.
+ *
+ * Raised-cosine (not linear) ramps so velocity — not just position — is
+ * continuous at the point each ramp meets the constant-speed middle: a
+ * linear ramp into a constant speed has a visible "kink" (an instant jump
+ * from the ramp's own slope to the middle's), where this reaches exactly
+ * the middle's speed just as the ramp ends.
+ */
+function makeTrapezoidEase(durationS: number) {
+  // Never let the two ramps meet past the run's own midpoint — a very short
+  // run degrades to one continuous ramp up and back down, never a plateau
+  // that's shorter than either ramp itself.
+  const r = Math.min(EASE_RAMP_S / durationS, 0.4);
+  const vMax = 1 / (1 - r); // total distance must integrate to exactly 1
+  const rampDistance = (vMax * r) / 2;
+
+  const rampPosition = (localT: number) =>
+    (vMax / 2) * (localT - (r / Math.PI) * Math.sin((Math.PI * localT) / r));
+
+  return (t: number) => {
+    if (t <= r) return rampPosition(t);
+    if (t >= 1 - r) return 1 - rampPosition(1 - t);
+    return rampDistance + vMax * (t - r);
+  };
+}
 
 /** Ceiling on how much (virtual, eased-animation) time a single tick of the
  *  frame-playback leg's own rAF loop is allowed to credit, in ms — see the
@@ -211,6 +262,7 @@ export default function useHeroAutoScroll({
     if (!lenis) return;
 
     const HERO_RUN_S = frameCount / FPS;
+    const mainLegEase = makeTrapezoidEase(HERO_RUN_S);
 
     let running = false;
     let watchdog = 0;
@@ -411,7 +463,7 @@ export default function useHeroAutoScroll({
         elapsedMs += Math.min(rawDelta, MAX_STEP_MS);
 
         const t = Math.min(elapsedMs / durationMs, 1);
-        const y = from + (to - from) * heroRunEase(t);
+        const y = from + (to - from) * mainLegEase(t);
         lenis.scrollTo(y, { immediate: true, force: true });
         forceLenisLock(lenis);
 
