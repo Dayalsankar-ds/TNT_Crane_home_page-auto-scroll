@@ -1,19 +1,18 @@
 "use client";
 
 /**
- * COLOR SCHEME STORE — "Light/Dark" toggle state, backing the other of the
- * two independent groups in ThemeToggle.tsx's popover (see
- * appearanceStore.ts's history for how this file was briefly merged away
- * and then split back out, 2026-09-17, on request — "each one is separate
- * button not linked with each other").
- *
- * Deliberately INDEPENDENT of themeVersionStore.ts's "Theme 1/2" state.
- * Picking Light/Dark has no effect on Theme 1/2, and vice versa.
+ * COLOR SCHEME STORE — "Light/Dark" toggle state, backing ThemeToggle.tsx's
+ * popover (see appearanceStore.ts's history for how this file was briefly
+ * merged away and then split back out, 2026-09-17, on request — "each one
+ * is separate button not linked with each other"). Used to sit alongside an
+ * independent "Theme 1/2" group (themeVersionStore.ts) — removed
+ * project-wide 2026-09-23, on request, so this is now the toggle's only
+ * state.
  *
  * Drives a real, PERSISTED site-wide color scheme (the `dark` class on
  * <html>, matched by `dark:` everywhere it's used — see globals.css's
- * `@custom-variant dark`) — unlike Theme 1/2, this is a genuine viewer
- * preference that should survive a reload.
+ * `@custom-variant dark`) — a genuine viewer preference that should survive
+ * a reload.
  *
  * Same plain-module + `useSyncExternalStore` pattern as the other version
  * stores.

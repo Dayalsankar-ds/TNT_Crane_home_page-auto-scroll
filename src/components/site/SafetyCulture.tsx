@@ -16,24 +16,16 @@
  * Badge is a self-contained shield (works on any background), so the
  * tagline is set here as real text instead, in the site's own type.
  *
- * 2026-09-07: Theme 2 (see themeVersionStore.ts / ThemeToggle.tsx) swaps
- * this band from maroon to dark slate, on request — a same-session
- * comparison of the red used here specifically. Theme 1 is unchanged.
- * Removed 2026-09-10 (theme one dropped project-wide, slate made permanent),
- * RESTORED 2026-09-14 on request ("one more theme to show to my manager") —
- * back to the original conditional below, EXCEPT theme one's own fill:
- * "change red to dark color" (2026-09-14, same day) swapped it from
- * `bg-tnt-maroon` to `bg-tnt-navy` (pure black — a different dark from
- * theme two's slate, so the two toggle states still read as distinct). No
- * other color changed as part of that request.
- *
- * THEME 1 IS LIGHT NOW (2026-09-15, on request — "iCARE needs to be in
- * light theme," confirmed as Theme 1 only, Theme 2 stays dark slate): the
- * section shell is `bg-white` on Theme 1, every white/N text/border utility
- * that existed to read against a dark fill is now the equivalent black/N,
- * and the pillar/badge chip fills flip from `bg-white/5` to `bg-black/5`.
- * The iCARE badge PNG and the amber accents are unchanged — both already
- * read fine on white. Theme 2 keeps its original dark styling untouched.
+ * LIGHT BY DEFAULT (2026-09-15, on request — "iCARE needs to be in light
+ * theme"): the section shell is `bg-white`, every white/N text/border
+ * utility that existed to read against a dark fill is the equivalent
+ * black/N, and the pillar/badge chip fills are `bg-black/5`. The iCARE
+ * badge PNG and the amber accents are unchanged — both read fine on white.
+ * This used to be conditional on a "Theme 1/2" toggle (Theme 2 swapping the
+ * band to dark slate) — that toggle was removed project-wide 2026-09-23,
+ * on request, so the section now always renders its Theme 1 (light) look;
+ * only the genuine Light/Dark viewer preference (colorSchemeStore) can
+ * still force it dark.
  *
  * 2026-07-30: the certification-chip row briefly moved to a new strip right
  * after the hero (CertificationsStrip), to avoid the same five badges
@@ -47,7 +39,6 @@
 
 import { Icon, type IconName } from "./primitives";
 import Reveal from "./Reveal";
-import { useThemeVersion } from "./themeVersionStore";
 import { useColorScheme } from "./colorSchemeStore";
 
 const BADGES = ["ISO 9001", "NCCCO Certified", "OSHA VPP", "ISNetworld", "Avetta"];
@@ -71,11 +62,8 @@ const PILLARS: { icon: IconName; title: string; body: string }[] = [
 ];
 
 export default function SafetyCulture() {
-  const [themeVersion] = useThemeVersion();
-  // Same rule as CoreServices.tsx: Light/Dark and Theme 1/2 never affect
-  // each other's state, but either one alone forces this section dark.
   const [colorScheme] = useColorScheme();
-  const dark = themeVersion === "two" || colorScheme === "dark";
+  const dark = colorScheme === "dark";
 
   return (
     <section

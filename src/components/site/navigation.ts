@@ -166,10 +166,31 @@ export const NAV_GROUPS: NavGroup[] = [
           // below rather than left pointing at a capability that no longer
           // renders.
           { index: "01", label: "Crane Rental", icon: "rental", href: `/#${slugify("Crane Rental")}` },
-          { index: "02", label: "Lift Planning & Engineering", icon: "engineering", href: `/#${slugify("Lift Planning & Engineering")}` },
-          { index: "03", label: "Specialized Rigging", icon: "rigging", href: `/#${slugify("Specialized Rigging")}` },
-          { index: "04", label: "Machinery Moving", icon: "heavylift", href: `/#${slugify("Machinery Moving")}` },
-          { index: "05", label: "Industrial Storage", icon: "storage", href: `/#${slugify("Industrial Storage")}` },
+          // Wind Energy's card was dropped 2026-09-22 when CoreServices'
+          // grid matched a 4-card Figma reference exactly — it stays
+          // dropped (2026-09-22, later same day): checked against the
+          // live tntcrane.com nav, and Wind Energy genuinely isn't one of
+          // TNT's real 5 services (Crane Rental, Specialized Rigging,
+          // Machinery Moving, Industrial Storage, Engineering). Its own
+          // nav entry below is left as a DEAD link rather than removed —
+          // ask if it should come out too.
+          //
+          // Lift Planning & Engineering's card came BACK the same day
+          // ("add the missing service") once the real count (5, not the
+          // reference's 4) was confirmed — label shortened to
+          // "Engineering" to match CoreServices' new card title; href
+          // unchanged, still lands on the same real card via that card's
+          // `id` override.
+          { index: "02", label: "Engineering", icon: "engineering", href: `/#${slugify("Lift Planning & Engineering")}` },
+          // Labels below renamed to match CoreServices' new, shorter card
+          // titles (2026-09-22) — hrefs point at the SAME anchors as
+          // before (hardcoded now, not `slugify(label)`, since the label
+          // and the id it needs to match diverged): CoreServices.tsx's
+          // `id` override on each STAGES entry keeps these landing on the
+          // right card.
+          { index: "03", label: "Rigging", icon: "rigging", href: "/#specialized-rigging" },
+          { index: "04", label: "Heavy Lift", icon: "heavylift", href: "/#machinery-moving" },
+          { index: "05", label: "Industrial Services", icon: "storage", href: "/#industrial-storage" },
           { index: "06", label: "Wind Energy", icon: "wind", href: `/#${slugify("Wind Energy")}` },
         ],
       },
@@ -188,8 +209,9 @@ export const NAV_GROUPS: NavGroup[] = [
     },
   },
   {
-    // Renamed from "Equipment" on 2026-09-10 to the client's "Fleet".
-    label: "Fleet",
+    // Renamed from "Equipment" on 2026-09-10 to the client's "Fleet", then
+    // to "Load Chart" on 2026-09-23, on request.
+    label: "Load Chart",
     href: "/#fleet-guide",
     columns: [
       {

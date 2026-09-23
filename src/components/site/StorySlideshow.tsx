@@ -12,15 +12,11 @@
  * crossfade). Each stat card is paired 1:1 with a slide and is itself the
  * navigation control — no separate arrows/progress bar (removed 2026-07-30;
  * the cards being clickable made them redundant). Clicking a card highlights
- * it in a dark fill, depending on themeVersionStore.ts's "Theme 1/2" toggle
- * (not dimmed; a fill reads as "selected", dimming reads as "disabled") and
- * swaps in that stat's description. Swapped to a permanent slate fill
- * 2026-09-10 when theme one (maroon) was dropped project-wide; RESTORED to
- * the theme-conditional fill 2026-09-14, on request ("one more theme to
- * show to my manager") — see SafetyCulture.tsx's docblock for the matching
- * restoration there. Theme one's own fill is `bg-tnt-navy` now, not maroon
- * — "change red to dark color," same day — so it stays visually distinct
- * from theme two's `bg-tnt-slate`.
+ * it in a `bg-tnt-navy` fill (not dimmed; a fill reads as "selected",
+ * dimming reads as "disabled") and swaps in that stat's description. This
+ * fill used to depend on themeVersionStore.ts's "Theme 1/2" toggle (Theme
+ * two swapping it to `bg-tnt-slate`) — that toggle was removed
+ * project-wide 2026-09-23, on request, so the fill is unconditional now.
  *
  * DESCRIPTION PLACEMENT (2026-09-13, on request — "remove the bottom
  * description"): the full-width black bar that used to sit below the photo
@@ -55,7 +51,6 @@ import {
 } from "react";
 import { Icon, type IconName } from "./primitives";
 import Button from "./Button";
-import { useThemeVersion } from "./themeVersionStore";
 
 type Slide = {
   icon: IconName;
@@ -133,7 +128,6 @@ const SLIDES: Slide[] = [
 const TOTAL = SLIDES.length;
 
 export default function StorySlideshow() {
-  const [themeVersion] = useThemeVersion();
   const [index, setIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const touchStartX = useRef<number | null>(null);
@@ -310,7 +304,7 @@ export default function StorySlideshow() {
                     aria-current={isActive ? "true" : undefined}
                     aria-label={`${s.label}: ${s.value}`}
                     className={`flex flex-col items-center justify-center gap-1.5 px-4 py-3 text-center transition-colors duration-300 sm:gap-2 sm:py-4 ${
-                      isActive ? (themeVersion === "two" ? "bg-tnt-slate" : "bg-tnt-navy") : ""
+                      isActive ? "bg-tnt-navy" : ""
                     } ${isFirst ? "col-span-2" : ""} ${
                       !isFirst && i % 2 === 1 ? "border-r border-black/10" : ""
                     } ${i < SLIDES.length - 2 ? "border-b border-black/10" : ""}`}

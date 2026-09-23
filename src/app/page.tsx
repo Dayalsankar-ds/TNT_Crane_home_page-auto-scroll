@@ -1,23 +1,12 @@
-// R3F port of the hero (Phase 4). The pre-R3F implementation and its two
-// .bak variants were deleted on 2026-08-06 in the dead-code sweep — they are
-// in git history if a rollback is ever needed:
-//   git show 5d89d04:src/components/HeroScrollExperience.tsx
-//
-// HeroVersioned (2026-09-08) used to wrap this hero alongside a second,
-// manual-scroll variant behind a floating "Hero 1 / 2" toggle. The
-// manual-scroll variant, the toggle, and the version store were all deleted
-// outright 2026-09-17, on request, when new footage (heroSequence.ts's V6)
-// replaced the old scene — this R3F hero was then the only one, unconditional.
-//
-// HERO HIDDEN ENTIRELY (2026-09-18, on request: "hide the hero section auto
-// scroll video") — homepage no longer renders it at all; FamilyStripV2 is
-// now the first thing visible. Not deleted: HeroVersioned.tsx,
-// HeroScrollExperienceR3F.tsx, useHeroAutoScroll.ts, heroSequence.ts, and
-// every frames-v6/*.webp are all untouched on disk, just unimported here.
-// To bring it back: restore the `import HeroVersioned ...` line below and
-// re-add `<HeroVersioned />` as the first child in the JSX, then undo the
-// wrapper <div>'s class change noted at its own comment.
-// import HeroVersioned from "@/components/site/HeroVersioned";
+// HERO REMOVED ENTIRELY 2026-09-23, on request (no more auto-scroll
+// animation on the homepage). Unlike the 2026-09-18 hide (which left
+// everything on disk), this deleted the hero outright: HeroVersioned.tsx,
+// HeroScrollExperienceR3F.tsx, useHeroAutoScroll.ts, heroSequence.ts,
+// HeroFamilyLogos.tsx, HeroFrameGL.tsx, HeroHeadline.tsx, the
+// encode-hero-frames.sh/encode-hero-video.sh scripts, and every
+// public/video/frames-v6/*.webp frame. The pre-R3F implementation is still
+// further back in git history if ever needed: git show
+// 5d89d04:src/components/HeroScrollExperience.tsx
 // FamilyStripV2 rendered directly as of 2026-09-13, on request — Nav
 // version 1's FamilyStrip.tsx (the diagonal-panel + 2x2 grid design) is
 // hidden, unrendered on disk; see that file's own docblock for what's still
@@ -76,22 +65,13 @@ export default function Home() {
   return (
     // Nav + footer live in the root layout; the homepage supplies content only.
     // `id="top"` stays — SiteNav's "Home" link targets it regardless of what
-    // renders first. The `-mt-[var(--chrome-h)] bg-black text-white` this div
-    // used to carry (cancelling <main>'s fixed-nav offset so the hero could
-    // run full-bleed beneath the bar) is gone along with the hero itself
-    // (2026-09-18, on request: "hide the hero section auto scroll video") —
-    // FamilyStripV2 now sits normally below the reserved nav space, same as
-    // every inner route already does, instead of needing its own exception.
-    //
-    // NOTE: removing the hero also removes the page's only <h1> — it lived
-    // inside HeroHeadline.tsx, rendered by HeroScrollExperienceR3F.tsx
-    // itself, not authored here. Nothing currently replaces it; flagged
-    // rather than silently left broken for SEO/accessibility. Say the word
-    // if you want a heading added back somewhere below.
+    // renders first. No offset-cancelling wrapper needed now that the hero
+    // (which ran full-bleed beneath the fixed nav) is gone — <main>'s own
+    // `pt-[var(--chrome-h)]` (see layout.tsx) handles the nav clearance.
     <div id="top">
-        {/* Trust, fast — TNT's own family-of-companies logos right off the
-            hero. FamilyStripV2 only as of 2026-09-13 — see the import
-            comment above. */}
+        {/* Trust, fast — TNT's own family-of-companies logos up front now
+            that the hero is gone. FamilyStripV2 only as of 2026-09-13 — see
+            that file's own docblock. */}
         <FamilyStripV2 />
 
         {/* Manifesto + scale — Technical Paper opening statement (About Us) */}

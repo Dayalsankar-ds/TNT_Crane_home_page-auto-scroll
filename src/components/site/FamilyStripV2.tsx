@@ -8,11 +8,24 @@
  *
  *   V1 (FamilyStrip)   — light canvas, split diagonal charcoal panel + a
  *                         2×2 logo quadrant anchored on a crosshair.
- *   V2 (this file)     — black headline band on top, then a full-width light
- *                         "shelf" holding the four brands in one horizontal
- *                         row with hairline dividers — reads like a
- *                         portfolio/investor-relations "brands of the group"
- *                         strip rather than a geometric composition.
+ *   V2 (this file)     — black headline band on top, then a light "shelf"
+ *                         holding the four brands in one horizontal row with
+ *                         hairline dividers — reads like a portfolio/
+ *                         investor-relations "brands of the group" strip
+ *                         rather than a geometric composition.
+ *
+ * 2026-09-22: shelf right-aligned within its section (was full-bleed/
+ * centered) on request, to echo a reference hero layout that placed a
+ * family-of-companies lockup row in the bottom-right corner of the banner
+ * rather than spanning edge-to-edge.
+ *
+ * 2026-09-23: reverted back to full-bleed — the hero it was echoing was
+ * removed entirely the same day, and this section is now the first thing on
+ * the page, directly under the nav. Right-aligning it with `ml-auto
+ * max-w-3xl` left a solid black block filling the left ~60% of the section
+ * (the bg-black section showing through past the un-shelved space) instead
+ * of the thin seam the docblock above describes — that seam assumption only
+ * holds when the shelf spans the full width.
  *
  * THE LOGOS ARE FULL-COLOR LOCKUPS, NOT SILHOUETTES — this is why the shelf
  * is light, not dark. Checked each /public/brand/*.svg: they're built from a
@@ -78,13 +91,13 @@ export default function FamilyStripV2() {
           isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
         }`}
       >
-        <div className="mx-auto grid max-w-6xl grid-cols-1 divide-y divide-black/10 px-6 sm:grid-cols-2 sm:divide-x sm:divide-y-0 sm:px-10 lg:grid-cols-4 lg:px-16">
+        <div className="grid grid-cols-2 divide-y divide-black/10 px-6 sm:divide-x sm:divide-y-0 sm:px-10 lg:grid-cols-4 lg:px-12">
           {BRANDS.map((brand) => (
             <div
               key={brand.id}
-              className="flex flex-col items-center gap-5 px-8 py-10 text-center"
+              className="flex flex-col items-center gap-4 px-6 py-8 text-center"
             >
-              <div className="flex h-14 w-full items-center justify-center">
+              <div className="flex h-12 w-full items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={brand.src}

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * CONTACT — the "reach a human" section.
  *
@@ -9,10 +11,20 @@
  *
  * NOTE: phone numbers are the real per-brand lines from the site audit but
  * should be confirmed against TNT's current routing before launch.
+ *
+ * LIGHT BY DEFAULT (2026-09-23, on request — caught in light mode still
+ * rendering the unconditional navy band): every white/N utility now has a
+ * black/N light counterpart, gated by `dark:`/`useColorScheme`, same
+ * convention as BranchLocator.tsx and SafetyCulture.tsx. The `.glass`
+ * regional-dispatch panel keeps that frosted treatment only in Dark mode —
+ * `.glass` is a white-tinted overlay meant to sit on a dark fill, so in
+ * Light mode it falls back to the `border-black/12 bg-black/[0.03]` card
+ * style used elsewhere.
  */
 
 import { Icon } from "./primitives";
 import RevealText from "./RevealText";
+import { useColorScheme } from "./colorSchemeStore";
 
 const PRIMARY = [
   { icon: "payment", label: "Phone", value: "1-800-799-2505", href: "tel:+18007992505" },
@@ -29,8 +41,11 @@ const REGIONAL = [
 ];
 
 export default function ContactSection() {
+  const [colorScheme] = useColorScheme();
+  const dark = colorScheme === "dark";
+
   return (
-    <section id="contact" className="scroll-mt-32 bg-tnt-navy">
+    <section id="contact" className="scroll-mt-32 bg-white dark:bg-tnt-navy">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left — headline + primary contact. The "24/7/365 dispatch" pill
@@ -41,9 +56,9 @@ export default function ContactSection() {
               as="h2"
               barClassName="bg-tnt-amber"
               text="Reach the Nearest Team"
-              className="font-display text-4xl tracking-wide text-white uppercase sm:text-5xl"
+              className="font-display text-4xl tracking-wide text-black uppercase sm:text-5xl dark:text-white"
             />
-            <p className="mt-4 max-w-md font-body text-base text-white/70 sm:text-lg">
+            <p className="mt-4 max-w-md font-body text-base text-black/70 sm:text-lg dark:text-white/70">
               Cranes move fast — so do we. Call the branch nearest your site, day
               or night, or send us the details and a rep will follow up.
             </p>
@@ -52,14 +67,14 @@ export default function ContactSection() {
               {PRIMARY.map((p) => {
                 const inner = (
                   <>
-                    <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white/10 text-tnt-amber">
+                    <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-black/5 text-tnt-amber dark:bg-white/10">
                       <Icon name={p.icon} className="h-5 w-5" />
                     </span>
                     <span>
-                      <dt className="font-body text-[11px] font-semibold tracking-[0.16em] text-white/50 uppercase">
+                      <dt className="font-body text-[11px] font-semibold tracking-[0.16em] text-black/50 uppercase dark:text-white/50">
                         {p.label}
                       </dt>
-                      <dd className="mt-0.5 font-mono text-lg text-white">
+                      <dd className="mt-0.5 font-mono text-lg text-black dark:text-white">
                         {p.value}
                       </dd>
                     </span>
@@ -83,11 +98,17 @@ export default function ContactSection() {
           </div>
 
           {/* Right — regional dispatch numbers */}
-          <div className="glass rounded-2xl p-6 sm:p-8">
+          <div
+            className={
+              dark
+                ? "glass rounded-2xl p-6 sm:p-8"
+                : "rounded-2xl border border-black/12 bg-black/[0.03] p-6 sm:p-8"
+            }
+          >
             <p className="font-body text-[13px] font-bold tracking-[0.18em] text-tnt-amber uppercase">
               Regional Dispatch
             </p>
-            <ul className="mt-5 divide-y divide-white/10">
+            <ul className="mt-5 divide-y divide-black/10 dark:divide-white/10">
               {REGIONAL.map((r) => (
                 <li key={r.brand}>
                   <a
@@ -95,10 +116,10 @@ export default function ContactSection() {
                     className="group flex items-center justify-between gap-4 py-4 transition-colors hover:text-tnt-amber"
                   >
                     <span>
-                      <span className="block font-display text-lg tracking-wide text-white uppercase group-hover:text-tnt-amber">
+                      <span className="block font-display text-lg tracking-wide text-black uppercase group-hover:text-tnt-amber dark:text-white">
                         {r.brand}
                       </span>
-                      <span className="mt-0.5 block font-body text-sm text-white/60">
+                      <span className="mt-0.5 block font-body text-sm text-black/60 dark:text-white/60">
                         {r.region}
                       </span>
                     </span>
