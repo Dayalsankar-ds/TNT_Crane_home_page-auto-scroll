@@ -242,9 +242,9 @@ body {
   cursor: pointer;
   /* `translate`, not `transform`: maplibre owns the marker's transform for
      positioning, and writing to it here would fight the map on every pan. */
-  transition:
-    opacity 240ms ease,
-    scale 240ms ease;
+  transition: opacity 240ms ease;
+  /* HIT-BOX SIZE NEVER CHANGES (2026-09-23) — see the flicker note on
+     `.tnt-marker.is-hovered` below for why. */
 }
 .tnt-marker:focus-visible {
   outline: 2px solid #f5a623;
@@ -261,25 +261,48 @@ body {
   box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.22);
   transition:
     box-shadow 240ms ease,
-    background-color 240ms ease;
+    background-color 240ms ease,
+    scale 240ms ease;
+  /* Purely decorative — the outer `.tnt-marker` button is the only element
+     that should ever be hit-tested. Without this, this span (or the pulse
+     ring below) can register its own mouseenter/mouseleave. */
+  pointer-events: none;
 }
 .tnt-marker__pulse {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
   opacity: 0;
+  /* FLICKER FIX (2026-09-23): the selected marker's ring grows past the
+     marker's own 34px footprint via `scale` in its infinite pulse animation
+     below. In dense clusters (Gulf Coast, Georgia, etc.) that growing ring
+     was visually overlapping neighboring markers — and since it's a real,
+     hit-testable DOM element, it intercepted THEIR mouseenter/mouseleave as
+     it expanded and contracted, making nearby markers flicker in and out of
+     their hover state with no cursor movement involved. `pointer-events:
+     none` makes it purely visual, so only each marker's own fixed-size
+     button can ever be hovered. */
+  pointer-events: none;
 }
-.tnt-marker.is-hovered {
-  scale: 1.18;
-}
+/* FLICKER FIX (2026-09-23): this used to `scale` the OUTER, hit-tested
+   `.tnt-marker` button itself (1.18 hovered / 1.32 selected) — a real,
+   reproducible bug: growing the very element being hovered, live, while the
+   cursor sits near its edge, was measured causing `is-hovered` to oscillate
+   on/off every ~60-75ms with the cursor barely moving (confirmed via a
+   frame-by-frame watch of the class list — position never changed, only
+   the hover class flapped). The growth now targets `.tnt-marker__dot`
+   instead, which is `pointer-events: none` — purely visual, so the
+   button's own hit-box is now a constant 34×34 in every state and can
+   never feed back into its own hover state. */
 .tnt-marker.is-hovered .tnt-marker__dot {
+  scale: 1.4;
   box-shadow: 0 0 0 6px rgba(245, 166, 35, 0.28);
 }
 .tnt-marker.is-selected {
-  scale: 1.32;
   z-index: 5;
 }
 .tnt-marker.is-selected .tnt-marker__dot {
+  scale: 1.7;
   background: #ffc24a;
   box-shadow:
     0 0 0 5px rgba(245, 166, 35, 0.35),

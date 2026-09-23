@@ -31,6 +31,8 @@ type Seed = {
 export type Branch = Seed & {
   /** Capabilities this branch's operating company actually offers. */
   services: string[];
+  /** PLACEHOLDER per-branch line — see DUMMY PHONE NUMBERS below. */
+  phone: { display: string; href: string };
 };
 
 /**
@@ -46,6 +48,27 @@ const BRAND_REGION: Record<string, RegionId | null> = {
   "Allison Crane & Rigging": "northeast-permian",
   "Eagle West Cranes": "western-canada",
 };
+
+/**
+ * DUMMY PHONE NUMBERS (2026-09-23, on request — "each location has an
+ * individual contact number... use dummy for now, we'll collect the real
+ * ones from the TNT team later"). Every branch had been sharing its BRAND's
+ * one real dispatch number (ContactSection.tsx's Regional Dispatch list) —
+ * accurate but not per-LOCATION, which is what was asked for.
+ *
+ * These are UNMISTAKABLY placeholders, not real numbers: "555-555-01XX"
+ * doubles up on the NANP's own reserved fictional exchange (555-0100–
+ * 555-0199 is set aside across North America for exactly this — movies,
+ * mockups, etc. — so it can never collide with a real assigned number), one
+ * per branch by its position in SEEDS below.
+ *
+ * REPLACE WITH REAL PER-BRANCH NUMBERS FROM THE TNT TEAM before this ships —
+ * search the codebase for "555-555-01" to find every spot that needs one.
+ */
+function dummyPhone(index: number): { display: string; href: string } {
+  const n = String(index).padStart(2, "0"); // 01 → 44, one per branch below
+  return { display: `(555) 555-01${n}`, href: `tel:+155555501${n}` };
+}
 
 // All 44 branches across the TNT family of brands
 const SEEDS: Seed[] = [
@@ -112,9 +135,10 @@ export type BranchLocatorData = {
 
 export function buildBranchLocator(): BranchLocatorData {
   return {
-    branches: SEEDS.map((b) => ({
+    branches: SEEDS.map((b, i) => ({
       ...b,
       services: servicesForRegion(BRAND_REGION[b.brand] ?? null),
+      phone: dummyPhone(i + 1),
     })),
   };
 }

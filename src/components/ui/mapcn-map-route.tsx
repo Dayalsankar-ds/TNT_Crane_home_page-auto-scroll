@@ -62,16 +62,22 @@ function ensureWorker() {
 
 /** Light "technical paper" palette (2026-08-20, on request — was a dark
  *  black/charcoal/gold theme). Only the map's own tile colors change here;
- *  markers keep their existing gold styling from globals.css untouched. */
+ *  markers keep their existing gold styling from globals.css untouched.
+ *
+ * PALED FURTHER (2026-09-23, on request — "use the same map look" as a
+ * reference screenshot showing a much flatter, lower-contrast basemap):
+ * labels and roads lightened from near-black/medium-gray to soft grays, and
+ * water brought closer to land so the whole map reads as a quiet backdrop
+ * a floating card sits on, not a competing focal point. */
 const THEME = {
   gold: "#F5A623",
   // Land must differ from the backdrop or the coastline disappears and the map
   // reads as a flat rectangle.
-  backdrop: "#E9ECED", // tnt-paper — cool technical-paper base
-  land: "#F7F6F2", // warm near-white
-  water: "#D7DEE1", // light cool blue-gray, distinct from land
-  road: "#B7B7B7", // medium gray, visible on light land without overpowering
-  label: "#242424", // near-black, for legibility on a light basemap
+  backdrop: "#EDEFF0", // tnt-paper — cool technical-paper base
+  land: "#F8F7F5", // warm near-white
+  water: "#DEE3E5", // barely-there cool tint, close to land on purpose
+  road: "#D6D6D6", // faint — visible on close look, not competing with labels
+  label: "#6B7280", // soft gray, legible without reading as primary content
   labelHalo: "#FFFFFF",
 };
 
@@ -81,7 +87,43 @@ const BOUNDS: [[number, number], [number, number]] = [
   [-52, 60],
 ];
 
-const FIT = { padding: 48, duration: 0 } as const;
+/**
+ * MARKERS HIDDEN BEHIND THE FLOATING CARDS (2026-09-23): BranchLocator.tsx's
+ * search and detail panels float ON TOP of this map at `xl` and up (fully
+ * opaque, see that file's own docblock). Without accounting for that, a
+ * fitBounds/flyTo happily centers a point right underneath one of them —
+ * confirmed for real: filtering to "United States" left Lexington SC, North
+ * Augusta SC, and Port Wentworth GA completely covered (and unclickable) by
+ * the detail card, and selecting Atlanta covered Conyers GA the same way.
+ * A marker trapped under an opaque card is invisible AND unhoverable, and a
+ * marker only partly covered by the card's edge flickers in and out of its
+ * hover state as the cursor crosses that boundary — this is very likely
+ * what "hovering a marker makes other markers flicker" actually was.
+ *
+ * Fix: pad fitBounds/flyTo so the USABLE map area excludes the columns the
+ * cards occupy — same technique any map UI with an overlaid panel needs
+ * (Google Maps, etc.). Values come from the cards' own geometry (search:
+ * `left-[60px]` + `w-[17rem]` = 272px; detail: `right-[60px]` + `w-[19rem]`
+ * = 304px), plus a comfortable margin.
+ *
+ * Only applies at `xl` and up (Tailwind's default 1280px, unconfigured in
+ * this project — see globals.css) — that's the exact breakpoint
+ * BranchLocator.tsx switches the cards to `xl:absolute`. Below it they
+ * stack in normal flow and never overlap the map, so padding the fit that
+ * generously there would just needlessly shrink/zoom out a map that has no
+ * overlap problem to dodge.
+ */
+function desktopOverlayActive() {
+  return typeof window !== "undefined" && window.matchMedia("(min-width: 1280px)").matches;
+}
+function mapPadding(): number | { top: number; bottom: number; left: number; right: number } {
+  return desktopOverlayActive()
+    ? { top: 48, bottom: 48, left: 380, right: 400 }
+    : 48;
+}
+function fitOptions() {
+  return { padding: mapPadding(), duration: 0 } as const;
+}
 
 export interface BranchMapProps {
   branches: Branch[];
@@ -187,7 +229,7 @@ export function BranchMap({
       container: host,
       style: STYLE_URL,
       bounds: BOUNDS,
-      fitBoundsOptions: FIT,
+      fitBoundsOptions: fitOptions(),
       // North America only — no world-spanning pan, no zooming out past the
       // continent, which is what "do not display the entire world" means in
       // interaction terms as well as on first paint.
@@ -263,7 +305,7 @@ export function BranchMap({
       const m = mapRef.current;
       if (!m) return;
       m.resize();
-      if (!selectedIdRef.current) m.fitBounds(BOUNDS, FIT);
+      if (!selectedIdRef.current) m.fitBounds(BOUNDS, fitOptions());
     });
     ro.observe(host);
 
@@ -310,6 +352,10 @@ export function BranchMap({
         zoom: Math.max(map.getZoom(), 9),
         duration: reduced ? 0 : 1100,
         essential: true,
+        // Keeps the selected branch centered in the space BETWEEN the two
+        // floating cards rather than the raw container center — see the
+        // "MARKERS HIDDEN BEHIND THE FLOATING CARDS" note above fitOptions().
+        padding: mapPadding(),
       });
     },
     [reduced],
@@ -330,7 +376,7 @@ export function BranchMap({
     if (pts.length < 2) return;
     const bounds = new LngLatBounds();
     for (const b of pts) bounds.extend([b.lng, b.lat]);
-    map.fitBounds(bounds, { padding: 64, duration: reduced ? 0 : 900, maxZoom: 6 });
+    map.fitBounds(bounds, { padding: mapPadding(), duration: reduced ? 0 : 900, maxZoom: 6 });
   }, [visibleIds, branchList, reduced]);
 
   return (

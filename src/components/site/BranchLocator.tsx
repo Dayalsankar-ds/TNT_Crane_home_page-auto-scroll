@@ -21,17 +21,25 @@
  * white/N text) with no regard for the site's Light/Dark toggle. Every
  * white/N utility now has a black/N light counterpart, gated by
  * `dark:`/`useColorScheme` the same way EquipmentGuide.tsx and
- * SafetyCulture.tsx do it. The two `.glass` panels (search + detail) keep
- * that frosted treatment only in Dark mode — `.glass` is a white-tinted
- * overlay meant to sit on a dark fill, so in Light mode they fall back to
- * the same `border-black/12 bg-black/[0.03]` card style SafetyCulture uses.
- * The map's own basemap palette (mapcn-map-route.tsx) was already
- * theme-independent light "technical paper" styling, so it needed no change.
+ * SafetyCulture.tsx do it. The map's own basemap palette
+ * (mapcn-map-route.tsx) was already theme-independent light "technical
+ * paper" styling, so it needed no change.
+ *
+ * FULL-BLEED MAP + FLOATING CARDS (2026-09-23, on request — "use the same
+ * map look" as a reference screenshot): the map fills the whole row
+ * (`xl:absolute xl:inset-0`) with the search panel and detail card floating
+ * on top, inset 60px from the map's left/right edges. Both cards are SOLID
+ * opaque fills (`bg-white` / dark: `bg-tnt-slate`), not the `.glass`
+ * frosted-on-dark treatment they used before — `.glass` is meant for a card
+ * over a dark hero, and left translucent here it let the busy basemap
+ * underneath bleed through and wash out the text. Below `xl`, none of this
+ * applies — search/map/detail stack in plain flex-column order exactly as
+ * before the redesign.
  */
 
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
-import { Search, Phone, ArrowRight, Building2 } from "lucide-react";
+import { Search, Phone, Building2 } from "lucide-react";
 import RevealText from "./RevealText";
 import Button from "./Button";
 import { useColorScheme } from "./colorSchemeStore";
@@ -45,7 +53,7 @@ const BranchMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="aspect-[4/3] w-full animate-pulse rounded-2xl border border-black/10 bg-[#E9ECED] lg:aspect-[5/4] dark:border-white/10 dark:bg-[#0B0B0B]" />
+      <div className="aspect-[4/3] w-full animate-pulse rounded-2xl border border-black/10 bg-[#E9ECED] lg:aspect-[5/4] xl:absolute xl:inset-0 xl:aspect-auto xl:h-full xl:w-full dark:border-white/10 dark:bg-[#0B0B0B]" />
     ),
   },
 );
@@ -141,16 +149,20 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
           })}
         </div>
 
-        {/* Desktop: search · map · detail. Tablet/mobile: stacked in that order,
-            which is also the DOM order — no visual/reading-order mismatch. */}
-        <div className="mt-10 grid gap-6 xl:grid-cols-[17rem_1fr_19rem] xl:items-start">
+        {/* Desktop (xl+): the map is a full-bleed backdrop (absolute, fills
+            the row) with the search and detail panels floating over it as
+            shadowed cards — matching the reference layout (2026-09-23, on
+            request: "bring same like this, use the same map look"). Below
+            xl: search · map · detail stacked in that order, which is also
+            the DOM order — no visual/reading-order mismatch, and none of
+            the xl: positioning utilities apply, so it's a plain flex
+            column exactly as before. */}
+        <div className="relative mt-10 flex flex-col gap-6 xl:h-[600px]">
           {/* ── Search + results ───────────────────────────────────────── */}
           <div
-            className={
-              dark
-                ? "glass rounded-2xl p-4"
-                : "rounded-2xl border border-black/12 bg-black/[0.03] p-4"
-            }
+            className={`rounded-2xl p-4 xl:absolute xl:top-8 xl:left-[60px] xl:z-10 xl:w-[17rem] xl:shadow-2xl ${
+              dark ? "border border-white/15 bg-tnt-slate" : "border border-black/10 bg-white"
+            }`}
           >
             <label htmlFor="branch-search" className="sr-only">
               Search by city, state, or branch
@@ -222,17 +234,15 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
             hoveredId={hoveredId}
             onSelect={onSelect}
             onHover={onHover}
-            className="aspect-[4/3] w-full lg:aspect-[5/4]"
+            className="aspect-[4/3] w-full lg:aspect-[5/4] xl:absolute xl:inset-0 xl:aspect-auto xl:h-full xl:w-full"
           />
 
           {/* ── Branch detail ──────────────────────────────────────────── */}
           {selected ? (
             <div
-              className={
-                dark
-                  ? "glass rounded-2xl p-5"
-                  : "rounded-2xl border border-black/12 bg-black/[0.03] p-5"
-              }
+              className={`rounded-2xl p-5 xl:absolute xl:top-8 xl:right-[60px] xl:z-10 xl:w-[19rem] xl:shadow-2xl ${
+                dark ? "border border-white/15 bg-tnt-slate" : "border border-black/10 bg-white"
+              }`}
             >
               <p className="font-body text-[11px] font-bold tracking-[0.18em] text-tnt-amber uppercase">
                 {selected.region}
@@ -243,6 +253,19 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
               <p className="mt-1.5 font-body text-[12px] font-semibold tracking-wide text-tnt-amber">
                 Operated by {selected.brand}
               </p>
+
+              {/* Contact number — a DUMMY, per-branch placeholder for now (see
+                  branchLocatorData.ts's dummyPhone) until the TNT team
+                  supplies real per-location numbers. Shown as its own row,
+                  not buried in a bottom link, so it reads as real branch
+                  info at a glance once it is. */}
+              <a
+                href={selected.phone.href}
+                className="mt-4 flex items-center gap-2 font-mono text-base font-semibold text-black transition-colors hover:text-tnt-amber dark:text-white"
+              >
+                <Phone aria-hidden="true" className="h-4 w-4 text-tnt-amber" />
+                {selected.phone.display}
+              </a>
 
               <p className="mt-5 font-mono text-[11px] tracking-[0.14em] text-black/45 uppercase dark:text-white/45">
                 Available Services
@@ -262,30 +285,27 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
                 ))}
               </ul>
 
-              <div className="mt-6 flex flex-col gap-2">
-                <Button href="#coverage" variant="primary" onDark={dark} arrow={false}>
-                  View branch
-                </Button>
-                <Button href="#quote" variant="secondary" onDark={dark} arrow={false}>
-                  Request quote
-                </Button>
-                <a
-                  href="tel:+18007992505"
-                  className="flex items-center justify-center gap-2 rounded-md px-5 py-2.5 font-mono text-sm font-semibold text-tnt-amber transition-colors hover:text-black focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none dark:hover:text-white"
-                >
-                  <Phone aria-hidden="true" className="h-4 w-4" />
-                  Call branch
-                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
-                </a>
-              </div>
+              {/* Single, clear CTA (2026-09-23, on request — a redesign of
+                  this card's content/functionality). Replaces the old
+                  three-item stack: "View branch" pointed at `#coverage`,
+                  i.e. the section it's already in — a dead link, not a real
+                  destination — and "Call branch" duplicated the phone row
+                  above with a hardcoded number that ignored which brand was
+                  selected. */}
+              <Button
+                href="#quote"
+                variant="primary"
+                onDark={dark}
+                className="mt-6 w-full justify-center"
+              >
+                Request a Quote
+              </Button>
             </div>
           ) : (
             <div
-              className={
-                dark
-                  ? "glass rounded-2xl p-5"
-                  : "rounded-2xl border border-black/12 bg-black/[0.03] p-5"
-              }
+              className={`rounded-2xl p-5 xl:absolute xl:top-8 xl:right-[60px] xl:z-10 xl:w-[19rem] xl:shadow-2xl ${
+                dark ? "border border-white/15 bg-tnt-slate" : "border border-black/10 bg-white"
+              }`}
             >
               <p className="font-body text-sm text-black/50 dark:text-white/60">
                 Select a branch to see its services and contact options.
