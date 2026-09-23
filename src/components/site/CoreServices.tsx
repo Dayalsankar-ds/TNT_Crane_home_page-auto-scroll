@@ -3,155 +3,112 @@
 /**
  * SECTION 5 — FULL-SCOPE CAPABILITY  (project lifecycle)
  *
- * Replaces the bento grid (2026-07-29). The grid showed seven services as seven
- * peers and left the visitor to assemble the story themselves; worse, its tiles
- * shared grid ROWS, so the nav's per-service deep links resolved to only three
- * scroll positions and four of seven landed under a different service's name.
+ * REVERTED TO THE ICON-CARD DESIGN (2026-09-23, on request — a reference
+ * screenshot: "FULL-SCOPE CAPABILITY" eyebrow, "ONE PARTNER, END TO END"
+ * heading, 6 plain icon cards in a 3×2 grid, solid-amber closing CTA panel).
+ * This replaces the "REAL SOLUTIONS FOR A HEAVIER TOMORROW" photo-card
+ * redesign from 2026-09-22 (5 cards, real TNT photos, header tag list,
+ * skewed CTA banner) — that version is still in git history
+ * (`git show d44e684^:src/components/site/CoreServices.tsx` for the
+ * pre-photo icon-card version this restores, or `git show
+ * 9e69379^:src/components/site/CoreServices.tsx` for the photo-card
+ * version this replaces) if either is ever wanted back instead.
+ *
+ * "ONE PARTNER, END TO END" is a genuine restoration, not just a copy of
+ * the last icon-card version: that heading (with its own <RevealText>
+ * animation) was removed entirely on 2026-09-11, before the photo-card
+ * redesign ever happened. The reference screenshot shows it present, so
+ * it's back here as a plain heading (no RevealText — that component's
+ * animation was tied to copy this rewrite doesn't reintroduce elsewhere).
+ *
+ * SIX SERVICES, NOT FIVE: the 2026-09-22 redesign had dropped Wind Energy
+ * after confirming against tntcrane.com that TNT's real, current service
+ * list is five (Crane Rental, Specialized Rigging, Machinery Moving,
+ * Industrial Storage, Engineering) — Wind Energy isn't one of them. The
+ * reference screenshot for THIS restoration shows Wind Energy as card 06,
+ * so it's back here on request; navigation.ts's Services panel was updated
+ * to match (see that file's own note). Flagging the tension rather than
+ * quietly resolving it: this section and the nav now show a service that
+ * tntcrane.com's own site doesn't list.
+ *
+ * CRANE RENTAL KEEPS ITS DEDICATED PAGE: unlike the rest of this restored
+ * design, Crane Rental's card still links to `/crane-rental` (added
+ * 2026-09-18, its own real sub-page) via next/link's <Link>, not a plain
+ * <a> — a plain <a> was measured forcing a full page reload instead of
+ * Next's client-side route swap (see that page's own docblock). Every
+ * other card still uses the shared `?service=...#quote` stretched-link
+ * pattern, since none of them have a dedicated page.
  *
  * The lifecycle — LIFT → PLAN → RIG → MOVE → STORE → RENEWABLE — is carried
- * by the STAGE labels and the numbering, not by a drawn spine. It was a
- * connected vertical chain until 2026-07-29; it is now a grid (3 columns at
- * `lg`) so every capability is visible at a glance, Crane Rental included
- * (see the note on that card below).
+ * by the STAGE labels and the numbering, not by a drawn spine. Stage
+ * numbering is JOURNEY order, and navigation.ts's Services panel matches —
+ * the panel and this section are one numbering system or neither means
+ * anything.
  *
- * Consequences worth knowing:
- *  - Stage numbering is JOURNEY order, and navigation.ts was renumbered to
- *    match — the panel and this section are one numbering system or neither
- *    means anything.
- *  - THE GRID REINSTATES THE ANCHOR COLLISION a chained layout would avoid.
- *    Three cards share a row, so /services#crane-rental and
- *    /services#specialized-rigging resolve to the same scroll position.
- *    <TargetHighlight> is what keeps the click legible — it outlines the
- *    requested card even when the page cannot move. Do not remove it while
- *    this layout stands.
- *  - Heavy Haul & Transport (was stage 05, "Transport") was removed entirely
- *    2026-09-11, on request. Crane Rental folding into the grid the same day
- *    (see below) brought the count back to six, so `lg:grid-cols-3` is a
- *    clean 3×2 again rather than the uneven 3+2 row the Transport removal
- *    left behind on its own.
+ * THE GRID REINSTATES THE ANCHOR COLLISION a chained layout would avoid.
+ * Three cards share a row, so /services#crane-rental and
+ * /services#specialized-rigging resolve to the same scroll position.
+ * <TargetHighlight> is what keeps the click legible — it outlines the
+ * requested card even when the page cannot move. Do not remove it while
+ * this layout stands.
  *
- * CRANE RENTAL FOLDED INTO THE GRID (2026-09-11, on request): it used to lead
- * as a full-width photo feature — the step given the biggest visual treatment
- * on the page, added 2026-09-03 when it swapped in for Lift Planning &
- * Engineering as the lead. That featured treatment (a separate LEAD const,
- * its own <ParallaxFrame> photo, its own "Request a crane rental" CTA) is
- * gone; Crane Rental is now just card 01 in the same STAGES array and grid
- * as everything else — same border/icon-well/blurb/"Learn more" pattern, no
- * special case. Its real TNT photo (SERVICE_PHOTOS.craneRentalAtCraneCoolerLift)
- * is unused now that there's no lead card to hold it; left in photos.ts
- * rather than deleted, in case a future feature treatment wants it back.
+ * NO SHADOWS anywhere in this section, by request: depth is a hairline
+ * border that goes gold, a 4%-opacity gold wash, and a 2px lift.
  *
- * NO SHADOWS anywhere in this section, by request: depth is a hairline border
- * that goes gold, a 4%-opacity gold wash, and a 2px lift.
+ * Palette: black / white / gold. NOT navy — the brand book has no navy, and
+ * the retired #071034 was removed site-wide on 2026-07-28.
  *
- * Every hover state is pure CSS. (The heading's own <RevealText> went with
- * the "One Partner, End to End" copy it animated, removed 2026-09-11 the
- * same day.)
- *
- * Palette: black / white / gold. NOT navy — the brand book has no navy, and the
- * retired #071034 was removed site-wide on 2026-07-28.
- *
- * LIGHT/DARK (2026-09-14, on request — "change this section to dark on
- * Theme 2"; the Theme 1/2 toggle this originally read was removed
- * project-wide 2026-09-23, so it's the Light/Dark toggle alone now): a
- * client component so it can read colorSchemeStore.ts. Light (default) is
- * the light shell — bg-white/text-black, black/N opacity utilities,
- * black-fill/amber-glyph icon-well hover. Dark flips the whole section to
- * the ORIGINAL 2026-09-02 dark treatment — bg-black/text-white, white/N
- * utilities, amber-fill/black-glyph hover — rather than reinventing it. The
- * closing CTA panel's solid amber fill is UNCHANGED in both — it reads fine
- * against either background, so it isn't part of the conditional.
+ * LIGHT/DARK: a client component so it can read colorSchemeStore.ts's
+ * site-wide Light/Dark toggle (the "Theme 1/2" toggle this used to also
+ * read, themeVersionStore.ts, was removed project-wide 2026-09-23). Light
+ * (default) is the light shell — bg-white/text-black, black/N opacity
+ * utilities, black-fill/amber-glyph icon-well hover. Dark flips the whole
+ * section to the original 2026-09-02 dark treatment — bg-black/text-white,
+ * white/N utilities, amber-fill/black-glyph hover. The closing CTA panel's
+ * solid amber fill is unchanged in both — it reads fine against either
+ * background, so it isn't part of the conditional.
  */
 
 import Image from "next/image";
 import Link from "next/link";
 import { Eyebrow, Icon, type IconName } from "./primitives";
+import Button from "./Button";
 import { slugify } from "./navigation";
 import TargetHighlight from "./TargetHighlight";
 import { useColorScheme } from "./colorSchemeStore";
-import { SERVICE_PHOTOS, RIGGING_PHOTOS, CASE_PHOTOS } from "./photos";
 
 type Stage = {
   /** Journey position. Mirrors navigation.ts. */
   index: string;
-  /** The verb — what this step DOES. Carries the sequence. Unused by the
-   *  card itself (no reference design has shown a stage word since
-   *  2026-09-22) — kept on the type/data only because navigation.ts's
-   *  ordering comment still refers to it. */
+  /** The verb — what this step DOES. Carries the sequence. */
   stage: string;
-  /** The service name — what it's called and sold as. Titles are TNT's
-   *  own real service names again as of 2026-09-22's "REAL SOLUTIONS FOR
-   *  A HEAVIER TOMORROW" reference (full names: Specialized Rigging,
-   *  Machinery Moving, Industrial Storage — not the shortened Rigging/
-   *  Heavy Lift/Industrial Services this file briefly carried the same
-   *  day), so most `id` overrides below are gone — `slugify(title)` alone
-   *  matches navigation.ts again. Engineering keeps its override: its
-   *  display title is short but navigation.ts still links to the fuller
-   *  `/#lift-planning-engineering`. */
+  /** The service name — what it's called and sold as. */
   title: string;
   blurb: string;
   icon: IconName;
-  /** Real TNT/RMS photography — see the note on each assignment below in
-   *  STAGES. Every stage has one now (Industrial Storage's was added
-   *  2026-09-22), so there is no icon-well fallback branch left to render. */
-  photo?: string;
-  /** Dedicated page, when one exists (2026-09-18, Crane Rental's own
-   *  /crane-rental — see that route's own docblock). Every stage without
-   *  one still falls back to the shared `?service=...#quote` link below;
-   *  this is the exception, not a new pattern every card is expected to
-   *  grow. */
+  /** Dedicated page, when one exists — see the docblock. Every stage
+   *  without one falls back to the shared `?service=...#quote` link. */
   href?: string;
-  /** Sub-links shown inside the card, above the Learn More/Explore row
-   *  (2026-09-22, matching the "REAL SOLUTIONS" reference's expanded
-   *  Crane Rental card). Only Crane Rental has one in the reference; every
-   *  other card omits this and renders the plain blurb-only body. Targets
-   *  are EquipmentGuide's own fleet-type ids where an exact match exists
-   *  (Crawler Cranes, Rough-Terrain Cranes); "Mobile Cranes" has no exact
-   *  fleet-type id in EquipmentGuide, so it lands on the guide generally. */
-  sublist?: { label: string; href: string }[];
-  /** Overrides `slugify(title)` for the card's `id` — see the note on
-   *  `title` above. Only Engineering needs this now. */
-  id?: string;
 };
 
-/**
- * MATCHES THE "REAL SOLUTIONS FOR A HEAVIER TOMORROW" REFERENCE EXACTLY
- * (2026-09-22, on request — third reference image, "Build this service
- * section exactly," following the same "no need do same from the image,
- * do IT exactly" correction the first Figma reference already taught this
- * file). This reference happens to show TNT's real 5-service count
- * (confirmed against tntcrane.com the same day) with its own full names,
- * so no service was added or renamed to make it fit — Crane Rental,
- * Specialized Rigging, Machinery Moving, Industrial Storage, Engineering.
- *
- * Photos are the same real, already-sourced TNT/RMS assets this file was
- * already using for these five stages (not new downloads) — see photos.ts.
- */
-const STAGES: Stage[] = [
-  {
-    index: "01",
-    stage: "Lift",
-    title: "Crane Rental",
-    blurb: "A modern fleet for projects of any size.",
-    icon: "rental",
-    href: "/crane-rental",
-    photo: SERVICE_PHOTOS.craneRentalAtCraneCoolerLift,
-    sublist: [
-      { label: "Mobile Cranes", href: "/#fleet-guide" },
-      { label: "Crawler Cranes", href: "/#crawler-cranes" },
-      { label: "Rough-Terrain Cranes", href: "/#rough-terrain-cranes" },
-    ],
-  },
-  { index: "02", stage: "Rig", title: "Specialized Rigging", blurb: "Engineered rigging solutions for complex lifts.", icon: "rigging", photo: CASE_PHOTOS.petrochemicalVesselPlacement },
-  { index: "03", stage: "Move", title: "Machinery Moving", blurb: "Safe, precise and efficient movement of critical equipment.", icon: "heavylift", photo: CASE_PHOTOS.refineryReactorExchange },
-  { index: "04", stage: "Store", title: "Industrial Storage", blurb: "Secure and flexible storage for your valuable equipment.", icon: "storage", photo: RIGGING_PHOTOS.versaLiftMachineryMoving },
-  { index: "05", stage: "Plan", title: "Engineering", blurb: "Lift planning and engineering for safer, smarter outcomes.", icon: "engineering", id: "lift-planning-engineering", photo: CASE_PHOTOS.bridgeGirderSet },
-];
+const STAGE_ICONS: Record<string, string> = {
+  "Specialized Rigging": "/icons/hook.svg",
+  "Machinery Moving": "/icons/forklift.svg",
+  "Industrial Storage": "/icons/cart.svg",
+  "Wind Energy": "/icons/tower-crane.svg",
+  // Crane Rental and "Lift Planning & Engineering" have no dedicated icon
+  // asset — both fall through to the /icons/crane.svg default below, which
+  // (for Crane Rental at least) is the right icon anyway.
+};
 
-/** Right-side vertical tag list in the section header — copy taken
- *  verbatim from the reference; generic enough to be true of TNT
- *  specifically, not placeholder text borrowed from a different design. */
-const HEADER_TAGS = ["People", "Equipment", "Expertise", "Safer Outcomes"];
+const STAGES: Stage[] = [
+  { index: "01", stage: "Lift", title: "Crane Rental", blurb: "Operated or bare rental — by the day, month, or project, from 8 to 1,300 tons. TNT's core service and the fleet every other capability on this page supports.", icon: "rental", href: "/crane-rental" },
+  { index: "02", stage: "Plan", title: "Lift Planning & Engineering", blurb: "Stamped lift plans, ground-bearing analysis, and crane selection — signed by in-house engineers before a single machine mobilizes.", icon: "engineering" },
+  { index: "03", stage: "Rig", title: "Specialized Rigging", blurb: "Hydraulic gantries, jack-and-slide, and precision skidding where a crane can't reach.", icon: "rigging" },
+  { index: "04", stage: "Move", title: "Machinery Moving", blurb: "SPMTs and skates for turnkey plant relocation — set, aligned, and levelled in place.", icon: "heavylift" },
+  { index: "05", stage: "Store", title: "Industrial Storage", blurb: "Secure indoor and outdoor yards with crane access between phases of work.", icon: "storage" },
+  { index: "06", stage: "Renewable", title: "Wind Energy", blurb: "Turbine erection, blade and component exchange across the wind corridor.", icon: "wind" },
+];
 
 export default function CoreServices() {
   const [colorScheme] = useColorScheme();
@@ -169,39 +126,13 @@ export default function CoreServices() {
 
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         {/* ── Section header ───────────────────────────────────────────── */}
-        {/* COPY NOW MATCHES THE FIGMA REFERENCE VERBATIM (2026-09-22, on
-            request — see the STAGES docblock above for the full "keep ours"
-            → "no, match the image" correction). "Full-Scope Capability" /
-            "One Partner, End to End" are gone; this is the reference's own
-            eyebrow/heading/intro text. */}
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <Eyebrow>Services</Eyebrow>
-            <h2
-              className={`mt-3 font-display text-4xl leading-[0.95] tracking-wide uppercase sm:text-5xl ${dark ? "text-white" : "text-black"}`}
-            >
-              Real Solutions
-              <br />
-              <span className="text-tnt-amber">For a Heavier Tomorrow.</span>
-            </h2>
-            <p
-              className={`mt-4 max-w-xl font-body text-base leading-relaxed ${dark ? "text-white/60" : "text-black/60"}`}
-            >
-              From crane rentals to engineered lift planning, we deliver
-              specialized solutions to keep your projects moving safely and
-              efficiently.
-            </p>
-          </div>
-
-          <ul
-            className={`flex shrink-0 flex-col gap-1.5 border-l pl-5 font-body text-[13px] font-semibold tracking-[0.08em] uppercase ${
-              dark ? "border-tnt-amber/60 text-white/70" : "border-tnt-amber/60 text-black/70"
-            }`}
+        <div className="max-w-3xl">
+          <Eyebrow>Full-Scope Capability</Eyebrow>
+          <h2
+            className={`mt-3 font-display text-4xl leading-[0.95] tracking-tight uppercase sm:text-5xl ${dark ? "text-white" : "text-black"}`}
           >
-            {HEADER_TAGS.map((tag) => (
-              <li key={tag}>{tag}</li>
-            ))}
-          </ul>
+            One Partner, End to End
+          </h2>
         </div>
 
         {/* ── Stages 01–06 — the grid ──────────────────────────────────── */}
@@ -209,140 +140,105 @@ export default function CoreServices() {
             and assistive tech should hear "1 of 6" rather than a pile of cards.
             The lifecycle lives in the STAGE labels and numbering rather than
             in a drawn spine or a featured lead card — a 3-across grid has no
-            single path to trace, and no card is bigger than another (Crane
-            Rental included, since 2026-09-11 — see the docblock above).
+            single path to trace, and no card is bigger than another.
             Equal heights come from the grid + `h-full` + column flex, not from
             trimming the copy. */}
-        <ol className="mt-10 grid gap-4 sm:mt-12 sm:grid-cols-2 lg:grid-cols-5">
+        <ol className="mt-10 grid gap-4 sm:mt-12 sm:grid-cols-2 lg:grid-cols-3">
           {STAGES.map((s) => (
             <li
               key={s.index}
-              id={s.id ?? slugify(s.title)}
+              id={slugify(s.title)}
               className="svc-tile group relative scroll-mt-32"
             >
               {/* No shadow at any state. Depth comes from the hairline border
                   going gold, a barely-there gold wash, and a 2px lift — enough
-                  to register as interactive without a drop shadow. Every
-                  card leads with a full-bleed photo (all 5 stages have one),
-                  cropping in on hover the same way EquipmentGuide's fleet
-                  gallery does. */}
+                  to register as interactive without a drop shadow. */}
               <article
-                className={`relative flex h-full flex-col overflow-hidden rounded-xl border transition-[translate,border-color,background-color] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:border-tnt-amber focus-within:border-tnt-amber ${
+                className={`relative flex h-full flex-col rounded-xl border p-5 transition-[translate,border-color,background-color] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:border-tnt-amber group-hover:bg-tnt-amber/[0.06] focus-within:border-tnt-amber sm:p-6 ${
                   dark
                     ? "border-white/12 bg-white/[0.03]"
                     : "border-black/12 bg-black/[0.03]"
                 }`}
               >
-                <div className="relative aspect-4/3 overflow-hidden">
-                  <Image
-                    src={s.photo!}
-                    alt=""
-                    fill
-                    sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                  />
-                </div>
-
-                <div className="flex flex-1 flex-col p-5 sm:p-6">
-                  {/* Small line icon + a short amber rule underneath —
-                      matches the "REAL SOLUTIONS" reference's mark below
-                      each photo. Plain <Icon>, not an image asset: every
-                      stage's `icon` is already a valid IconName. */}
-                  <Icon name={s.icon} className="h-7 w-7 text-tnt-amber" strokeWidth={1.5} />
+                <div className="flex items-start justify-between gap-3">
+                  {/* Icon well */}
                   <span
-                    aria-hidden="true"
-                    className="mt-2 h-px w-6 bg-tnt-amber transition-all duration-300 group-hover:w-9"
-                  />
-
-                  <h3
-                    className={`mt-3 font-display text-lg tracking-wide uppercase ${dark ? "text-white" : "text-black"}`}
+                    className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-tnt-amber/10 text-tnt-amber transition-colors duration-300 ${
+                      dark
+                        ? "group-hover:bg-tnt-amber group-hover:text-black"
+                        : "group-hover:bg-black group-hover:text-tnt-amber"
+                    }`}
                   >
-                    {s.title}
-                  </h3>
-                  <p
-                    className={`mt-2 font-body text-[13px] leading-relaxed ${dark ? "text-white/60" : "text-black/60"}`}
-                  >
-                    {s.blurb}
-                  </p>
-
-                  {/* Crane Rental's expanded sub-list (2026-09-22, matching
-                      the reference's own treatment of card 01 only). */}
-                  {s.sublist && (
-                    <ul
-                      className={`mt-3 flex flex-col gap-1 border-t pt-3 ${dark ? "border-white/10" : "border-black/10"}`}
-                    >
-                      {s.sublist.map((item) => (
-                        <li key={item.label}>
-                          {/* Real, independently-clickable link (relative
-                              z-10 lifts it above the card's stretched
-                              overlay link below) — not just an affordance
-                              like the card-level Learn More/Explore. */}
-                          <Link
-                            href={item.href}
-                            className={`relative z-10 flex items-center gap-1.5 font-body text-[12px] font-semibold hover:text-tnt-amber ${
-                              dark ? "text-white/70" : "text-black/70"
-                            }`}
-                          >
-                            {item.label}
-                            <Icon name="arrow" className="h-3 w-3 text-tnt-amber" />
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  {/* Spacer pushes the Learn More/Explore row to a common
-                      baseline across the row regardless of sub-list length. */}
-                  <div className="flex-1" />
-
-                  {/* Learn more / Explore + circular arrow button — the
-                      whole card is the hit area via the stretched link
-                      below, so this is the affordance, not the target. */}
-                  <div
-                    className={`mt-4 flex items-center justify-between border-t pt-4 ${dark ? "border-white/10" : "border-black/10"}`}
-                  >
+                    <Image
+                      src={STAGE_ICONS[s.title] ?? "/icons/crane.svg"}
+                      alt=""
+                      width={24}
+                      height={24}
+                      unoptimized
+                      className={`h-6 w-6 object-contain transition-[filter] duration-300 [filter:brightness(0)_saturate(100%)_invert(63%)_sepia(65%)_saturate(721%)_hue-rotate(352deg)_brightness(97%)_contrast(101%)] ${
+                        dark ? "group-hover:[filter:brightness(0)_saturate(100%)]" : ""
+                      }`}
+                    />
+                  </span>
+                  <span className="flex items-center gap-2 pt-1">
                     <span
-                      className={`font-mono text-xs font-semibold tracking-[0.1em] uppercase transition-colors duration-300 group-hover:text-tnt-amber ${
-                        dark ? "text-white" : "text-black"
+                      className={`font-mono text-[11px] tabular-nums transition-colors duration-300 group-hover:text-tnt-amber ${
+                        dark ? "text-white/30" : "text-black/30"
                       }`}
                     >
-                      {s.sublist ? "Explore" : "Learn more"}
+                      {s.index}
                     </span>
-                    <span
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 group-hover:border-tnt-amber group-hover:bg-tnt-amber ${
-                        dark ? "border-white/25" : "border-black/25"
-                      }`}
-                    >
-                      <Icon
-                        name="arrow"
-                        className={`h-4 w-4 -rotate-45 text-tnt-amber transition-colors duration-300 group-hover:text-black`}
-                      />
+                    <span className="font-body text-[10px] font-bold tracking-[0.2em] text-tnt-amber uppercase">
+                      {s.stage}
                     </span>
-                  </div>
+                  </span>
                 </div>
+
+                <h3
+                  className={`mt-5 font-display text-xl tracking-wide uppercase ${dark ? "text-white" : "text-black"}`}
+                >
+                  {s.title}
+                </h3>
+                {/* flex-1 pushes the CTA to a common baseline across the row,
+                    so blurbs of different lengths still align. */}
+                <p
+                  className={`mt-2 flex-1 font-body text-[13px] leading-relaxed ${dark ? "text-white/60" : "text-black/60"}`}
+                >
+                  {s.blurb}
+                </p>
+
+                {/* Hairline separator instead of a shadow to divide the card's
+                    body from its action. */}
+                <span
+                  aria-hidden="true"
+                  className={`mt-5 block h-px w-full transition-colors duration-300 group-hover:bg-tnt-amber/40 ${
+                    dark ? "bg-white/10" : "bg-black/10"
+                  }`}
+                />
+
+                {/* Learn more — the whole card is the hit area via the stretched
+                    link, so this is the affordance, not the target. */}
+                <span
+                  className={`mt-4 flex items-center gap-2 font-body text-sm font-semibold transition-colors duration-300 group-hover:text-tnt-amber ${
+                    dark ? "text-white" : "text-black"
+                  }`}
+                >
+                  Learn more
+                  <Icon
+                    name="arrow"
+                    className="h-4 w-4 text-tnt-amber transition-transform duration-300 group-hover:translate-x-1"
+                  />
+                </span>
 
                 {/* Stretched link: one focusable element per card, full-card hit
                     area, and a real focus ring — a div with onClick would give
                     none of those.
-                    NOTE: there is no per-service detail page for most stages
-                    yet, so those still convert to the quote form. `?service=`
-                    is carried so whoever wires the form up can pre-select the
-                    capability; nothing reads it today.
-                    The path was `/contact` until 2026-08-04; that route is gone
-                    and the quote form now lives on this page, so this is a
-                    PATH-RELATIVE url — it keeps the query param while resolving
-                    to the current page rather than a deleted one.
-                    Crane Rental is the one exception (2026-09-18, on request):
-                    `s.href` points at its own dedicated page instead.
-
-                    NEXT/LINK, NOT A PLAIN <a> (2026-09-18, on request — "why
-                    is it taking more time to load"): a plain <a> to
-                    /crane-rental forced a full browser navigation (confirmed
-                    via `performance.getEntriesByType("navigation")[0].type
-                    === "navigate"`) — the whole page reloading from scratch
-                    instead of Next's normal instant client-side route swap.
-                    <Link> restores that (and still resolves the query-param
-                    fallback correctly for every other stage). */}
+                    Crane Rental is the one exception: `s.href` points at its
+                    own dedicated page (/crane-rental) instead of the shared
+                    quote-form anchor every other stage still uses. <Link>,
+                    not a plain <a> — a plain <a> forced a full page reload
+                    instead of Next's client-side route swap (measured via
+                    `performance.getEntriesByType("navigation")[0].type`). */}
                 <Link
                   href={s.href ?? `?service=${slugify(s.title)}#quote`}
                   className="absolute inset-0 rounded-xl focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:ring-offset-2 focus-visible:outline-none"
@@ -356,40 +252,34 @@ export default function CoreServices() {
           ))}
         </ol>
 
-        {/* ── Closing row — tagline + skewed CTA banner ───────────────────── */}
-        {/* Replaces the old solid-amber "One partner..." panel (2026-09-22,
-            on request, "REAL SOLUTIONS FOR A HEAVIER TOMORROW" reference —
-            that reference has no full-width panel at all, just this
-            bottom-left tagline / bottom-right CTA pairing). The parallelogram
-            skew is a CSS `clip-path`, not a `transform: skew` — a transform
-            would tilt the button's own text with it; clip-path only cuts the
-            visible shape, so "Discuss Your Project" stays upright. */}
-        <div className="mt-14 flex flex-col items-start justify-between gap-8 sm:mt-16 lg:flex-row lg:items-center">
-          <div>
-            <span
-              aria-hidden="true"
-              className="mb-3 block h-px w-8 bg-tnt-amber"
-            />
-            <p
-              className={`font-display text-2xl leading-[0.95] tracking-wide uppercase sm:text-3xl ${dark ? "text-white" : "text-black"}`}
-            >
-              Built for
-              <br />
-              <span className="text-tnt-amber">What&rsquo;s Next.</span>
-            </p>
+        {/* ── Closing CTA ──────────────────────────────────────────────── */}
+        {/* Solid amber fill — the site's standard bg-tnt-amber + text-black
+            pairing (same convention as the nav CTA, active chips, etc.).
+            Buttons drop `onDark` since the fill itself is light — primary/
+            secondary "light" skins (black fill / black outline) are what
+            read on amber. */}
+        <div className="mt-12 overflow-hidden rounded-2xl bg-tnt-amber sm:mt-14">
+          <div className="flex flex-col gap-7 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between lg:p-12">
+            <div>
+              <p className="font-display text-2xl leading-tight tracking-wide text-black uppercase sm:text-3xl lg:text-4xl">
+                One partner.
+                <br />
+                From lift planning to final set.
+              </p>
+              <p className="mt-3 max-w-lg font-body text-sm leading-relaxed text-black/70 sm:text-base">
+                Tell us the load, the site, and the window. We&rsquo;ll scope the
+                rest.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
+              <Button href="#quote" variant="primary">
+                Request a quote
+              </Button>
+              <Button href="#contact" variant="secondary">
+                Talk to an engineer
+              </Button>
+            </div>
           </div>
-
-          <Link
-            href="#quote"
-            className="group relative inline-flex items-center gap-3 bg-tnt-amber py-5 pr-10 pl-12 font-body text-sm font-bold tracking-[0.08em] text-black uppercase transition-colors duration-300 hover:bg-tnt-amber-vivid"
-            style={{ clipPath: "polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%)" }}
-          >
-            Discuss Your Project
-            <Icon
-              name="arrow"
-              className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
-            />
-          </Link>
         </div>
       </div>
     </section>
