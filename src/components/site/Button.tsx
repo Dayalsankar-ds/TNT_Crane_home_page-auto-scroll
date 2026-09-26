@@ -12,6 +12,22 @@
  * maroon, the nav). Every variant shares the same amber arrow that nudges right
  * on hover — the one consistent, on-brand motion across the site.
  *
+ * PRESS ANIMATION (2026-09-24, on request — "I want a button animation",
+ * against the TNT Button design system in Figma, node 195:50): that file
+ * defines Default/Hover/Pressed/Disabled as four separate states for every
+ * style, but this component only ever had two — a static look plus a hover
+ * color swap, no Pressed state at all. Checked Figma's own motion data for
+ * this node directly (`get_motion_context`) and it came back empty — the
+ * file is a static state-swatch reference, not an animated prototype, so
+ * there was no specific easing/timing spec to copy; the animation itself is
+ * this component's own addition to close that gap; `active:scale-[0.97]`
+ * gives every variant a real tactile press-down on click/tap, not just a
+ * color change, eased back out on release via the same `transition-transform`
+ * that already drives the arrow's hover nudge. `active:` in the Tailwind
+ * sense (the `:active` pseudo-class, i.e. "currently being pressed") should
+ * not be confused with `onDark`'s "active"/current styling elsewhere in this
+ * codebase — different meaning entirely.
+ *
  * Renders an <a> when `href` is set, otherwise a <button>.
  */
 
@@ -64,7 +80,7 @@ export default function Button({
     variant === "link"
       ? "rounded-sm focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
       : "focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:ring-offset-2 focus-visible:outline-none";
-  const cls = `group inline-flex items-center gap-2 font-body text-sm font-semibold transition-colors ${skin} ${ring} ${className}`;
+  const cls = `group inline-flex items-center gap-2 font-body text-sm font-semibold transition-[color,background-color,border-color,transform] duration-150 ease-out active:scale-[0.97] ${skin} ${ring} ${className}`;
 
   // Amber arrow everywhere except the amber-filled primary-on-dark button,
   // where amber-on-amber would vanish — there it follows the (black) text.

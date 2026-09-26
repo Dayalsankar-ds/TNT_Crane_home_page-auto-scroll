@@ -17,15 +17,21 @@
  * tagline is set here as real text instead, in the site's own type.
  *
  * LIGHT BY DEFAULT (2026-09-15, on request — "iCARE needs to be in light
- * theme"): the section shell is `bg-white`, every white/N text/border
- * utility that existed to read against a dark fill is the equivalent
- * black/N, and the pillar/badge chip fills are `bg-black/5`. The iCARE
- * badge PNG and the amber accents are unchanged — both read fine on white.
- * This used to be conditional on a "Theme 1/2" toggle (Theme 2 swapping the
- * band to dark slate) — that toggle was removed project-wide 2026-09-23,
- * on request, so the section now always renders its Theme 1 (light) look;
- * only the genuine Light/Dark viewer preference (colorSchemeStore) can
- * still force it dark.
+ * theme"): every white/N text/border utility that existed to read against a
+ * dark fill is the equivalent black/N, and the pillar/badge chip fills are
+ * `bg-black/5`. The iCARE badge PNG and the amber accents are unchanged —
+ * both read fine on either fill. This used to be conditional on a
+ * "Theme 1/2" toggle (Theme 2 swapping the band to dark slate) — that
+ * toggle was removed project-wide 2026-09-23, on request, so the section
+ * now always renders its Theme 1 (light) look; only the genuine Light/Dark
+ * viewer preference (colorSchemeStore) can still force it dark.
+ *
+ * LIGHT-MODE SHELL IS `bg-tnt-gray` (2026-09-24, on request — "add grey bg
+ * on this section, we are not showing difference on bg between the
+ * sections"): was `bg-white`, same as CoverageMap/BranchLocator above it and
+ * ContactSection below it, so three sections in a row read as one
+ * undifferentiated block. `tnt-gray` (#eeeeee) is the token globals.css
+ * itself documents for exactly this — "alternating section backgrounds".
  *
  * 2026-07-30: the certification-chip row briefly moved to a new strip right
  * after the hero (CertificationsStrip), to avoid the same five badges
@@ -68,7 +74,7 @@ export default function SafetyCulture() {
   return (
     <section
       id="safety"
-      className={`scroll-mt-32 ${dark ? "bg-tnt-slate" : "bg-white"}`}
+      className={`scroll-mt-32 ${dark ? "bg-tnt-slate" : "bg-tnt-gray"}`}
     >
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div className="grid items-center gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">

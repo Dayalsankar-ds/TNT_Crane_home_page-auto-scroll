@@ -7,6 +7,14 @@
  * only: on submit it shows a success state — there is NO backend yet, so wire
  * the handler to a real endpoint/email service before launch. Services are
  * multi-select chips (reusing the Coverage filter-pill treatment).
+ *
+ * LIGHT-MODE SHELL IS `bg-tnt-gray` (2026-09-26, on request — same "add grey
+ * bg" ask SafetyCulture.tsx got, for the same reason: this section sat right
+ * after ContactSection, both `bg-white`, so they ran together with no
+ * visible seam. `tnt-gray` (#eeeeee) is globals.css's own token for exactly
+ * this — "alternating section backgrounds". The form/success card underneath
+ * stays `bg-white` — it now reads as a card floating on the grey band rather
+ * than blending into it, same pattern the floating map cards use.
  */
 
 import { useState, type FormEvent } from "react";
@@ -43,7 +51,7 @@ export default function RequestQuote() {
   };
 
   return (
-    <section id="quote" className="scroll-mt-32 bg-white dark:bg-black">
+    <section id="quote" className="scroll-mt-32 bg-tnt-gray dark:bg-black">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,22rem)_1fr] lg:gap-16">
           {/* Left — statement */}
