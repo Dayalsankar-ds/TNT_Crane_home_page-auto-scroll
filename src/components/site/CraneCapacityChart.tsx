@@ -207,7 +207,26 @@ export default function CraneCapacityChart() {
         )}
       </div>
 
-      <div data-lenis-prevent className="hidden max-h-[60vh] overflow-auto overscroll-contain sm:block sm:max-h-[32rem]">
+      {/* `relative` (2026-09-29, on request — /load-chart's page height was
+          inflating to ~8000px): each row's `sr-only` type label is
+          `position: absolute` (Tailwind's standard screen-reader-only
+          recipe) with no offset, so it takes its "static position" from
+          normal flow — but with no positioned ancestor between it and the
+          document root, that containing block is the initial containing
+          block, not this scrollable div. The static position is computed
+          against the table's full, UNCLIPPED 157-row layout, so the last
+          row's label lands ~8000px down and inflates
+          `document.documentElement.scrollHeight` (not `body`'s — a real,
+          if obscure, containing-block quirk) regardless of this div's own
+          `overflow-auto` clipping. This never surfaced before because
+          EquipmentGuide.tsx only ever renders this component inside a
+          `position: fixed` modal, which incidentally already supplied a
+          containing block — /load-chart/page.tsx is the first place this
+          renders in normal page flow without one. `relative` here (a
+          visual no-op on its own) makes THIS div the containing block
+          instead, scoping every such descendant back inside the box that's
+          already correctly capped. */}
+      <div data-lenis-prevent className="relative hidden max-h-[60vh] overflow-auto overscroll-contain sm:block sm:max-h-[32rem]">
         <table className="w-full border-collapse font-body text-sm">
           <thead className="sticky top-0 z-10 bg-tnt-navy dark:bg-tnt-amber">
             <tr className="border-b border-white/10 text-left text-[10px] tracking-[0.12em] text-white/50 uppercase sm:text-[11px] sm:tracking-[0.14em] dark:border-black/10 dark:text-black/50">

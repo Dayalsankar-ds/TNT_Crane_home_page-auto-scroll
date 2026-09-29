@@ -39,7 +39,7 @@
 
 import dynamic from "next/dynamic";
 import { useCallback, useMemo, useState } from "react";
-import { Search, Phone, Building2 } from "lucide-react";
+import { Search, Phone, Building2, MapPin } from "lucide-react";
 import RevealText from "./RevealText";
 import Button from "./Button";
 import { useColorScheme } from "./colorSchemeStore";
@@ -75,7 +75,11 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
   const [selectedId, setSelectedId] = useState<string | null>("hou");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  // Matches city, state (code or full name), region, and operating brand.
+  // Matches city, state (code or full name), region, operating brand, and
+  // ZIP code (2026-09-29, on request — "search by using zip code"). ZIP only
+  // matches branches with real address data on file (branchLocatorData.ts's
+  // `address` field, currently 16 of 44) — there's no fabricated ZIP to
+  // search for the rest.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return branches.filter((b) => {
@@ -85,7 +89,8 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
         b.city.toLowerCase().includes(q) ||
         b.state.toLowerCase().includes(q) ||
         b.region.toLowerCase().includes(q) ||
-        b.brand.toLowerCase().includes(q)
+        b.brand.toLowerCase().includes(q) ||
+        (b.address?.zip.toLowerCase().includes(q) ?? false)
       );
     });
   }, [branches, query, country]);
@@ -165,7 +170,7 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
             }`}
           >
             <label htmlFor="branch-search" className="sr-only">
-              Search by city, state, or branch
+              Search by city, state, ZIP code, or branch
             </label>
             <div className="flex items-center gap-2 rounded-lg bg-black/5 px-3 py-2 ring-1 ring-black/15 focus-within:ring-tnt-amber dark:bg-white/10 dark:ring-white/20">
               <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-black/60 dark:text-white/70" />
@@ -174,7 +179,7 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="City, state, or branch…"
+                placeholder="City, state, ZIP, or branch…"
                 className="w-full bg-transparent font-body text-sm text-black placeholder:text-black/40 focus:outline-none dark:text-white dark:placeholder:text-white/50"
               />
             </div>
@@ -254,11 +259,51 @@ export default function BranchLocator({ branches }: BranchLocatorData) {
                 Operated by {selected.brand}
               </p>
 
-              {/* Contact number — a DUMMY, per-branch placeholder for now (see
-                  branchLocatorData.ts's dummyPhone) until the TNT team
-                  supplies real per-location numbers. Shown as its own row,
-                  not buried in a bottom link, so it reads as real branch
-                  info at a glance once it is. */}
+              {/* Address / directions (2026-09-29, on request — "redirect
+                  to gmap to check the exact distance from their current
+                  location"): links to Google Maps' directions view with
+                  ONLY a destination set (no origin) — Maps fills the
+                  origin in with the visitor's own current location itself
+                  (prompting for permission if needed), so this needs no
+                  geolocation handling on our side. Destination is lat/lng,
+                  not the street address string: every branch has real
+                  coordinates (branchLocatorData.ts's SEEDS), but only 16 of
+                  44 have a real street address (see BranchLocator's own
+                  note above), so lat/lng is what makes this work for every
+                  branch, not just those 16. Real address text (where it
+                  exists) is still shown as the link's label — more useful
+                  than a bare "Get directions" — it's just not what's
+                  actually passed to Maps. */}
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${selected.lat},${selected.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 flex items-start gap-2 font-body text-sm text-black/70 transition-colors hover:text-tnt-amber dark:text-white/80"
+              >
+                <MapPin
+                  aria-hidden="true"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-tnt-amber"
+                />
+                <span>
+                  {selected.address ? (
+                    <>
+                      {selected.address.street}
+                      <br />
+                      {selected.city} {selected.address.zip}
+                    </>
+                  ) : (
+                    "Get directions"
+                  )}
+                </span>
+              </a>
+
+              {/* Contact number — real per-branch line where
+                  branchLocatorData.ts found one (the 16 TNT Crane & Rigging
+                  branches, via navigation.ts's LOCATION_DETAILS); a DUMMY
+                  placeholder for the rest until the TNT team supplies real
+                  numbers for them too. Shown as its own row, not buried in
+                  a bottom link, so it reads as real branch info at a
+                  glance. */}
               <a
                 href={selected.phone.href}
                 className="mt-4 flex items-center gap-2 font-mono text-base font-semibold text-black transition-colors hover:text-tnt-amber dark:text-white"

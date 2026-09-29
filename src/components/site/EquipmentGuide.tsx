@@ -74,34 +74,13 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Eyebrow, Icon, type IconName } from "./primitives";
+import { Eyebrow, Icon } from "./primitives";
 import Button from "./Button";
 import CraneCapacityChart from "./CraneCapacityChart";
 import { slugify } from "./navigation";
-import { FLEET_PHOTOS, PHOTOS, IMG, GRADIENTS } from "./photos";
+import { FLEET_TYPES } from "./fleetTypes";
 import { useColorScheme } from "./colorSchemeStore";
 import { useCapacityChartOpen } from "./capacityChartStore";
-
-type FleetType = {
-  name: string;
-  icon: IconName;
-  photo: string;
-  /** True only for FLEET_PHOTOS's real, locally-hosted set — drives the
-   *  "Stock photo" corner tag below, so a genuine TNT photo and a stand-in
-   *  Unsplash one are never presented as if they were the same kind of
-   *  claim. */
-  isRealFleetPhoto: boolean;
-  gradient: string;
-};
-
-const FLEET_TYPES: FleetType[] = [
-  { name: "All-Terrain Cranes", icon: "allterrain", photo: FLEET_PHOTOS.allTerrainCrane, isRealFleetPhoto: true, gradient: GRADIENTS.navy },
-  { name: "Crawler Cranes", icon: "crawler", photo: FLEET_PHOTOS.crawlerCrane, isRealFleetPhoto: true, gradient: GRADIENTS.slate },
-  { name: "Hydraulic Truck Cranes", icon: "boom", photo: FLEET_PHOTOS.hydraulicTruckCrane, isRealFleetPhoto: true, gradient: GRADIENTS.maroon },
-  { name: "Rough-Terrain Cranes", icon: "transport", photo: IMG(PHOTOS.roughTerrainCrane, 800), isRealFleetPhoto: false, gradient: GRADIENTS.navy },
-  { name: "Carry Deck Cranes", icon: "carrydeck", photo: IMG(PHOTOS.carryDeckCrane, 800), isRealFleetPhoto: false, gradient: GRADIENTS.slate },
-  { name: "Tower Cranes", icon: "tower", photo: IMG(PHOTOS.towerCrane, 800), isRealFleetPhoto: false, gradient: GRADIENTS.maroon },
-];
 
 export default function EquipmentGuide() {
   // Opens the full capacity chart (restored 2026-09-17, on request — it

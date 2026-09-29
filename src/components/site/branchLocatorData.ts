@@ -11,7 +11,7 @@
  * it. One source, so the map and the nav can't disagree.
  */
 
-import { servicesForRegion, type RegionId } from "./navigation";
+import { servicesForRegion, slugify, LOCATION_DETAILS, type RegionId } from "./navigation";
 
 export type Country = "US" | "CA";
 
@@ -31,8 +31,15 @@ type Seed = {
 export type Branch = Seed & {
   /** Capabilities this branch's operating company actually offers. */
   services: string[];
-  /** PLACEHOLDER per-branch line — see DUMMY PHONE NUMBERS below. */
+  /** Real per-branch line where navigation.ts's LOCATION_DETAILS has one
+   *  (currently the 16 TNT Crane & Rigging branches); a DUMMY placeholder
+   *  otherwise — see DUMMY PHONE NUMBERS below. */
   phone: { display: string; href: string };
+  /** Full street address + zip, real data from navigation.ts's
+   *  LOCATION_DETAILS. Undefined where no real address exists yet (every
+   *  branch outside TNT Crane & Rigging) — omit the address in the UI
+   *  rather than showing a fabricated one. */
+  address?: { street: string; zip: string };
 };
 
 /**
@@ -50,11 +57,18 @@ const BRAND_REGION: Record<string, RegionId | null> = {
 };
 
 /**
- * DUMMY PHONE NUMBERS (2026-09-23, on request — "each location has an
- * individual contact number... use dummy for now, we'll collect the real
- * ones from the TNT team later"). Every branch had been sharing its BRAND's
- * one real dispatch number (ContactSection.tsx's Regional Dispatch list) —
- * accurate but not per-LOCATION, which is what was asked for.
+ * DUMMY PHONE NUMBERS — FALLBACK ONLY (2026-09-23, on request — "each
+ * location has an individual contact number... use dummy for now, we'll
+ * collect the real ones from the TNT team later"). Every branch had been
+ * sharing its BRAND's one real dispatch number (ContactSection.tsx's
+ * Regional Dispatch list) — accurate but not per-LOCATION, which is what
+ * was asked for.
+ *
+ * NARROWED TO A FALLBACK (2026-09-29): real per-branch numbers turned up in
+ * navigation.ts's LOCATION_DETAILS (added for the Services location picker)
+ * for the 16 TNT Crane & Rigging branches — buildBranchLocator() below uses
+ * those directly now. This generator only fires for the other 28 branches,
+ * which still have no real number on file.
  *
  * These are UNMISTAKABLY placeholders, not real numbers: "555-555-01XX"
  * doubles up on the NANP's own reserved fictional exchange (555-0100–
@@ -135,10 +149,19 @@ export type BranchLocatorData = {
 
 export function buildBranchLocator(): BranchLocatorData {
   return {
-    branches: SEEDS.map((b, i) => ({
-      ...b,
-      services: servicesForRegion(BRAND_REGION[b.brand] ?? null),
-      phone: dummyPhone(i + 1),
-    })),
+    branches: SEEDS.map((b, i) => {
+      // slugify(b.city) matches LOCATION_DETAILS's own keys exactly — both
+      // are built from "City, ST" strings the same way (e.g. "Houston, TX"
+      // → "houston-tx").
+      const details = LOCATION_DETAILS[slugify(b.city)];
+      return {
+        ...b,
+        services: servicesForRegion(BRAND_REGION[b.brand] ?? null),
+        phone: details
+          ? { display: details.phone, href: `tel:+${details.phone.replace(/\D/g, "")}` }
+          : dummyPhone(i + 1),
+        address: details ? { street: details.address, zip: details.zip } : undefined,
+      };
+    }),
   };
 }

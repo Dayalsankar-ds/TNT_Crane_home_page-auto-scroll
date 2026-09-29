@@ -72,12 +72,6 @@ export type NavFeature = {
   blurb: string;
   href: string;
   cta: string;
-  /** When true, the cta opens the shared capacity-chart modal
-   *  (capacityChartStore.ts) instead of following `href` — added
-   *  2026-09-18, on request, for Fleet's "View Full Capacity Chart" so it
-   *  opens the SAME popup as the button on About the Fleet, not just a
-   *  scroll to the section. */
-  ctaOpensCapacityChart?: boolean;
 };
 
 export type NavGroup = {
@@ -206,8 +200,19 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     // Renamed from "Equipment" on 2026-09-10 to the client's "Fleet", then
     // to "Load Chart" on 2026-09-23, on request.
+    //
+    // POINTS AT A DEDICATED PAGE (2026-09-29, on request — "I want to have
+    // dedicated page for all list of 6 cranes"): all 7 links here used to be
+    // same-page anchors into the homepage's EquipmentGuide.tsx ("About the
+    // Fleet"). That section is unchanged; these now land on /load-chart
+    // instead, a new page showing the same 6 crane types (reusing
+    // EquipmentGuide's own FLEET_TYPES) plus the full capacity chart
+    // (CraneCapacityChart.tsx) inline — see that page's own docblock. The
+    // capacity-chart CTA no longer opens EquipmentGuide's modal
+    // (`ctaOpensCapacityChart` removed) — it's a plain link to that page's
+    // #capacity-chart section now.
     label: "Load Chart",
-    href: "/#fleet-guide",
+    href: "/load-chart",
     columns: [
       {
         no: "01",
@@ -215,16 +220,17 @@ export const NAV_GROUPS: NavGroup[] = [
         // grid) replaced 2026-09-13, on request, with "About the Fleet" —
         // matching tntcrane.com's own homepage section of that name. These 6
         // items are its exact crane-type list; hrefs match EquipmentGuide.tsx's
-        // FLEET_TYPES array exactly. `meta` stays dropped — the source section
+        // FLEET_TYPES array exactly (now on /load-chart, not the homepage —
+        // see the note above). `meta` stays dropped — the source section
         // is a plain list, no capacity ranges to show per item.
         heading: "About the Fleet",
         items: [
-          { index: "01", label: "All-Terrain Cranes", icon: "allterrain", href: `/#${slugify("All-Terrain Cranes")}` },
-          { index: "02", label: "Crawler Cranes", icon: "crawler", href: `/#${slugify("Crawler Cranes")}` },
-          { index: "03", label: "Hydraulic Truck Cranes", icon: "boom", href: `/#${slugify("Hydraulic Truck Cranes")}` },
-          { index: "04", label: "Rough-Terrain Cranes", icon: "transport", href: `/#${slugify("Rough-Terrain Cranes")}` },
-          { index: "05", label: "Carry Deck Cranes", icon: "carrydeck", href: `/#${slugify("Carry Deck Cranes")}` },
-          { index: "06", label: "Tower Cranes", icon: "tower", href: `/#${slugify("Tower Cranes")}` },
+          { index: "01", label: "All-Terrain Cranes", icon: "allterrain", href: `/load-chart#${slugify("All-Terrain Cranes")}` },
+          { index: "02", label: "Crawler Cranes", icon: "crawler", href: `/load-chart#${slugify("Crawler Cranes")}` },
+          { index: "03", label: "Hydraulic Truck Cranes", icon: "boom", href: `/load-chart#${slugify("Hydraulic Truck Cranes")}` },
+          { index: "04", label: "Rough-Terrain Cranes", icon: "transport", href: `/load-chart#${slugify("Rough-Terrain Cranes")}` },
+          { index: "05", label: "Carry Deck Cranes", icon: "carrydeck", href: `/load-chart#${slugify("Carry Deck Cranes")}` },
+          { index: "06", label: "Tower Cranes", icon: "tower", href: `/load-chart#${slugify("Tower Cranes")}` },
         ],
       },
     ],
@@ -233,9 +239,8 @@ export const NAV_GROUPS: NavGroup[] = [
       title: "700+ cranes, six classes",
       blurb:
         "All-terrain to tower cranes, plus the specialized rigging equipment that moves what a crane alone can't.",
-      href: "/#fleet-guide",
+      href: "/load-chart#capacity-chart",
       cta: "View Full Capacity Chart",
-      ctaOpensCapacityChart: true,
     },
   },
   // The three inert items. Each was a real route until 2026-08-04 and has no

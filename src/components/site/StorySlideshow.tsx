@@ -49,7 +49,7 @@ import {
   useState,
   type TouchEvent,
 } from "react";
-import { Icon, type IconName } from "./primitives";
+import { Eyebrow, Icon, type IconName } from "./primitives";
 import Button from "./Button";
 
 type Slide = {
@@ -261,13 +261,45 @@ export default function StorySlideshow() {
              colliding at narrower widths; that's fine here since the bar
              below repeats the same copy for those widths anyway. */}
           <div className="pointer-events-none absolute inset-y-0 left-8 flex w-[36%] max-w-md items-center">
-            {/* Wrapping div (not just the <p>) carries the key/fade now,
-                so "Learn more" re-plays the same per-slide fade instead of
-                sitting static beneath an animating paragraph. */}
-            <div key={index} className="story-fade-up">
-              <p className="font-body text-xl leading-relaxed text-white lg:text-2xl">
-                {current.description}
-              </p>
+            <div>
+              {/* Eyebrow/heading are static labels for the SECTION, not the
+                  slide — on request, only the description itself should
+                  move on slide change; these no longer sit inside the keyed
+                  wrapper below, so they never remount/re-animate. */}
+              <Eyebrow>Who We Are</Eyebrow>
+              <h2 className="mt-3 font-display text-3xl tracking-wide text-white uppercase lg:text-4xl">
+                About Us
+              </h2>
+              {/* Reserves height for the TALLEST description at whatever the
+                  current viewport width is, so switching to a shorter/longer
+                  one never changes this block's height — which is what was
+                  shifting the heading/button above/below it (the column is
+                  vertically centered via `items-center` on the parent, so
+                  any height change recentered the whole block). All 7 sit
+                  invisibly stacked in the same grid cell via `[grid-area:1/1]`
+                  (real CSS Grid auto-sizing, not a guessed pixel value, so it
+                  stays correct if the copy ever changes) — the real,
+                  animated paragraph below is absolutely positioned over that
+                  reserved space and keyed on `index` so only IT replays the
+                  fade. */}
+              <div className="relative mt-4">
+                <div aria-hidden="true" className="invisible grid">
+                  {SLIDES.map((s) => (
+                    <p
+                      key={s.label}
+                      className="col-start-1 row-start-1 font-body text-xl leading-relaxed lg:text-2xl"
+                    >
+                      {s.description}
+                    </p>
+                  ))}
+                </div>
+                <p
+                  key={index}
+                  className="story-fade-up absolute inset-0 font-body text-xl leading-relaxed text-white lg:text-2xl"
+                >
+                  {current.description}
+                </p>
+              </div>
               {/* pointer-events-auto: the wrapper above is pointer-events-none
                   (it overlays the photo without blocking clicks through to
                   it), so the button has to opt back in to be clickable —
