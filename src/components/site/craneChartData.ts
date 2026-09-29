@@ -5,14 +5,21 @@
  * manufacturer load-chart PDF (hosted on tntcrane.com — same source, not
  * re-hosted here).
  *
- * The site"s own icon taxonomy only exposes 4 top-level types (Mobile &
- * All-Terrain, Rough-Terrain, Crawler, Rigging & Machinery Moving) rather
- * than the page"s marketing copy claim of 7 — those 4 are what the live
- * data actually carries per row, so that"s what ships here rather than a
- * guessed-at finer split.
+ * ALL-TERRAIN SPLIT OUT (2026-09-29, on request — populating the dedicated
+ * /load-chart/all-terrain-cranes page): the site"s own top-level icon
+ * taxonomy only ever exposed 4 classes here (Mobile & All-Terrain,
+ * Rough-Terrain, Crawler, Rigging & Machinery Moving), collapsing All-Terrain
+ * into the broader "mobile" bucket alongside unrelated truck/carry-deck
+ * cranes. tntcrane.com/crane-charts/ actually has a genuine "All-Terrain
+ * Cranes" filter of its own (checked live, 2026-09-29) — the 46 models it
+ * returns are the ones re-tagged "all-terrain" below, matched by exact
+ * make+model. The remaining "mobile" rows are what's left once those 46 are
+ * pulled out — Broderson/National-Sterling/Manitex-style truck and
+ * carry-deck cranes — so the label changes from the now-inaccurate "Mobile &
+ * All-Terrain" to "Mobile & Truck Cranes".
  */
 
-export type CraneType = "mobile" | "rough-terrain" | "crawler" | "rigging";
+export type CraneType = "all-terrain" | "mobile" | "rough-terrain" | "crawler" | "rigging";
 
 export type CraneModel = {
   type: CraneType;
@@ -24,7 +31,8 @@ export type CraneModel = {
 };
 
 export const CRANE_TYPE_LABELS: Record<CraneType, string> = {
-  mobile: "Mobile & All-Terrain",
+  "all-terrain": "All-Terrain Cranes",
+  mobile: "Mobile & Truck Cranes",
   "rough-terrain": "Rough-Terrain",
   crawler: "Crawler",
   rigging: "Rigging & Machinery Moving",
@@ -89,7 +97,7 @@ export const CRANE_MODELS: CraneModel[] = [
   { type: "rigging", make: "Lift Systems", model: "4066SCT", capacityTons: 66, chartHref: "https://tntcrane.com/wp-content/uploads/2025/02/Lift-Systems-4066sct.pdf" },
   { type: "rough-terrain", make: "Grove", model: "RT 770E", capacityTons: 70, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_RT770E.pdf" },
   { type: "mobile", make: "Link-Belt", model: "HTC-8670", capacityTons: 70, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt_HTC-8670.pdf" },
-  { type: "mobile", make: "Tadano", model: "ATF 70G-4", capacityTons: 75, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_ATF-70G-4.pdf" },
+  { type: "all-terrain", make: "Tadano", model: "ATF 70G-4", capacityTons: 75, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_ATF-70G-4.pdf" },
   { type: "rough-terrain", make: "Tadano", model: "GR-750XL-2", capacityTons: 75, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_GR-750XL-2.pdf" },
   { type: "rough-terrain", make: "Tadano", model: "GR-750XL", capacityTons: 75, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_GR-750XL.pdf" },
   { type: "mobile", make: "Terex", model: "T 775", capacityTons: 75, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex_T-775.pdf" },
@@ -106,8 +114,8 @@ export const CRANE_MODELS: CraneModel[] = [
   { type: "rough-terrain", make: "Grove", model: "RT 890E", capacityTons: 90, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_RT890E.pdf" },
   { type: "mobile", make: "Link-Belt", model: "HTC-8690", capacityTons: 90, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt_HTC-8690.pdf" },
   { type: "mobile", make: "Terex", model: "Roadmaster 9000", capacityTons: 90, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex_Roadmaster-9000.pdf" },
-  { type: "mobile", make: "Demag", model: "AC 80-2", capacityTons: 100, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_AC-80-2.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 4100B", capacityTons: 100, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-4100B.pdf" },
+  { type: "all-terrain", make: "Demag", model: "AC 80-2", capacityTons: 100, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_AC-80-2.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 4100B", capacityTons: 100, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-4100B.pdf" },
   { type: "crawler", make: "Kobelco", model: "CK1000", capacityTons: 100, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Kobelco_CK1000.pdf" },
   { type: "mobile", make: "Link-Belt", model: "HTC-86100", capacityTons: 100, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt_HTC-86100.pdf" },
   { type: "rough-terrain", make: "Tadano", model: "GR-1000XL-2", capacityTons: 100, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_GR-1000XL-2.pdf" },
@@ -115,77 +123,77 @@ export const CRANE_MODELS: CraneModel[] = [
   { type: "rough-terrain", make: "Tadano", model: "GR-1000XL", capacityTons: 100, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_GR-1000XL.pdf" },
   { type: "rough-terrain", make: "Grove", model: "GRT 8100", capacityTons: 100, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GRT8100.pdf" },
   { type: "rigging", make: "Enerpac", model: "RC10010", capacityTons: 103, chartHref: "https://tntcrane.com/wp-content/uploads/2025/02/Enerpac-RC10010.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1090-4.1", capacityTons: 110, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1090-4.1.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1090-4.2", capacityTons: 110, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1090-4.2.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1090-4.1", capacityTons: 110, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1090-4.1.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1090-4.2", capacityTons: 110, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1090-4.2.pdf" },
   { type: "crawler", make: "Kobelco", model: "CK1100G", capacityTons: 110, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Kobelco_CK1100G.pdf" },
   { type: "crawler", make: "Link-Belt", model: "TCC-1100", capacityTons: 110, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt_TCC-1100.pdf" },
   { type: "crawler", make: "Link-Belt", model: "LS-218", capacityTons: 110, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt_LS-218H.pdf" },
   { type: "mobile", make: "Grove", model: "TMS 9000E", capacityTons: 110, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_TMS9000E.pdf" },
   { type: "mobile", make: "Grove", model: "TMS 9000E-2", capacityTons: 115, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_TMS9000-2.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1095-5.1", capacityTons: 120, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1095-5.1.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5120B", capacityTons: 120, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5120B.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1100-5.2", capacityTons: 120, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1100-5.2.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1100-2", capacityTons: 120, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1100-2.pdf" },
-  { type: "mobile", make: "Tadano", model: "ATF 110G-5", capacityTons: 130, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_ATF110G-5.pdf" },
-  { type: "mobile", make: "Link-Belt", model: "ATC-3130", capacityTons: 130, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt_ATC-3130.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1095-5.1", capacityTons: 120, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1095-5.1.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5120B", capacityTons: 120, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5120B.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1100-5.2", capacityTons: 120, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1100-5.2.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1100-2", capacityTons: 120, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1100-2.pdf" },
+  { type: "all-terrain", make: "Tadano", model: "ATF 110G-5", capacityTons: 130, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_ATF110G-5.pdf" },
+  { type: "all-terrain", make: "Link-Belt", model: "ATC-3130", capacityTons: 130, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt_ATC-3130.pdf" },
   { type: "rough-terrain", make: "Grove", model: "RT 9130E", capacityTons: 130, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_RT9130E.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5135", capacityTons: 135, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5135.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5135", capacityTons: 135, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5135.pdf" },
   { type: "mobile", make: "Link-Belt", model: "HTC-3140LB", capacityTons: 140, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt_HTC-3140.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1130-5.1", capacityTons: 150, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1130-5.1.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1130-5.1", capacityTons: 150, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1130-5.1.pdf" },
   { type: "crawler", make: "Manitowoc", model: "555", capacityTons: 150, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Manitowoc_555.pdf" },
   { type: "rough-terrain", make: "Grove", model: "RT 9150E", capacityTons: 150, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_RT9150E.pdf" },
-  { type: "mobile", make: "Tadano", model: "ATF 130G-5", capacityTons: 160, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_ATF130G-5.pdf" },
+  { type: "all-terrain", make: "Tadano", model: "ATF 130G-5", capacityTons: 160, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_ATF130G-5.pdf" },
   { type: "rough-terrain", make: "Tadano", model: "GR-1600XL", capacityTons: 160, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_GR-1600XL.pdf" },
   { type: "rough-terrain", make: "Tadano", model: "GR-1600XL-3", capacityTons: 160, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_GR-1600XL-3.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5165-2", capacityTons: 165, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5165-2.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5165", capacityTons: 165, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5165.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5165-2", capacityTons: 165, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5165-2.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5165", capacityTons: 165, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5165.pdf" },
   { type: "rough-terrain", make: "Grove", model: "GRT 9165", capacityTons: 165, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GRT9165.pdf" },
-  { type: "mobile", make: "Terex-Demag", model: "AC 140", capacityTons: 170, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_AC-140.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5170", capacityTons: 170, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5170.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5150L", capacityTons: 175, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5150L.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1160-5.2", capacityTons: 190, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1160-5.2.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1160-5.1", capacityTons: 190, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1160-5.1.pdf" },
-  { type: "mobile", make: "Terex-Demag", model: "AC 160-2", capacityTons: 190, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-160-2.pdf" },
+  { type: "all-terrain", make: "Terex-Demag", model: "AC 140", capacityTons: 170, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_AC-140.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5170", capacityTons: 170, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5170.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5150L", capacityTons: 175, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5150L.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1160-5.2", capacityTons: 190, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1160-5.2.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1160-5.1", capacityTons: 190, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1160-5.1.pdf" },
+  { type: "all-terrain", make: "Terex-Demag", model: "AC 160-2", capacityTons: 190, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-160-2.pdf" },
   { type: "crawler", make: "Liebherr", model: "LR 1160", capacityTons: 200, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LR-1160.pdf" },
   { type: "crawler", make: "Manitowoc", model: "14000", capacityTons: 220, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Manitowoc_14000.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5225", capacityTons: 225, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5225.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1200-5.1", capacityTons: 240, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1200-5.1.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5200-1", capacityTons: 240, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5200-1.pdf" },
-  { type: "mobile", make: "Terex-Demag", model: "AC 220-5", capacityTons: 245, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-220-5.pdf" },
-  { type: "mobile", make: "Demag", model: "AC 220-5", capacityTons: 245, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_AC-220-5.pdf" },
-  { type: "mobile", make: "Link-Belt", model: "ATC-3250", capacityTons: 250, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt-ATC-3250.pdf" },
-  { type: "mobile", make: "Tadano", model: "ATF 220G-5", capacityTons: 250, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_ATF-220G-5.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1220-5.1", capacityTons: 265, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1200-5.1.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1220-5.2", capacityTons: 265, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1220-5.2.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5225", capacityTons: 225, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5225.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1200-5.1", capacityTons: 240, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1200-5.1.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5200-1", capacityTons: 240, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5200-1.pdf" },
+  { type: "all-terrain", make: "Terex-Demag", model: "AC 220-5", capacityTons: 245, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-220-5.pdf" },
+  { type: "all-terrain", make: "Demag", model: "AC 220-5", capacityTons: 245, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_AC-220-5.pdf" },
+  { type: "all-terrain", make: "Link-Belt", model: "ATC-3250", capacityTons: 250, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Link-Belt-ATC-3250.pdf" },
+  { type: "all-terrain", make: "Tadano", model: "ATF 220G-5", capacityTons: 250, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Tadano_ATF-220G-5.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1220-5.1", capacityTons: 265, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1200-5.1.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1220-5.2", capacityTons: 265, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1220-5.2.pdf" },
   { type: "crawler", make: "Liebherr", model: "LTR 1220", capacityTons: 265, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTR-1220.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5275", capacityTons: 275, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5275.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5275", capacityTons: 275, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5275.pdf" },
   { type: "crawler", make: "Terex", model: "HC 275", capacityTons: 275, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex_HC-275.pdf" },
   { type: "crawler", make: "Manitowoc", model: "999 III", capacityTons: 275, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Manitowoc_999.pdf" },
-  { type: "mobile", make: "Terex-Demag", model: "AC 250-1", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-250-1.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1250-6.1", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1250-6.1.pdf" },
-  { type: "mobile", make: "Terex", model: "AC 250-1", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex_AC-250-1.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1250-5.1", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1250-5.1.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 5250L", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5250L.pdf" },
+  { type: "all-terrain", make: "Terex-Demag", model: "AC 250-1", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-250-1.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1250-6.1", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1250-6.1.pdf" },
+  { type: "all-terrain", make: "Terex", model: "AC 250-1", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex_AC-250-1.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1250-5.1", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1250-5.1.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 5250L", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-5250L.pdf" },
   { type: "crawler", make: "Liebherr", model: "LR 1280", capacityTons: 300, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LR-1280.pdf" },
   { type: "crawler", make: "Liebherr", model: "LR 1300 SX", capacityTons: 330, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LR-1300-SX.pdf" },
   { type: "crawler", make: "Liebherr", model: "LR 1300", capacityTons: 330, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LR-1300.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 6300", capacityTons: 350, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-6300.pdf" },
-  { type: "mobile", make: "Grove", model: "GMK 6350", capacityTons: 350, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-6350.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1300-6.2", capacityTons: 350, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1300-6.2.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 6300", capacityTons: 350, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-6300.pdf" },
+  { type: "all-terrain", make: "Grove", model: "GMK 6350", capacityTons: 350, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Grove_GMK-6350.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1300-6.2", capacityTons: 350, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1300-6.2.pdf" },
   { type: "crawler", make: "Liebherr", model: "LR 1350-1", capacityTons: 400, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LR-1350-1.pdf" },
   { type: "crawler", make: "Manitowoc", model: "16000", capacityTons: 440, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Manitowoc_16000.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1400-7.1", capacityTons: 500, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1400-7.1.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1400-7.1", capacityTons: 500, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1400-7.1.pdf" },
   { type: "rigging", make: "Hydra-Slide", model: "HT500", capacityTons: 500, chartHref: "https://tntcrane.com/wp-content/uploads/2025/02/Hydra-Slide-HT500.pdf" },
   { type: "rigging", make: "Enerpac", model: "SBL500", capacityTons: 585, chartHref: "https://tntcrane.com/wp-content/uploads/2025/02/Enerpac-SBL500.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1500-8.1", capacityTons: 625, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1500-8.1.pdf" },
-  { type: "mobile", make: "Terex-Demag", model: "AC 500-2", capacityTons: 625, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-500-2.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1500-8.1", capacityTons: 625, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1500-8.1.pdf" },
+  { type: "all-terrain", make: "Terex-Demag", model: "AC 500-2", capacityTons: 625, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-500-2.pdf" },
   { type: "crawler", make: "Demag", model: "CC 2800", capacityTons: 660, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_CC-2800.pdf" },
   { type: "crawler", make: "Liebherr", model: "LR 1600-2", capacityTons: 660, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LR-1600-2.pdf" },
   { type: "crawler", make: "Demag", model: "CC 3800 SL", capacityTons: 715, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_CC-3800-SL.pdf" },
   { type: "crawler", make: "Liebherr", model: "LR 1700-1.0", capacityTons: 770, chartHref: "https://tntcrane.com/wp-content/uploads/2026/06/lr_1700-1.0.pdf" },
-  { type: "mobile", make: "Terex-Demag", model: "AC 700", capacityTons: 800, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-700.pdf" },
-  { type: "mobile", make: "Demag", model: "AC 700-9", capacityTons: 800, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_AC-700-9.pdf" },
+  { type: "all-terrain", make: "Terex-Demag", model: "AC 700", capacityTons: 800, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Terex-Demag_AC-700.pdf" },
+  { type: "all-terrain", make: "Demag", model: "AC 700-9", capacityTons: 800, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Demag_AC-700-9.pdf" },
   { type: "crawler", make: "Manitowoc", model: "18000", capacityTons: 825, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Manitowoc_18000.pdf" },
-  { type: "mobile", make: "Liebherr", model: "LTM 1750-9.1", capacityTons: 900, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1750-9.1.pdf" },
+  { type: "all-terrain", make: "Liebherr", model: "LTM 1750-9.1", capacityTons: 900, chartHref: "https://tntcrane.com/wp-content/uploads/2023/10/Liebherr_LTM-1750-9.1.pdf" },
   { type: "rigging", make: "Enerpac", model: "SBL1100", capacityTons: 1178, chartHref: "https://tntcrane.com/wp-content/uploads/2025/02/Enerpac-SBL1100.pdf" },
 ];

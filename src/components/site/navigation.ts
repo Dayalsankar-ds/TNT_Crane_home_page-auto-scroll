@@ -201,46 +201,39 @@ export const NAV_GROUPS: NavGroup[] = [
     // Renamed from "Equipment" on 2026-09-10 to the client's "Fleet", then
     // to "Load Chart" on 2026-09-23, on request.
     //
-    // POINTS AT A DEDICATED PAGE (2026-09-29, on request — "I want to have
-    // dedicated page for all list of 6 cranes"): all 7 links here used to be
+    // /load-chart PAGE REMOVED, TITLES KEPT (2026-09-29, on request —
+    // "Except all terrain Cranes page remove all the other individual
+    // pages", then corrected same day: "Keep the title on the nav bar I ask
+    // you to remove the page only"): only the /load-chart overview page
+    // itself is gone — all 6 crane-type titles stay in this dropdown.
+    // All-Terrain Cranes keeps its own dedicated page
+    // (/load-chart/all-terrain-cranes); the other 5, with no page of their
+    // own anymore, revert to what they were before /load-chart existed —
     // same-page anchors into the homepage's EquipmentGuide.tsx ("About the
-    // Fleet"). That section is unchanged; these now land on /load-chart
-    // instead, a new page showing the same 6 crane types (reusing
-    // EquipmentGuide's own FLEET_TYPES) plus the full capacity chart
-    // (CraneCapacityChart.tsx) inline — see that page's own docblock. The
-    // capacity-chart CTA no longer opens EquipmentGuide's modal
-    // (`ctaOpensCapacityChart` removed) — it's a plain link to that page's
-    // #capacity-chart section now.
+    // Fleet"), via that section's own `id={slugify(t.name)}` per card.
     label: "Load Chart",
-    href: "/load-chart",
+    href: "/load-chart/all-terrain-cranes",
     columns: [
       {
         no: "01",
-        // Rigging & Attachments (6 categories, its own compare-modal card
-        // grid) replaced 2026-09-13, on request, with "About the Fleet" —
-        // matching tntcrane.com's own homepage section of that name. These 6
-        // items are its exact crane-type list; hrefs match EquipmentGuide.tsx's
-        // FLEET_TYPES array exactly (now on /load-chart, not the homepage —
-        // see the note above). `meta` stays dropped — the source section
-        // is a plain list, no capacity ranges to show per item.
         heading: "About the Fleet",
         items: [
-          { index: "01", label: "All-Terrain Cranes", icon: "allterrain", href: `/load-chart#${slugify("All-Terrain Cranes")}` },
-          { index: "02", label: "Crawler Cranes", icon: "crawler", href: `/load-chart#${slugify("Crawler Cranes")}` },
-          { index: "03", label: "Hydraulic Truck Cranes", icon: "boom", href: `/load-chart#${slugify("Hydraulic Truck Cranes")}` },
-          { index: "04", label: "Rough-Terrain Cranes", icon: "transport", href: `/load-chart#${slugify("Rough-Terrain Cranes")}` },
-          { index: "05", label: "Carry Deck Cranes", icon: "carrydeck", href: `/load-chart#${slugify("Carry Deck Cranes")}` },
-          { index: "06", label: "Tower Cranes", icon: "tower", href: `/load-chart#${slugify("Tower Cranes")}` },
+          { index: "01", label: "All-Terrain Cranes", icon: "allterrain", href: "/load-chart/all-terrain-cranes" },
+          { index: "02", label: "Crawler Cranes", icon: "crawler", href: `/#${slugify("Crawler Cranes")}` },
+          { index: "03", label: "Hydraulic Truck Cranes", icon: "boom", href: `/#${slugify("Hydraulic Truck Cranes")}` },
+          { index: "04", label: "Rough-Terrain Cranes", icon: "transport", href: `/#${slugify("Rough-Terrain Cranes")}` },
+          { index: "05", label: "Carry Deck Cranes", icon: "carrydeck", href: `/#${slugify("Carry Deck Cranes")}` },
+          { index: "06", label: "Tower Cranes", icon: "tower", href: `/#${slugify("Tower Cranes")}` },
         ],
       },
     ],
     feature: {
       eyebrow: "About the Fleet",
-      title: "700+ cranes, six classes",
+      title: "46 all-terrain models",
       blurb:
-        "All-terrain to tower cranes, plus the specialized rigging equipment that moves what a crane alone can't.",
-      href: "/load-chart#capacity-chart",
-      cta: "View Full Capacity Chart",
+        "75 to 900 tons, every make TNT runs — search and filter the full chart by make or tonnage.",
+      href: "/load-chart/all-terrain-cranes#capacity-chart",
+      cta: "View Capacity Chart",
     },
   },
   // The three inert items. Each was a real route until 2026-08-04 and has no

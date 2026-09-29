@@ -43,6 +43,24 @@ export const PHOTOS = {
   roughTerrainCrane: "photo-1597089038854-6be9a836a40d",
   carryDeckCrane: "photo-1583246820648-e06ee5e2c267",
   towerCrane: "photo-1539269071019-8bc6d57b0205",
+  // ALL-TERRAIN CARD PHOTOS (2026-09-29, on request — "Add different image
+  // on all the cards ... Don't show the same images"): the
+  // /load-chart/all-terrain-cranes card grid has 46 cards but only one real
+  // TNT all-terrain photo (FLEET_PHOTOS.allTerrainCrane) — no rights-cleared
+  // photo exists per individual manufacturer model (see CraneCardGrid.tsx's
+  // own docblock). These 5 are genuine photos of real all-terrain/mobile
+  // telescopic cranes (checked by eye, not just by search term — Unsplash's
+  // "mobile crane"/"telescopic crane truck" results are heavily diluted with
+  // die-cast toy-crane photography and unrelated tower/crawler cranes, both
+  // skipped here), verified HTTP 200 / image/jpeg. Rotated across the grid
+  // alongside the one real photo so no two adjacent cards repeat the same
+  // image — see CraneCardGrid.tsx for the rotation and the "Stock photo" tag
+  // this set carries there.
+  allTerrainStock1: "photo-1781356857510-0be2172fecc1",
+  allTerrainStock2: "photo-1771679910145-3a368d7f537c",
+  allTerrainStock3: "photo-1586458995526-09ce6839babe",
+  allTerrainStock4: "photo-1724556507333-670bf6033737",
+  allTerrainStock5: "photo-1748974467633-2e21ffd9dd94",
 } as const;
 
 /**

@@ -69,58 +69,28 @@
  * backgrounds"), not plain white, so this section reads as its own tinted
  * band between the white Full-Scope Capability section above and whatever
  * follows, rather than blending into either.
+ *
+ * "VIEW FULL CAPACITY CHART" POPUP REMOVED (2026-09-29, on request —
+ * "Remove 'FULL CAPACITY CHART' pop up from main screen"): this section used
+ * to also have a button opening every model TNT operates, in a modal
+ * (CraneCapacityChart.tsx, via the shared capacityChartStore.ts so the Load
+ * Chart nav dropdown's CTA could open the same one). Both the button and the
+ * modal are gone; the label list above is the section's only interaction
+ * now. CraneCapacityChart.tsx and capacityChartStore.ts were this modal's
+ * only consumers, so both files were deleted rather than left orphaned —
+ * see /load-chart/all-terrain-cranes for where model-browsing now actually
+ * lives (CraneCardGrid.tsx, its own light-theme card view).
  */
 
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import Link from "next/link";
 import { Eyebrow, Icon } from "./primitives";
-import Button from "./Button";
-import CraneCapacityChart from "./CraneCapacityChart";
 import { slugify } from "./navigation";
 import { FLEET_TYPES } from "./fleetTypes";
-import { useColorScheme } from "./colorSchemeStore";
-import { useCapacityChartOpen } from "./capacityChartStore";
 
 export default function EquipmentGuide() {
-  // Opens the full capacity chart (restored 2026-09-17, on request — it
-  // previously lived on the now-removed EquipmentFinder section, deleted
-  // 2026-09-10 along with its "Find Your Machine" section; the button and
-  // modal wiring here are that same mechanism, just triggered from About
-  // the Fleet instead) in a modal rather than inline, same reasoning as
-  // before: keep the full filterable table off the page by default.
-  //
-  // Backed by capacityChartStore.ts (2026-09-18, on request), not local
-  // state: the Fleet nav dropdown's "View Full Capacity Chart" CTA
-  // (SiteNav.tsx) needs to open this exact same modal, and that's a
-  // completely separate component tree — a shared store is what lets a
-  // click there flip the same boolean this component reads.
-  const [chartOpen, setChartOpen] = useCapacityChartOpen();
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const closeRef = useRef<HTMLButtonElement>(null);
-  // Drives the button's own dark-mode skin below (2026-09-18, on request:
-  // "change the button color in dark mode") — Button.tsx's colors are
-  // controlled by its `onDark` prop, not a Tailwind `dark:` class, so this
-  // section (which otherwise flips color purely via `dark:` utilities) has
-  // to read the toggle directly for just this one component.
-  const [colorScheme] = useColorScheme();
-
-  useEffect(() => {
-    if (!chartOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setChartOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
-      triggerRef.current?.focus();
-    };
-  }, [chartOpen]);
-
   // Single-photo slideshow — same shape as StorySlideshow.tsx's autoplay:
   // 4s cadence, off while the section is out of view or reduced-motion is
   // on, and any manual pick (clicking a label) restarts the 4s window
@@ -129,6 +99,11 @@ export default function EquipmentGuide() {
   const galleryRef = useRef<HTMLDivElement>(null);
   const inViewRef = useRef(false);
   const reducedMotionRef = useRef(false);
+  // Hovering a label pauses the 4s autoplay (2026-09-29, on request —
+  // "shall we make that changes into while hovering"): without this, the
+  // photo you just hovered to preview could get yanked away mid-look by the
+  // next autoplay tick. Resumes the moment the pointer leaves the list.
+  const hoveringRef = useRef(false);
 
   useEffect(() => {
     reducedMotionRef.current = window.matchMedia(
@@ -152,7 +127,7 @@ export default function EquipmentGuide() {
   useEffect(() => {
     if (reducedMotionRef.current) return;
     const id = setInterval(() => {
-      if (inViewRef.current) {
+      if (inViewRef.current && !hoveringRef.current) {
         setActiveType((i) => (i + 1) % FLEET_TYPES.length);
       }
     }, 4000);
@@ -220,55 +195,89 @@ export default function EquipmentGuide() {
               everything else we do.
             </p>
 
-            {/* Label list — click to jump, active state also driven by the
-                4s autoplay above. Keeps each type's slugified `id` so
-                navigation.ts's Fleet panel deep links still land on
-                something real. */}
-            <ul className="mt-8 flex flex-col gap-2">
-              {FLEET_TYPES.map((t, i) => (
-                <li key={t.name} id={slugify(t.name)} className="scroll-mt-32">
-                  <button
-                    type="button"
-                    onClick={() => selectType(i)}
-                    aria-current={i === activeType ? "true" : undefined}
-                    className={`flex w-full items-center gap-4 rounded-xl border px-5 py-4 text-left transition-colors ${
-                      i === activeType
-                        ? "border-tnt-amber bg-tnt-amber/10"
-                        : "border-transparent hover:border-black/10 dark:hover:border-white/10"
-                    }`}
-                  >
+            {/* Label list — hover to preview, click to jump (click matters
+                on touch, where hover doesn't fire). Active state also
+                driven by the 4s autoplay above, paused while a label is
+                hovered (see `hoveringRef`). Keeps each type's slugified
+                `id` so navigation.ts's Fleet panel deep links still land on
+                something real.
+                HOVER-TO-PREVIEW (2026-09-29, on request — "shall we make
+                that changes into while hovering"): `onMouseEnter` calls the
+                same `selectType` the click handler does — hovering and
+                clicking aren't two different actions, hovering just fires
+                it sooner, on any device with a real pointer.
+                ALL-TERRAIN LINKS OUT (2026-09-29, on request — "if user
+                clicked All terrain from 'About the Fleet' it needs to take
+                the dedicated page"): every other label just swaps the
+                slideshow photo in place, but All-Terrain Cranes is the one
+                type with its own real page
+                (/load-chart/all-terrain-cranes — 46 real models, searchable
+                and filterable), so its label is a `Link` there instead of a
+                `selectType` button — hovering it still previews its photo,
+                same as the rest, before you click through. Same visual
+                treatment either way (icon + label, active-state ring), so
+                the row doesn't visually call out which one behaves
+                differently until you click it. */}
+            <ul
+              className="mt-8 flex flex-col gap-2"
+              onMouseEnter={() => {
+                hoveringRef.current = true;
+              }}
+              onMouseLeave={() => {
+                hoveringRef.current = false;
+              }}
+            >
+              {FLEET_TYPES.map((t, i) => {
+                const isActive = i === activeType;
+                const content = (
+                  <>
                     <Icon
                       name={t.icon}
                       className={`h-8 w-8 shrink-0 ${
-                        i === activeType ? "text-tnt-amber" : "text-black/40 dark:text-white/40"
+                        isActive ? "text-tnt-amber" : "text-black/40 dark:text-white/40"
                       }`}
                       strokeWidth={1.5}
                     />
                     <span
                       className={`font-body text-base font-semibold ${
-                        i === activeType ? "text-black dark:text-white" : "text-black/60 dark:text-white/60"
+                        isActive ? "text-black dark:text-white" : "text-black/60 dark:text-white/60"
                       }`}
                     >
                       {t.name}
                     </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
+                  </>
+                );
+                const itemClassName = `flex w-full items-center gap-4 rounded-xl border px-5 py-4 text-left transition-colors ${
+                  isActive
+                    ? "border-tnt-amber bg-tnt-amber/10"
+                    : "border-transparent hover:border-black/10 dark:hover:border-white/10"
+                }`;
 
-            {/* Opens the full capacity chart — every model TNT operates,
-                filterable by class and searchable by make/model, each
-                linking its real manufacturer load-chart PDF — in a modal. */}
-            <Button
-              ref={triggerRef}
-              type="button"
-              variant="primary"
-              onDark={colorScheme === "dark"}
-              onClick={() => setChartOpen(true)}
-              className="mt-8"
-            >
-              View Full Capacity Chart
-            </Button>
+                return (
+                  <li key={t.name} id={slugify(t.name)} className="scroll-mt-32">
+                    {t.name === "All-Terrain Cranes" ? (
+                      <Link
+                        href="/load-chart/all-terrain-cranes"
+                        onMouseEnter={() => selectType(i)}
+                        className={itemClassName}
+                      >
+                        {content}
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => selectType(i)}
+                        onMouseEnter={() => selectType(i)}
+                        aria-current={isActive ? "true" : undefined}
+                        className={itemClassName}
+                      >
+                        {content}
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
           {/* ── SIDE B — photo ───────────────────────────────────────── */}
@@ -313,45 +322,6 @@ export default function EquipmentGuide() {
           </div>
         </div>
       </div>
-
-      {chartOpen && (
-        // `data-lenis-prevent`: Lenis owns the wheel globally, so without it
-        // a wheel over this overlay smooth-scrolls the (locked, overflow:
-        // hidden) page behind it instead of this dialog's own content.
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="capacity-chart-heading"
-          data-lenis-prevent
-          className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-black/70 p-4 py-10 sm:p-8"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) setChartOpen(false);
-          }}
-        >
-          <div className="relative mx-auto w-full max-w-5xl">
-            <button
-              ref={closeRef}
-              type="button"
-              onClick={() => setChartOpen(false)}
-              aria-label="Close capacity chart"
-              className="absolute -top-3 -right-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-tnt-navy text-white hover:border-tnt-amber hover:text-tnt-amber focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
-            >
-              <svg
-                viewBox="0 0 20 20"
-                aria-hidden="true"
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-              >
-                <path d="m5 5 10 10M15 5 5 15" />
-              </svg>
-            </button>
-            <CraneCapacityChart />
-          </div>
-        </div>
-      )}
     </section>
   );
 }
