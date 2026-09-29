@@ -7,11 +7,11 @@
 // public/video/frames-v6/*.webp frame. The pre-R3F implementation is still
 // further back in git history if ever needed: git show
 // 5d89d04:src/components/HeroScrollExperience.tsx
-// FamilyStripV2 rendered directly as of 2026-09-13, on request — Nav
-// version 1's FamilyStrip.tsx (the diagonal-panel + 2x2 grid design) is
-// hidden, unrendered on disk; see that file's own docblock for what's still
-// there vs. what's live. FamilyStripV2 no longer depends on navVersion at
-// all here — it renders regardless of which Nav version is active.
+// FamilyStripV2 rendered directly as of 2026-09-13, on request. Nav version
+// 1's FamilyStrip.tsx (the diagonal-panel + 2x2 grid design) and the "Nav
+// 1/2" picker it was compared against were both deleted outright 2026-09-29,
+// on request ("we are going with Nav Version 2") — see FamilyStripV2.tsx's
+// own docblock for the fuller history.
 import FamilyStripV2 from "@/components/site/FamilyStripV2";
 import StatementSection from "@/components/site/StatementSection";
 import EquipmentGuide from "@/components/site/EquipmentGuide";

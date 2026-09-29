@@ -43,15 +43,12 @@ import TopInfoBar from "./TopInfoBar";
 import { Icon } from "./primitives";
 import LocationSelect, { wasEscapeHandled } from "./LocationSelect";
 import { CHROME_H } from "./chrome";
-import { useNavVersion } from "./navVersionStore";
 import Image from "next/image";
 import {
-  FAMILY_BRANDS,
   FAMILY_FILTERS,
   NAV_GROUPS,
   SERVICE_LOCATIONS,
   activeGroup,
-  brandOf,
   servicesPanelFor,
   type LocationId,
   type NavColumn,
@@ -82,19 +79,12 @@ export default function SiteNav() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileSection, setMobileSection] = useState<string | null>(null);
-  const [versionPickerOpen, setVersionPickerOpen] = useState(false);
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
-  // Shared with FamilyStrip/FamilyStripV2 via a module-level store — see
-  // navVersionStore.ts for why this isn't local useState anymore.
-  const [navVersion, setNavVersion] = useNavVersion();
-  // Nav version 1 drops the About group entirely (2026-09-12, on request,
-  // for design comparison) — version 2 keeps the full nav unchanged. Both
-  // versions still share every other group; this is the one deliberate
-  // difference between them at the top level.
-  const visibleNavGroups =
-    navVersion === "one"
-      ? NAV_GROUPS.filter((g) => g.label !== "About")
-      : NAV_GROUPS;
+  // Used to be conditional on a "Nav 1/2" toggle (Nav version 1 dropped the
+  // About group entirely, for design comparison) — removed project-wide
+  // 2026-09-29, on request ("we are going with Nav Version 2"), so this is
+  // just NAV_GROUPS directly now, unconditionally.
+  const visibleNavGroups = NAV_GROUPS;
   // Which region the Services panel is filtered to. Held here rather than in
   // the panel so the choice survives closing and reopening the menu — someone
   // who told us they're in the Gulf Coast shouldn't have to say it twice.
@@ -470,7 +460,7 @@ export default function SiteNav() {
                     inner padding 8/10→6/8 hand ~128px to the grid. The panel's
                     own `max-w-7xl` and `py-12` are deliberately untouched. */}
                 <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-                  {localized && navVersion === "two" && (
+                  {localized && (
                     <FamilyFilters
                       value={location}
                       onChange={(next) => {
@@ -543,8 +533,6 @@ export default function SiteNav() {
                         {feature.cta}
                         <Icon name="arrow" className="h-5 w-5" />
                       </Link>
-
-                        {localized && navVersion === "one" && <FamilyMarks location={location} />}
                     </div>
                   </div>
                   </div>
@@ -733,100 +721,16 @@ export default function SiteNav() {
       </div>
 
       </header>
-      {/* Single pill button (2026-09-02: was a stacked column of two; the
-          About version picker that used to sit alongside this one was
-          removed outright 2026-09-23, on request — it toggled StorySlideshow
-          layout variants that no longer exist, so it had gone dead). Keeps
-          its own popover directly above it via its flex-col wrapper. */}
-      <div className="fixed right-4 bottom-4 z-[60] flex items-end gap-2 sm:right-6 sm:bottom-6">
-        <div className="flex flex-col items-end gap-2">
-          {versionPickerOpen && (
-            <div
-              id="nav-version-picker"
-              className="flex flex-col gap-1 rounded-md border border-white/15 bg-tnt-slate p-1 shadow-xl shadow-black/30"
-              role="group"
-              aria-label="Navigation versions"
-            >
-              {(["one", "two"] as const).map((version) => (
-                <button
-                  key={version}
-                  type="button"
-                  onClick={() => setNavVersion(version)}
-                  aria-pressed={navVersion === version}
-                  className={`min-w-28 rounded-sm px-3 py-2 text-left font-mono text-xs tracking-[0.12em] uppercase transition-colors ${
-                    navVersion === version
-                      ? "bg-tnt-amber text-black"
-                      : "text-white/75 hover:bg-white/10 hover:text-white"
-                  }`}
-                >
-                  Nav version {version === "one" ? "1" : "2"}
-                </button>
-              ))}
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={() => setVersionPickerOpen((open) => !open)}
-            aria-expanded={versionPickerOpen}
-            aria-controls="nav-version-picker"
-            className="rounded-full border border-tnt-amber bg-tnt-amber px-4 py-2.5 font-mono text-xs font-semibold tracking-[0.1em] text-black uppercase shadow-lg shadow-black/25 transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-tnt-amber focus-visible:outline-none"
-          >
-            Nav / {navVersion === "one" ? "01" : "02"}
-          </button>
-        </div>
-      </div>
+      {/* The floating "Nav / 01" version-picker pill that used to sit here
+          (bottom-right) was removed outright 2026-09-29, on request — "we
+          are going with Nav Version 2" (confirmed, permanent), so there's
+          no longer a version to pick. The About version picker that once
+          sat alongside it was already removed 2026-09-23 for the same
+          reason (see git history if either is ever wanted back). */}
     </>
   );
 }
 
-/**
- * Operating-company marks under the feature card.
- *
- * Each logo sits directly on the menu surface. The supplied marks carry their
- * own black blocks or white lettering, so the menu does not add a white chip
- * behind them or alter their brand colours.
- *
- * `fill` + object-contain rather than fixed width/height: the marks run from
- * 2:1 (TNT) to 4:1 (Southway), so one width/height pair would letterbox some
- * and crop others. The chip is the frame; each logo fits itself inside it.
- */
-function FamilyMarks({ location }: { location: LocationId }) {
-  const one = brandOf(location);
-  const marks = one ? (one.logo ? [{ brand: one.brand, logo: one.logo }] : []) : FAMILY_BRANDS;
-
-  return (
-    <div className="mt-7 border-t border-black/10 pt-5 dark:border-white/10">
-      <p className="font-mono text-[10px] tracking-[0.14em] text-black/40 uppercase dark:text-white/40">
-        {one ? "Operated by" : "Operating companies"}
-      </p>
-      {marks.length > 0 ? (
-        <ul className="mt-3 flex flex-wrap gap-2">
-          {marks.map((mark) => (
-            <li
-              key={mark.brand}
-              className="relative h-10 w-[108px] rounded-sm bg-transparent p-1.5"
-              aria-label={mark.brand}
-            >
-              <Image
-                src={mark.logo}
-                alt=""
-                aria-hidden="true"
-                fill
-                sizes="108px"
-                unoptimized
-                className="object-contain"
-              />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-2 font-body text-sm font-semibold text-black/80 dark:text-white/80">
-          {one?.brand}
-        </p>
-      )}
-    </div>
-  );
-}
 
 function FamilyFilters({
   value,

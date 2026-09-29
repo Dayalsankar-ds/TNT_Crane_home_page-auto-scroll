@@ -16,7 +16,7 @@
  * business surviving a reload.
  *
  * Same plain-module + `useSyncExternalStore` pattern as the other stores
- * in this directory (colorSchemeStore.ts, navVersionStore.ts, etc.).
+ * in this directory (colorSchemeStore.ts, etc.).
  */
 
 import { useSyncExternalStore } from "react";

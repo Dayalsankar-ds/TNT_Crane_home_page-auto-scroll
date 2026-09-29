@@ -184,59 +184,54 @@ export default function EquipmentGuide() {
               more than 700 cranes
             </h2>
 
-            {/* The two closing paragraphs from the live site. Its own copy
-                links "Specialized Rigging"/"Machinery Moving"/"Industrial
-                Storage" out to those service pages — reproduced here as
-                same-page anchors to CoreServices.tsx's own stage cards
-                (identical slugs: `slugify("Specialized Rigging")` etc.),
-                since those are the real equivalent sections on THIS site. */}
+            {/* Condensed to one paragraph (2026-09-29, on request — "can we
+                reduce this content"): was two paragraphs, the first an
+                itemized equipment list (gantry lift systems, jack & slide
+                systems, machinery skates, etc.). Still links "Specialized
+                Rigging"/"Machinery Moving"/"Industrial Storage" out to those
+                service pages — same-page anchors to CoreServices.tsx's own
+                stage cards (identical slugs: `slugify("Specialized
+                Rigging")` etc.), since those are the real equivalent
+                sections on THIS site. */}
             <p className="mt-6 font-body text-base leading-relaxed text-tnt-body">
-              TNT Crane &amp; Rigging is also proud to provide an extended
-              fleet of{" "}
+              TNT Crane &amp; Rigging also offers an extended fleet of{" "}
               <a
                 href="#specialized-rigging"
                 className="font-semibold text-tnt-amber underline-offset-2 hover:underline"
               >
                 Specialized Rigging
               </a>{" "}
-              equipment including Hydraulic Gantry Lift Systems, Jack &amp;
-              Slide Systems, Machinery Skates, Specialized Forklifts,
-              Cantilever Bars, Self-Propelled Modular Transporters, and other
-              Specialized Rigging Equipment.
-            </p>
-            <p className="mt-4 font-body text-base leading-relaxed text-tnt-body">
-              Need expert{" "}
+              equipment, expert{" "}
               <a
                 href="#machinery-moving"
                 className="font-semibold text-tnt-amber underline-offset-2 hover:underline"
               >
                 Machinery Moving
-              </a>{" "}
-              or secure{" "}
+              </a>
+              , and secure{" "}
               <a
                 href="#industrial-storage"
                 className="font-semibold text-tnt-amber underline-offset-2 hover:underline"
               >
                 Industrial Storage
-              </a>
-              ? TNT Crane &amp; Rigging has you covered — from precision
-              equipment relocation to complex rigging in tight spaces and
-              safe storage solutions, we handle it all with efficiency and
-              care.
+              </a>{" "}
+              — from precision equipment relocation to complex rigging in
+              tight spaces, handled with the same efficiency and care as
+              everything else we do.
             </p>
 
             {/* Label list — click to jump, active state also driven by the
                 4s autoplay above. Keeps each type's slugified `id` so
                 navigation.ts's Fleet panel deep links still land on
                 something real. */}
-            <ul className="mt-8 flex flex-col gap-1">
+            <ul className="mt-8 flex flex-col gap-2">
               {FLEET_TYPES.map((t, i) => (
                 <li key={t.name} id={slugify(t.name)} className="scroll-mt-32">
                   <button
                     type="button"
                     onClick={() => selectType(i)}
                     aria-current={i === activeType ? "true" : undefined}
-                    className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-colors ${
+                    className={`flex w-full items-center gap-4 rounded-xl border px-5 py-4 text-left transition-colors ${
                       i === activeType
                         ? "border-tnt-amber bg-tnt-amber/10"
                         : "border-transparent hover:border-black/10 dark:hover:border-white/10"
@@ -244,13 +239,13 @@ export default function EquipmentGuide() {
                   >
                     <Icon
                       name={t.icon}
-                      className={`h-6 w-6 shrink-0 ${
+                      className={`h-8 w-8 shrink-0 ${
                         i === activeType ? "text-tnt-amber" : "text-black/40 dark:text-white/40"
                       }`}
                       strokeWidth={1.5}
                     />
                     <span
-                      className={`font-body text-sm font-semibold ${
+                      className={`font-body text-base font-semibold ${
                         i === activeType ? "text-black dark:text-white" : "text-black/60 dark:text-white/60"
                       }`}
                     >

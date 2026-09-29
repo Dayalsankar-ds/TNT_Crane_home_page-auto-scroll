@@ -1,10 +1,13 @@
 "use client";
 
 /**
- * FAMILY STRIP V2 — alternate Family-of-Companies section, gated behind the
- * "Nav / 02" picker (see navVersionStore.ts). New design, not a variant of
- * FamilyStrip.tsx — deliberately a different composition so the picker has
- * something meaningfully different to compare:
+ * FAMILY STRIP V2 — the Family-of-Companies section. Originally gated
+ * behind a "Nav / 02" picker (see git history for navVersionStore.ts) so it
+ * could be compared side by side with FamilyStrip.tsx ("V1") — both the
+ * picker and V1 were removed outright 2026-09-29, on request ("we are
+ * going with Nav Version 2"), and this is rendered directly now (already
+ * true since 2026-09-13 — see page.tsx). Kept as a genuinely different
+ * composition rather than a variant of V1, for the record:
  *
  *   V1 (FamilyStrip)   — light canvas, split diagonal charcoal panel + a
  *                         2×2 logo quadrant anchored on a crosshair.
