@@ -89,6 +89,21 @@ export default function SiteNav() {
   // the panel so the choice survives closing and reopening the menu — someone
   // who told us they're in the Gulf Coast shouldn't have to say it twice.
   const [location, setLocation] = useState<LocationId>("all");
+  // Which operating companies the logo row has toggled on. Multi-select —
+  // empty means "all companies", not "none". Held here for the same reason.
+  const [brands, setBrands] = useState<string[]>([]);
+  // Toggling a company off also drops a picked city that belonged to it, so
+  // the panel never shows a city from a company the row says is excluded.
+  const toggleBrand = (brand: string) => {
+    const next = brands.includes(brand)
+      ? brands.filter((b) => b !== brand)
+      : [...brands, brand];
+    setBrands(next);
+    const city = SERVICE_LOCATIONS.find((l) => l.id === location);
+    if (next.length && city?.region && !next.includes(city.brand)) {
+      setLocation("all");
+    }
+  };
   // Inner routes have no hero, so start visible; the homepage starts hidden and
   // is revealed by the scroll loop below. Seeded from the initial pathname so
   // there's no first-paint flash on a direct load of an inner route.
@@ -437,14 +452,16 @@ export default function SiteNav() {
             // Everything else is national and renders as authored.
             const localized = g.label === "Services";
             const { columns, feature } = localized
-              ? servicesPanelFor(location)
+              ? servicesPanelFor(location, brands)
               : { columns: g.columns, feature: g.feature! };
             // Remounting on the location key replays the swap animation. A
             // transition would be the obvious choice, but transitions inside
             // this backdrop-filtered header freeze mid-flight under the scroll
             // rAF loops (see the note at the top); a keyframe animation always
             // lands on its final state even when frames are dropped.
-            const swapKey = localized ? location : "static";
+            const swapKey = localized
+              ? `${location}|${brands.join(",")}`
+              : "static";
 
             return (
               <div
@@ -462,10 +479,11 @@ export default function SiteNav() {
                 <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
                   {localized && (
                     <FamilyFilters
-                      value={location}
-                      onChange={(next) => {
-                        setLocation(next);
-                        setLocationPickerOpen(true);
+                      selected={brands}
+                      onToggle={toggleBrand}
+                      onClear={() => {
+                        setBrands([]);
+                        setLocation("all");
                       }}
                     />
                   )}
@@ -477,6 +495,7 @@ export default function SiteNav() {
                     <div className="w-[12.5rem] shrink-0 border-r border-black/10 pr-6 dark:border-white/10">
                       <LocationSelect
                         value={location}
+                        brands={brands}
                         onChange={(next) => {
                           setLocation(next);
                           setLocationPickerOpen(true);
@@ -570,7 +589,7 @@ export default function SiteNav() {
             const expanded = mobileSection === g.label;
             const localized = g.label === "Services";
             const cols = localized
-              ? servicesPanelFor(location).columns
+              ? servicesPanelFor(location, brands).columns
               : g.columns;
             // Same three shapes as the desktop bar: accordion, plain link, or
             // inert label. The accordion toggle only renders when there is
@@ -732,23 +751,35 @@ export default function SiteNav() {
 }
 
 
+/**
+ * The company logo row atop the Services panel. Multi-select: each logo is an
+ * independent toggle (aria-pressed), so a visitor can ask for "RMS and
+ * Southway" at once. "All" is the reset — it is pressed exactly when nothing
+ * else is, since no filter and every company mean the same thing.
+ */
 function FamilyFilters({
-  value,
-  onChange,
+  selected,
+  onToggle,
+  onClear,
 }: {
-  value: LocationId;
-  onChange: (next: LocationId) => void;
+  selected: string[];
+  onToggle: (brand: string) => void;
+  onClear: () => void;
 }) {
+  const none = selected.length === 0;
   return (
     <div className="mb-8 flex justify-center border-b border-black/10 pb-6 dark:border-white/10">
-      <ul className="flex w-full max-w-3xl flex-wrap items-center justify-center gap-3">
+      <ul
+        aria-label="Filter services by company (select any number)"
+        className="flex w-full max-w-3xl flex-wrap items-center justify-center gap-3"
+      >
         <li>
           <button
             type="button"
-            onClick={() => onChange("all")}
-            aria-pressed={value === "all"}
+            onClick={onClear}
+            aria-pressed={none}
             className={`flex h-12 min-w-20 items-center justify-center rounded-sm border px-3 font-mono text-[10px] tracking-[0.08em] uppercase transition-colors ${
-              value === "all"
+              none
                 ? "border-tnt-amber bg-tnt-amber text-black"
                 : "border-black/15 text-black/65 hover:border-tnt-amber/60 hover:text-tnt-amber dark:border-white/15 dark:text-white/65"
             }`}
@@ -757,16 +788,16 @@ function FamilyFilters({
           </button>
         </li>
         {FAMILY_FILTERS.map((company) => {
-          const selected = value === company.locationId;
+          const isOn = selected.includes(company.brand);
           return (
             <li key={company.brand}>
               <button
                 type="button"
-                onClick={() => onChange(company.locationId)}
+                onClick={() => onToggle(company.brand)}
                 aria-label={`Filter services by ${company.brand}`}
-                aria-pressed={selected}
+                aria-pressed={isOn}
                 className={`relative block h-12 w-28 rounded-sm border p-1 transition-colors ${
-                  selected
+                  isOn
                     ? "border-tnt-amber ring-1 ring-tnt-amber"
                     : "border-transparent hover:border-black/20 dark:hover:border-white/20"
                 }`}
@@ -779,6 +810,18 @@ function FamilyFilters({
                   unoptimized
                   className="object-contain"
                 />
+                {/* A check, not just the ring, so "on" survives a glance at a
+                    row where several logos are lit at once. */}
+                {isOn && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-tnt-amber text-black"
+                  >
+                    <svg viewBox="0 0 12 12" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m2.5 6.5 2.5 2.5 4.5-5" />
+                    </svg>
+                  </span>
+                )}
               </button>
             </li>
           );

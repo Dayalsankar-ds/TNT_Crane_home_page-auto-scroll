@@ -68,11 +68,14 @@ function BrandMark({ brand }: { brand: string }) {
 
 export default function LocationSelect({
   value,
+  brands,
   onChange,
   open,
   onOpenChange,
 }: {
   value: LocationId;
+  /** Companies toggled on in the logo row; empty = no company filter. */
+  brands: string[];
   onChange: (next: LocationId) => void;
   open: boolean;
   onOpenChange: (next: boolean) => void;
@@ -84,16 +87,27 @@ export default function LocationSelect({
 
   const selected =
     SERVICE_LOCATIONS.find((l) => l.id === value) ?? SERVICE_LOCATIONS[0];
-  const isBrandScoped =
-    selected.region && selected.brand !== "US & Canada network";
+  // With companies picked in the logo row, the list offers only their cities,
+  // plus the "All Locations" row as the way back to "any of those companies".
+  const brandScope = useMemo(
+    () =>
+      brands.length
+        ? SERVICE_LOCATIONS.filter((l) => !l.region || brands.includes(l.brand))
+        : SERVICE_LOCATIONS,
+    [brands],
+  );
 
-  const brandScope = isBrandScoped
-    ? SERVICE_LOCATIONS.filter((l) => l.brand === selected.brand && l.id !== "all")
-    : SERVICE_LOCATIONS;
+  // The trigger's second line: with no city picked, it names the company
+  // filter rather than claiming the whole network.
+  const scopeLine =
+    selected.region || brands.length === 0
+      ? selected.brand
+      : brands.length === 1
+        ? brands[0]
+        : `${brands.length} companies`;
 
   // Matches the city AND the operating company, so "RMS" finds Denver and
-  // "Eagle" finds Vancouver — people look for markets both ways. When a
-  // company filter is active, the dropdown shows that brand's cities only.
+  // "Eagle" finds Vancouver — people look for markets both ways.
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const source = brandScope;
@@ -217,7 +231,7 @@ export default function LocationSelect({
             {selected.label}
           </span>
           <span className="block truncate font-mono text-[11px] text-black/45 dark:text-white/45">
-            {selected.brand}
+            {scopeLine}
           </span>
         </span>
         <svg

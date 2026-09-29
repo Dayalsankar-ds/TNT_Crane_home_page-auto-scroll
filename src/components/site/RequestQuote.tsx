@@ -15,6 +15,16 @@
  * this — "alternating section backgrounds". The form/success card underneath
  * stays `bg-white` — it now reads as a card floating on the grey band rather
  * than blending into it, same pattern the floating map cards use.
+ *
+ * REQUIRED FIELDS (2026-09-29, from the desktop comparison review against
+ * maximcrane.com): name, email, phone, jobsite ZIP and crane type are
+ * required and marked with an asterisk, keyed by a "* Required" note at the
+ * top of the form. Phone moved from optional to required — sales calls back.
+ * Jobsite ZIP and crane type were added so a rep can route the lead to a
+ * branch and a fleet class without a follow-up question. Load and radius are
+ * their own optional fields (they used to live only in the description
+ * placeholder) — a visitor who knows them saves a call; one who doesn't
+ * shouldn't be blocked.
  */
 
 import { useState, type FormEvent } from "react";
@@ -30,10 +40,43 @@ const SERVICES = [
   "Engineering",
 ];
 
+// The six classes in the nav's Load Chart menu, so the form and the fleet
+// speak the same taxonomy. "Not sure" is a real answer — a rep will recommend.
+const CRANE_TYPES = [
+  "All-Terrain Crane",
+  "Crawler Crane",
+  "Hydraulic Truck Crane",
+  "Rough-Terrain Crane",
+  "Carry Deck Crane",
+  "Tower Crane",
+  "Not sure — recommend one",
+];
+
+// US ZIP (12345 or 12345-6789) or Canadian postal code (A1A 1A1) — TNT
+// Canada and Eagle West quote Canadian jobsites.
+const POSTAL_PATTERN = "\\d{5}(-\\d{4})?|[A-Za-z]\\d[A-Za-z] ?\\d[A-Za-z]\\d";
+
 const field =
   "w-full rounded-md border border-black/15 bg-white px-4 py-3 font-body text-sm text-black placeholder:text-tnt-meta focus:border-tnt-amber focus:ring-1 focus:ring-tnt-amber focus:outline-none dark:border-white/15 dark:bg-black dark:text-white";
 const label =
   "block font-body text-[11px] font-semibold tracking-[0.16em] text-tnt-meta uppercase";
+
+/** Visual required marker. aria-hidden: the input's own `required` is what
+ *  assistive tech announces, so the star would only be read as "star". */
+function Req() {
+  return (
+    <span aria-hidden="true" className="ml-1 text-tnt-maroon dark:text-tnt-amber">
+      *
+    </span>
+  );
+}
+
+/** Quiet "optional" tag for the fields a visitor may reasonably not know. */
+function Opt() {
+  return (
+    <span className="ml-1 font-normal tracking-normal normal-case">(optional)</span>
+  );
+}
 
 export default function RequestQuote() {
   const [selected, setSelected] = useState<string[]>([]);
@@ -91,30 +134,104 @@ export default function RequestQuote() {
               onSubmit={onSubmit}
               className="rounded-2xl border border-black/10 bg-white p-6 sm:p-8 dark:border-white/10 dark:bg-black"
             >
+              <p className="mb-5 font-body text-[13px] text-tnt-body">
+                <span aria-hidden="true" className="text-tnt-maroon dark:text-tnt-amber">*</span>{" "}
+                Required field
+              </p>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="q-name" className={label}>
-                    Full name
+                    Full name<Req />
                   </label>
-                  <input id="q-name" name="name" required className={`mt-2 ${field}`} />
+                  <input id="q-name" name="name" required autoComplete="name" className={`mt-2 ${field}`} />
                 </div>
                 <div>
                   <label htmlFor="q-company" className={label}>
                     Company
                   </label>
-                  <input id="q-company" name="company" className={`mt-2 ${field}`} />
+                  <input id="q-company" name="company" autoComplete="organization" className={`mt-2 ${field}`} />
                 </div>
                 <div>
                   <label htmlFor="q-email" className={label}>
-                    Email
+                    Email<Req />
                   </label>
-                  <input id="q-email" name="email" type="email" required className={`mt-2 ${field}`} />
+                  <input id="q-email" name="email" type="email" required autoComplete="email" className={`mt-2 ${field}`} />
                 </div>
                 <div>
                   <label htmlFor="q-phone" className={label}>
-                    Phone
+                    Phone<Req />
                   </label>
-                  <input id="q-phone" name="phone" type="tel" className={`mt-2 ${field}`} />
+                  <input id="q-phone" name="phone" type="tel" required autoComplete="tel" className={`mt-2 ${field}`} />
+                </div>
+              </div>
+
+              {/* Job details — where, what, and (if known) how big */}
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="q-zip" className={label}>
+                    Jobsite ZIP / postal code<Req />
+                  </label>
+                  <input
+                    id="q-zip"
+                    name="jobsiteZip"
+                    required
+                    autoComplete="postal-code"
+                    pattern={POSTAL_PATTERN}
+                    title="5-digit ZIP (e.g. 77001) or Canadian postal code (e.g. T2P 1J9)"
+                    placeholder="e.g. 77001"
+                    className={`mt-2 ${field}`}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="q-crane" className={label}>
+                    Crane type<Req />
+                  </label>
+                  <select
+                    id="q-crane"
+                    name="craneType"
+                    required
+                    defaultValue=""
+                    className={`mt-2 ${field}`}
+                  >
+                    <option value="" disabled>
+                      Select a crane type
+                    </option>
+                    {CRANE_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="q-load" className={label}>
+                    Load weight (tons)<Opt />
+                  </label>
+                  <input
+                    id="q-load"
+                    name="loadTons"
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step="any"
+                    placeholder="e.g. 40"
+                    className={`mt-2 ${field}`}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="q-radius" className={label}>
+                    Lift radius (ft)<Opt />
+                  </label>
+                  <input
+                    id="q-radius"
+                    name="radiusFt"
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step="any"
+                    placeholder="e.g. 80"
+                    className={`mt-2 ${field}`}
+                  />
                 </div>
               </div>
 
@@ -171,7 +288,7 @@ export default function RequestQuote() {
                   id="q-desc"
                   name="description"
                   rows={4}
-                  placeholder="Load, radius, site conditions, access…"
+                  placeholder="Site conditions, access, lift height, anything else…"
                   className={`mt-2 ${field} resize-y`}
                 />
               </div>

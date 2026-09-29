@@ -733,41 +733,79 @@ const LOCATION_CONTENT: Record<RegionId, LocationContent> = {
 const SERVICES_GROUP = NAV_GROUPS.find((g) => g.label === "Services")!;
 
 /**
- * Services panel content for a location. Returns the same shape the panel
- * renders for any other group, so the location layer stays out of the view:
- * the component asks for columns and a feature and paints them.
+ * Services panel content for a location, or for a set of operating companies.
+ * Returns the same shape the panel renders for any other group, so the
+ * location layer stays out of the view: the component asks for columns and a
+ * feature and paints them.
+ *
+ * A picked city wins over the company filter — it is the narrower answer.
+ * With no city, `brands` (the multi-select logo row) filters to the UNION of
+ * what those companies' regions offer: picking RMS and Southway asks "what can
+ * either of you do", not "what can both". An empty `brands` means no filter.
  *
  * Columns that filter down to nothing are dropped rather than rendered empty —
  * a heading over a blank space reads as a loading bug.
  */
-export function servicesPanelFor(locationId: LocationId): {
+export function servicesPanelFor(
+  locationId: LocationId,
+  brands: string[] = [],
+): {
   columns: NavColumn[];
   feature: NavFeature;
 } {
   const loc = SERVICE_LOCATIONS.find((l) => l.id === locationId);
-  if (!loc?.region) {
+  const regions: RegionId[] = loc?.region
+    ? [loc.region]
+    : [
+        ...new Set(
+          SERVICE_LOCATIONS.filter(
+            (l) => l.region && brands.includes(l.brand),
+          ).map((l) => l.region as RegionId),
+        ),
+      ];
+  if (regions.length === 0) {
     return { columns: SERVICES_GROUP.columns, feature: SERVICES_GROUP.feature! };
   }
-  const content = LOCATION_CONTENT[loc.region];
+  const services = new Set(regions.flatMap((r) => LOCATION_CONTENT[r].services));
+  const industries = new Set(
+    regions.flatMap((r) => LOCATION_CONTENT[r].industries),
+  );
   const allow = (heading: string) =>
-    heading === "Industries" ? content.industries : content.services;
+    heading === "Industries" ? industries : services;
 
   const columns = SERVICES_GROUP.columns
     .map((col) => ({
       ...col,
       items: col.items.filter((item) => {
         const slug = item.href.split("#")[1];
-        return slug ? allow(col.heading).includes(slug) : true;
+        return slug ? allow(col.heading).has(slug) : true;
       }),
     }))
     .filter((col) => col.items.length > 0);
 
-  // The eyebrow names the CITY you picked, not the region — you asked for
-  // Houston, so the panel should say Houston back to you. Region copy still
+  // The eyebrow names what you picked, not the region — you asked for Houston
+  // (or for RMS), so the panel should say that back to you. Region copy still
   // carries the body, since that's the level the capability set is defined at.
+  // Several companies spanning regions have no single region story to tell,
+  // so they get the network-wide card under a count.
+  if (loc?.region) {
+    return {
+      columns,
+      feature: { ...LOCATION_CONTENT[loc.region].feature, eyebrow: loc.label },
+    };
+  }
+  if (regions.length === 1) {
+    return {
+      columns,
+      feature: {
+        ...LOCATION_CONTENT[regions[0]].feature,
+        eyebrow: brands.length === 1 ? brands[0] : `${brands.length} companies`,
+      },
+    };
+  }
   return {
     columns,
-    feature: { ...content.feature, eyebrow: loc.label },
+    feature: { ...SERVICES_GROUP.feature!, eyebrow: `${brands.length} companies` },
   };
 }
 
