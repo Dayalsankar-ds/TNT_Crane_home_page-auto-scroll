@@ -9,7 +9,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:light": "NEXT_PUBLIC_FORCE_THEME=light next build",
+    "build:dark": "NEXT_PUBLIC_FORCE_THEME=dark next build",
+    "start:light": "next start -p 3001",
+    "start:dark": "next start -p 3002"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

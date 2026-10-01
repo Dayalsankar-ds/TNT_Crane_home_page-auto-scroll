@@ -236,6 +236,13 @@ export const NAV_GROUPS: NavGroup[] = [
       cta: "View Capacity Chart",
     },
   },
+  // Flat top-level item, next to Load Chart (2026-09-30, on request — "add
+  // safety needs next to load chart on the nav bar", label corrected same
+  // day — "name it safety needs not safety"). Points at the same #safety
+  // anchor (SafetyCulture.tsx's iCARE section) the About panel's "Safety &
+  // Record" item and feature card already use — one real section, now
+  // reachable two ways rather than a second copy of it.
+  { label: "Safety Needs", href: "/#safety", columns: [] },
   // The three inert items. Each was a real route until 2026-08-04 and has no
   // homepage section, so there is nothing honest to point at yet — see the
   // `href` docs on NavGroup above.

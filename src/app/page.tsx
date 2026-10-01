@@ -7,11 +7,20 @@
 // public/video/frames-v6/*.webp frame. The pre-R3F implementation is still
 // further back in git history if ever needed: git show
 // 5d89d04:src/components/HeroScrollExperience.tsx
+//
+// HERO REBUILT 2026-10-01, on request, from new footage — a from-scratch
+// Hero.tsx, not a revival of the deleted files above. No scroll-scrub, no
+// pin, no WebGL: a one-time, fully automated frame-sequence playback (578
+// frames, new footage) that plays once per page load and stops on the last
+// frame — see Hero.tsx's own docblock for the full spec and how it differs
+// from the removed hero.
+//
 // FamilyStripV2 rendered directly as of 2026-09-13, on request. Nav version
 // 1's FamilyStrip.tsx (the diagonal-panel + 2x2 grid design) and the "Nav
 // 1/2" picker it was compared against were both deleted outright 2026-09-29,
 // on request ("we are going with Nav Version 2") — see FamilyStripV2.tsx's
 // own docblock for the fuller history.
+import Hero from "@/components/site/Hero";
 import FamilyStripV2 from "@/components/site/FamilyStripV2";
 import StatementSection from "@/components/site/StatementSection";
 import EquipmentGuide from "@/components/site/EquipmentGuide";
@@ -65,13 +74,24 @@ export default function Home() {
   return (
     // Nav + footer live in the root layout; the homepage supplies content only.
     // `id="top"` stays — SiteNav's "Home" link targets it regardless of what
-    // renders first. No offset-cancelling wrapper needed now that the hero
-    // (which ran full-bleed beneath the fixed nav) is gone — <main>'s own
-    // `pt-[var(--chrome-h)]` (see layout.tsx) handles the nav clearance.
-    <div id="top">
-        {/* Trust, fast — TNT's own family-of-companies logos up front now
-            that the hero is gone. FamilyStripV2 only as of 2026-09-13 — see
-            that file's own docblock. */}
+    // renders first.
+    //
+    // FULL-BLEED UNDER THE NAV AGAIN (2026-10-01, on request — "I can see
+    // dark space on the top of this video clip... did you remember how we
+    // placed it before removing this hero section?"): yes — `-mt-[var(
+    // --chrome-h)] bg-black` cancels <main>'s `pt-[var(--chrome-h)]` nav
+    // clearance (see layout.tsx), the exact mechanism the pre-removal
+    // page.tsx used, so Hero.tsx runs from true viewport y=0 again instead
+    // of starting below a solid nav-colored band. SiteNav itself didn't
+    // need any change — `.glass-nav` was already a translucent, backdrop-
+    // blurred fixed bar (SiteNav.tsx), so it floats over the hero exactly
+    // as it did before, no second "transparent over hero" mode to maintain.
+    <div id="top" className="-mt-[var(--chrome-h)] bg-black">
+        <Hero />
+
+        {/* Trust, fast — TNT's own family-of-companies logos, right after
+            the hero. FamilyStripV2 only as of 2026-09-13 — see that file's
+            own docblock. */}
         <FamilyStripV2 />
 
         {/* Manifesto + scale — Technical Paper opening statement (About Us) */}

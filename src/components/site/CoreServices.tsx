@@ -257,7 +257,11 @@ export default function CoreServices() {
             pairing (same convention as the nav CTA, active chips, etc.).
             Buttons drop `onDark` since the fill itself is light — primary/
             secondary "light" skins (black fill / black outline) are what
-            read on amber. */}
+            read on amber.
+            SINGLE CTA (2026-09-30, on request — "remove that talk to
+            engineer from the strip banner"): "Talk to an engineer" (the
+            secondary #contact button) removed; "Request a quote" is now the
+            panel's only action. */}
         <div className="mt-12 overflow-hidden rounded-2xl bg-tnt-amber sm:mt-14">
           <div className="flex flex-col gap-7 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between lg:p-12">
             <div>
@@ -274,9 +278,6 @@ export default function CoreServices() {
             <div className="flex flex-col gap-3 sm:flex-row lg:shrink-0">
               <Button href="#quote" variant="primary">
                 Request a quote
-              </Button>
-              <Button href="#contact" variant="secondary">
-                Talk to an engineer
               </Button>
             </div>
           </div>
