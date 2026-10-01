@@ -131,6 +131,18 @@ import { CHROME_H } from "@/components/site/chrome";
 
 const FRAME_DIR = "/video/frames-v7";
 const FRAME_COUNT = 578;
+/** Max frames loading at once during preload (2026-10-02, on request — "the
+ *  hero section is stuck/struck after pushing to GitHub"): firing all 578
+ *  `new Image()` requests in the same tick worked on localhost (near-zero
+ *  latency, no real network) but broke on the live Vercel deployment — the
+ *  network tab there showed hundreds of the 578 requests failing with
+ *  `net::ERR_ABORTED`, overwhelming the browser's concurrent-connection
+ *  handling under real network conditions. Since `ready` only flips once
+ *  every single frame settles, any one permanently-aborted request meant
+ *  the hero could never start. 16 is a conservative, standard pool size for
+ *  bulk image preloading — comfortably under typical per-origin connection
+ *  limits with room to spare. */
+const PRELOAD_CONCURRENCY = 16;
 /** First index of clip 2 in the merged sequence (clip 1 is 00000–00264). */
 const CLIP_SPLIT = 265;
 /** Clip 1's playback rate (frames 00000–00264). Raised 40 → 110 (2026-10-01,
@@ -215,21 +227,37 @@ export default function Hero() {
     let cancelled = false;
     const images: HTMLImageElement[] = new Array(FRAME_COUNT);
     let settled = 0;
-    for (let i = 0; i < FRAME_COUNT; i++) {
+    let nextIndex = 0;
+
+    // Loads at most PRELOAD_CONCURRENCY frames at once (see that constant's
+    // own note above) rather than firing all 578 requests in the same tick.
+    // Each loader picks up the next unclaimed index the instant its own
+    // frame settles, so the pool stays full until the whole sequence has
+    // been requested.
+    const loadNext = () => {
+      if (cancelled) return;
+      const i = nextIndex++;
+      if (i >= FRAME_COUNT) return;
       const img = new Image();
+      images[i] = img;
       const done = () => {
         if (cancelled) return;
         settled += 1;
         if (settled === FRAME_COUNT) setReady(true);
+        else loadNext();
       };
       img.onload = done;
       img.onerror = done; // a missing frame must not deadlock the preload
       img.src = framePath(i);
-      images[i] = img;
+    };
+    for (let w = 0; w < Math.min(PRELOAD_CONCURRENCY, FRAME_COUNT); w++) {
+      loadNext();
     }
+
     return () => {
       cancelled = true;
       for (const img of images) {
+        if (!img) continue;
         img.onload = null;
         img.onerror = null;
         img.src = "";
